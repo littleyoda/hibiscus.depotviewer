@@ -23,6 +23,7 @@ Unter dem Punkt "Konten" den Button "Konto manuell anlegen" anklicken.
 Folgende Einstellungen sind im Dialog nötig:
 
 Für CortalConsors
+
 | Feld | Inhalt |
 | --------- | ------ |
 | Bezeichnung des Kontos | frei wählbar |
@@ -36,6 +37,7 @@ Für CortalConsors
 | Offline-Konto | muss aktiv sein |
 
 Für Fondsdepot Bank
+
 | Feld | Inhalt |
 | --------- | ------ |
 | Bezeichnung des Kontos | frei wählbar |
