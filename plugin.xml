@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<plugin xmlns="http://www.willuhn.de/schema/jameica-plugin"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.willuhn.de/schema/jameica-plugin http://www.willuhn.de/schema/jameica-plugin-1.2.xsd"
+        name="hibiscus.depotviewer" version="0.1.1" class="de.open4me.depot.DepotViewerPlugin">
+
+  <description>Depot Viewer -- Beta-Version für Tester -- Unterstützte Depots: Cortal Consors, Fondsdepot Bank</description>
+  <url>http://www.open4me.de/hibiscus/hibiscus.depotviewer/hibiscus.depotviewer.zip</url>
+  <homepage>https://github.com/littleyoda/hibiscus.depotviewer</homepage>
+  <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
+
+  <requires jameica="2.6.0+">
+    <import plugin="hibiscus" version="2.6.0+" />
+    <import plugin="hibiscus.scripting.htmlunit" version="2.13+" />
+  </requires>
+
+  <!-- Define regex wildcards for the classes and jars the classfinder should load -->
+  <classfinder>
+    <include>hibiscus\.depotviewer\.jar</include>
+    <include>.*\.class</include>
+  </classfinder>
+
+<extensions>
+  <extension extends="hibiscus.navi" class="de.open4me.depot.gui.Navi"/>
+</extensions> 
+  <navigation>
+    <item name="Depot" icon-close="folder.png" icon-open="folder-open.png" action="de.open4me.depot.gui.action.DepotViewerMainAction">
+      <item name="Orderbuch" icon-close="text-x-generic.png" action="de.open4me.depot.gui.action.OrderList" />
+      <item name="Bestand" icon-close="text-x-generic.png" action="de.open4me.depot.gui.action.BestandAction" />
+    </item>
+  </navigation>
+
+</plugin>
+
