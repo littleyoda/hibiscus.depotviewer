@@ -1,6 +1,7 @@
 package de.open4me.depot.depotabruf;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,7 +29,7 @@ import de.willuhn.jameica.system.Application;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
-public class Fondsdepotbank implements BasisDepotAbruf {
+public class Fondsdepotbank extends BasisDepotAbruf {
 
 	private final static I18N i18n = Application.getPluginLoader().getPlugin(DepotViewerPlugin.class).getResources().getI18N();
 
@@ -36,7 +37,7 @@ public class Fondsdepotbank implements BasisDepotAbruf {
 
 
 	public void run(Konto konto) throws ApplicationException {
-
+		ArrayList<String> seiten = new ArrayList<String>(); 
 		try {
 			String username = konto.getKundennummer();
 			String password = konto.getMeta(PROP_PASSWORD, null);
@@ -58,6 +59,7 @@ public class Fondsdepotbank implements BasisDepotAbruf {
 			webClient.setCssErrorHandler(new SilentCssErrorHandler());
 			webClient.setRefreshHandler(new ThreadedRefreshHandler());
 			HtmlPage page = webClient.getPage("https://banking.fondsdepotbank.de/i3/fodb/public/login_init.do");
+			seiten.add(page.asXml());
 			List<HtmlForm> forms = (List<HtmlForm>) page.getByXPath( "//form[@name='loginForm']");
 			if (forms.size() != 1) {
 				throw new ApplicationException("Konnte das Login-Formular nicht finden.");
@@ -66,8 +68,10 @@ public class Fondsdepotbank implements BasisDepotAbruf {
 			((HtmlTextInput) form.getInputByName("authentificationNo")).setValueAttribute(username);
 			((HtmlPasswordInput) form.getInputByName("pin")).setValueAttribute(password);
 			page = form.getInputByValue("Anmelden").click();
+			seiten.add(page.asXml());
 			try {
 				page = page.getAnchorByText("Umsätze").click();
+				seiten.add(page.asXml());
 			} catch (ElementNotFoundException e) {
 				throw new ApplicationException("Login fehlgeschlagen! Falsches Password?");
 			}
@@ -82,6 +86,7 @@ public class Fondsdepotbank implements BasisDepotAbruf {
 			HtmlCheckBoxInput cb = form.getInputByName("showAllTransactions");
 			cb.setChecked(true);
 			page = form.getInputByValue("Suchen").click();
+			seiten.add(page.asXml());
 			//		System.out.println(page.asText());
 			//	System.out.println(page.asXml());
 			TextPage text = page.getAnchorByHref("/i3/fodb/transaction_list_export_csv.do").click();
@@ -136,6 +141,7 @@ public class Fondsdepotbank implements BasisDepotAbruf {
 
 			// Depot Bestand
 			page = page.getAnchorByText("Depotübersicht").click();
+			seiten.add(page.asText());
 			text = page.getAnchorByHref("/i3/fodb/sec_account_asset_overview_export_csv.do").click();
 			ArrayList<HashMap<String, String>> x = parseCSV(text.getContent(), "Bestand");
 			Utils.clearBestand(konto);
@@ -153,6 +159,12 @@ public class Fondsdepotbank implements BasisDepotAbruf {
 
 		} catch (IOException e) {
 			throw new ApplicationException(e);
+		}finally{
+			try {
+				debug(seiten, konto);
+			} catch (RemoteException e) {
+				throw new ApplicationException(e);
+			}
 		}
 	}
 
@@ -202,8 +214,8 @@ public class Fondsdepotbank implements BasisDepotAbruf {
 
 	@Override
 	public List<String> getPROP() {
-		List<String> result = new ArrayList<String>();
-		result.add(PROP_PASSWORD);
+		List<String> result = super.getPROP();
+		result.add(0, PROP_PASSWORD);
 		return result;
 	}
 

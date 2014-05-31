@@ -1,6 +1,7 @@
 package de.open4me.depot.depotabruf;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,6 +17,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -29,13 +31,14 @@ import de.willuhn.jameica.system.Application;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
-public class CortalConsors implements BasisDepotAbruf {
+public class CortalConsors extends BasisDepotAbruf {
 
 	private final static I18N i18n = Application.getPluginLoader().getPlugin(DepotViewerPlugin.class).getResources().getI18N();
 
 	final static String PROP_PASSWORD = "Passwort";
 
 	public void run(Konto konto) throws ApplicationException {
+		ArrayList<String> seiten = new ArrayList<String>(); 
 		try {
 			String username = konto.getKundennummer();
 			String password = konto.getMeta(PROP_PASSWORD, null);
@@ -57,6 +60,7 @@ public class CortalConsors implements BasisDepotAbruf {
 			webClient.setRefreshHandler(new ThreadedRefreshHandler());
 			webClient.getOptions().setJavaScriptEnabled(false); 
 			HtmlPage page = webClient.getPage("https://mobile.cortalconsors.de/euroWebDe/-?$part=sslm.login&s_requestedURL=https://mobile.cortalconsors.de/euroWebDe/-?$part=sslm.MobileDefault.depot&$event=orderInfoEntry");
+			seiten.add(page.asXml());
 			//		System.out.println(page.asText());
 			List<HtmlForm> forms = (List<HtmlForm>) page.getByXPath( "//form[@id='login']");
 			if (forms.size() != 1) {
@@ -68,6 +72,7 @@ public class CortalConsors implements BasisDepotAbruf {
 			form.getInputByName("nip").setValueAttribute(password);
 			HtmlInput input = form.getInputByName("$$event_contentAreaCustomerLoginMobile");
 			page = input.click();
+			seiten.add(page.asXml());
 			try {
 				page = page.getAnchorByText("Orderinfo").click();
 			} catch (com.gargoylesoftware.htmlunit.ElementNotFoundException e) {
@@ -80,6 +85,7 @@ public class CortalConsors implements BasisDepotAbruf {
 				if (x.getAttribute("href").contains("orderInfoPageNumber")) {
 					infos.clear();
 					page =  x.click();
+					seiten.add(page.asXml());
 					DomNodeList<DomElement> list = page.getElementsByTagName("table");
 					if (list.size() != 3) {
 						//throw new ApplicationException("Anzahl der Tabelen in Orderinfo stimmt nicht. Ist: " + list.size());
@@ -115,11 +121,16 @@ public class CortalConsors implements BasisDepotAbruf {
 			infos = null;
 			try {
 				page = page.getAnchorByText("Depot").click();
+				seiten.add(page.asXml());
 			} catch (com.gargoylesoftware.htmlunit.ElementNotFoundException e) {
 				return;
 			}
 
 			List<HtmlTable> tabs = (List<HtmlTable>) page.getByXPath( "//table[@class='transactions']");
+			if (tabs.size() == 0) {
+				Utils.report((List<? extends HtmlElement>) page.getByXPath( "//table"));
+				throw new ApplicationException("Tabelle mit den Transaktionen wurde nicht gefunden!");
+			}
 			ArrayList<HashMap<String, String>> liste = tableRowsToHashs(tabs.get(0));
 			Utils.clearBestand(konto);
 
@@ -140,6 +151,12 @@ public class CortalConsors implements BasisDepotAbruf {
 
 		} catch (IOException e) {
 			throw new ApplicationException(e);
+		}finally{
+			try {
+				debug(seiten, konto);
+			} catch (RemoteException e) {
+				throw new ApplicationException(e);
+			}
 		}
 
 	}
@@ -220,8 +237,8 @@ public class CortalConsors implements BasisDepotAbruf {
 
 	@Override
 	public List<String> getPROP() {
-		List<String> result = new ArrayList<String>();
-		result.add(PROP_PASSWORD);
+		List<String> result = super.getPROP();
+		result.add(0, PROP_PASSWORD);
 		return result;
 	}
 

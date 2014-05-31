@@ -26,6 +26,8 @@ public class DepotViewerPlugin extends AbstractPlugin
 	{
 		super.init();
 		SQLUtils.checkforupdates();
+
+		
 	}
 
 	/**

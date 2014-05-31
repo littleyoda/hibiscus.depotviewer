@@ -40,7 +40,6 @@
 		<property name="project.zipdir" 			  value="${project.release}/${plugin.name}" />
 
 		<property name="src.dir" 					      value="src" />
-    <property name="sql.dir"                value="sql" />
 		<property name="lang.dir" 					    value="${src.dir}/lang" />
 		<property name="lib.dir" 					      value="lib" />
 		<property name="class.dir" 					    value="${project.tmp}/bin" />
@@ -110,10 +109,6 @@
 		<mkdir dir="${project.release}" />
 		<mkdir dir="${project.zipdir}" />
 
-    <mkdir dir="${project.zipdir}/sql" />
-    <copy todir="${project.zipdir}/sql">
-      <fileset dir="${sql.dir}" />
-    </copy>
 
 		<tstamp/>
 		<jar destfile="${project.zipdir}/${define.jarfilename}">
@@ -153,7 +148,6 @@
         <include name="plugin.xml" />
 				<include name="${lib.dir}/**" />
 				<include name="${src.dir}/**" />
-        <include name="${sql.dir}/**" />
 				<include name="${build.dir}/**" />
 				<exclude name="${build.dir}/BUILD" />
 			</fileset>

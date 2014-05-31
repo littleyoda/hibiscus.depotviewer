@@ -1,13 +1,20 @@
 package de.open4me.depot.depotabruf;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import de.open4me.depot.Settings;
@@ -15,11 +22,55 @@ import de.open4me.depot.rmi.Bestand;
 import de.open4me.depot.rmi.Umsatz;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.datasource.rmi.DBIterator;
+import de.willuhn.jameica.gui.dialogs.YesNoDialog;
 import de.willuhn.jameica.hbci.rmi.Konto;
+import de.willuhn.jameica.plugin.Plugin;
+import de.willuhn.jameica.system.Application;
+import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
 public class Utils {
 
+	public static void debug(String path, String dateiname, String options, List<String> seiten) {
+		try {
+			if (options.toLowerCase().contains("save")) {
+				YesNoDialog d = new YesNoDialog(YesNoDialog.POSITION_CENTER);
+				d.setTitle("Speichern");
+				d.setText("Sollen die Debug-Informationen gespeichert werden?\n"
+						+ "Ziel: " + (new File(path, dateiname + ".zip")));
+				try {
+					Boolean choice = (Boolean) d.open();
+					if (!choice.booleanValue()) {
+						return;
+					}
+				}	catch (Exception e) {
+					return;
+				}
+				try { 
+					ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(
+							new File(path, dateiname + ".zip")));
+					int i = 0;
+					for (String x : seiten) {
+						ZipEntry ze = new ZipEntry(dateiname + "." + i + ".html");
+						zip.putNextEntry(ze);
+						zip.write(x.getBytes(Charset.forName("UTF-8")));
+						zip.closeEntry();
+						i++;
+					}
+					zip.close();
+				} catch (IOException e) {
+					throw new ApplicationException(e);
+
+				}
+			}
+		} catch (Exception e) {
+			Logger.error("Zusammenstellung der Debug-Informationen fehlgeschlagen", e);
+		}
+	}
+
+	public static String getWorkingDir(Class<? extends Plugin> class1) {
+		return Application.getPluginLoader().getPlugin(class1).getResources().getWorkPath();
+	}
 	public static Double getDoubleFromZahl(String s) {
 		return Double.parseDouble(s.replace(".", "").replace(",","."));
 	}
@@ -30,7 +81,7 @@ public class Utils {
 			DBIterator liste = Settings.getDBService().createList(Umsatz.class);
 			liste.addFilter("orderid=?", orderid);
 			if (liste.hasNext()) {
-				System.out.println("Skipping Buchung");
+				Logger.info("Skipping Buchung");
 				return;
 			}
 			// create new project
@@ -145,6 +196,13 @@ public class Utils {
 		out = new BufferedWriter(new FileWriter("/tmp/" + s + ".xml"));
 		out.write(page.asXml());
 		out.close();
+	}
+
+	public static void report(List<? extends HtmlElement> byXPath) {
+		Logger.warn("Mögliche alternative Elemente:");
+		for (HtmlElement  x : byXPath) {
+			Logger.warn("- " + x.getTagName() + " Attribute: " + x.getAttributesMap().entrySet().toString());
+		}
 	}
 
 
