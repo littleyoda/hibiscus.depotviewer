@@ -71,11 +71,12 @@ public class Utils {
 	public static String getWorkingDir(Class<? extends Plugin> class1) {
 		return Application.getPluginLoader().getPlugin(class1).getResources().getWorkPath();
 	}
+	
 	public static Double getDoubleFromZahl(String s) {
 		return Double.parseDouble(s.replace(".", "").replace(",","."));
 	}
-	public static
-	void addUmsatz(String wkn, String name, String aktion, String info, Double anzahl, 
+	
+	public static void addUmsatz(String wkn, String name, String aktion, String info, Double anzahl, 
 			Double kurs, String kursW, Double kosten, String kostenW, Date date, String orderid) throws ApplicationException {
 		try {
 			DBIterator liste = Settings.getDBService().createList(Umsatz.class);

@@ -28,6 +28,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 import de.open4me.depot.DepotViewerPlugin;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
@@ -62,8 +63,9 @@ public class CortalConsors extends BasisDepotAbruf {
 			HtmlPage page = webClient.getPage("https://mobile.cortalconsors.de/euroWebDe/-?$part=sslm.login&s_requestedURL=https://mobile.cortalconsors.de/euroWebDe/-?$part=sslm.MobileDefault.depot&$event=orderInfoEntry");
 			seiten.add(page.asXml());
 			//		System.out.println(page.asText());
-			List<HtmlForm> forms = (List<HtmlForm>) page.getByXPath( "//form[@id='login']");
+			List<HtmlForm> forms = (List<HtmlForm>) page.getByXPath("//form[@id='login']");
 			if (forms.size() != 1) {
+				Utils.report((List<? extends HtmlElement>) page.getByXPath("//form"));
 				throw new ApplicationException("Konnte das Login-Formular nicht finden.");
 			}
 			HtmlForm form = forms.get(0);
@@ -76,7 +78,8 @@ public class CortalConsors extends BasisDepotAbruf {
 			try {
 				page = page.getAnchorByText("Orderinfo").click();
 			} catch (com.gargoylesoftware.htmlunit.ElementNotFoundException e) {
-				return;
+				Utils.report(page.getAnchors());
+				throw new ApplicationException("Orderinfo nicht gefunden!");
 			}
 
 			HashMap<String, String> infos = new HashMap<String, String>();
@@ -123,7 +126,8 @@ public class CortalConsors extends BasisDepotAbruf {
 				page = page.getAnchorByText("Depot").click();
 				seiten.add(page.asXml());
 			} catch (com.gargoylesoftware.htmlunit.ElementNotFoundException e) {
-				return;
+				Utils.report(page.getAnchors());
+				throw new ApplicationException("Depot Button nicht gefunden");
 			}
 
 			List<HtmlTable> tabs = (List<HtmlTable>) page.getByXPath( "//table[@class='transactions']");
@@ -151,7 +155,7 @@ public class CortalConsors extends BasisDepotAbruf {
 
 		} catch (IOException e) {
 			throw new ApplicationException(e);
-		}finally{
+		} finally {
 			try {
 				debug(seiten, konto);
 			} catch (RemoteException e) {
@@ -196,8 +200,7 @@ public class CortalConsors extends BasisDepotAbruf {
 					continue;
 				}
 				if (cells.size() != 2) {
-					System.out.println("Warnung. Ungültige Anzahl an Zellen: " + cells.size() + " " + row.asText());
-					System.out.println(cells.get(0).toString().toLowerCase());
+					Logger.info("Warnung. Ungültige Anzahl an Zellen: " + cells.size() + " " + row.asText());
 					continue;
 				}
 				infos.put(cells.get(0).asText().toLowerCase(), cells.get(1).asText());
@@ -213,7 +216,7 @@ public class CortalConsors extends BasisDepotAbruf {
 		for (int zeile = 1; zeile < rows.size(); zeile++) {
 			List<HtmlTableCell> r2 = rows.get(zeile).getCells();
 			if (r1.size() != r2.size()) {
-				System.out.println("Warnung. Ungültige Anzahl an Zellen: " + r1.toString());
+				Logger.info("Warnung. Ungültige Anzahl an Zellen: " + r1.toString());
 				continue;
 			}
 			int missing=0;
