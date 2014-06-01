@@ -84,6 +84,7 @@ public class CortalConsors extends BasisDepotAbruf {
 
 			HashMap<String, String> infos = new HashMap<String, String>();
 			DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+			boolean missingOrderDate = false;
 			for (HtmlAnchor x : page.getAnchors()) {
 				if (x.getAttribute("href").contains("orderInfoPageNumber")) {
 					infos.clear();
@@ -96,7 +97,10 @@ public class CortalConsors extends BasisDepotAbruf {
 					tohash(infos, (HtmlTable) list.get(2), false);
 					tohash(infos, (HtmlTable) list.get(3), true);
 					String[] kurs = ((String) infos.get("kurs")).replaceAll("  *", " ").split(" ");
-
+					if (!infos.containsKey("order vom")) {
+						missingOrderDate = true;
+						continue;
+					}
 					Date d;
 					try {
 						d = df.parse(infos.get("order vom").substring(0,10));
@@ -151,6 +155,9 @@ public class CortalConsors extends BasisDepotAbruf {
 			konto.setSaldo(bestandswert);
 			konto.store();
 
+			if (missingOrderDate) {
+				throw new ApplicationException("Nicht alle Order könnten übernommen werden, da das Orderdatum fehlt");
+			}
 
 
 		} catch (IOException e) {
