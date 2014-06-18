@@ -1,6 +1,5 @@
 package de.open4me.depot.gui.menu;
 
-import de.open4me.depot.rmi.Bestand;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.gui.Action;
