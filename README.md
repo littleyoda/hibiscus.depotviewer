@@ -3,6 +3,7 @@ hibiscus.depotviewer
 
 Depot-Viewer-Plugin für Hibiscus
 
+
 Mit Hilfe dieses Plugins können für die folgenden Banken Depot-Informationen abgerufen werden:
 * Cortal Consors
 * Fondsdepot Bank

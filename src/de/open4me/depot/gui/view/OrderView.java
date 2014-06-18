@@ -8,7 +8,7 @@ import de.willuhn.jameica.gui.GUI;
 /**
  * View to show the list of existing projects.
  */
-public class OrderList extends AbstractView
+public class OrderView extends AbstractView
 {
 
 	/**

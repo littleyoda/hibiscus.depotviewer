@@ -20,6 +20,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import de.open4me.depot.Settings;
 import de.open4me.depot.rmi.Bestand;
 import de.open4me.depot.rmi.Umsatz;
+import de.open4me.depot.rmi.Wertpapier;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.gui.dialogs.YesNoDialog;
@@ -71,12 +72,12 @@ public class Utils {
 	public static String getWorkingDir(Class<? extends Plugin> class1) {
 		return Application.getPluginLoader().getPlugin(class1).getResources().getWorkPath();
 	}
-	
+
 	public static Double getDoubleFromZahl(String s) {
 		return Double.parseDouble(s.replace(".", "").replace(",","."));
 	}
-	
-	public static void addUmsatz(String wkn, String name, String aktion, String info, Double anzahl, 
+
+	public static void addUmsatz(String kontoid, String wpid, String aktion, String info, Double anzahl, 
 			Double kurs, String kursW, Double kosten, String kostenW, Date date, String orderid) throws ApplicationException {
 		try {
 			DBIterator liste = Settings.getDBService().createList(Umsatz.class);
@@ -85,12 +86,16 @@ public class Utils {
 				Logger.info("Skipping Buchung");
 				return;
 			}
+			if (!(aktion.toUpperCase().equals("KAUF") || aktion.toUpperCase().equals("VERKAUF") || aktion.toUpperCase().equals("EINLAGE"))) {
+				Logger.error("Unbekannte Buchungsart" + aktion);
+				return;
+			}
 			// create new project
 			Umsatz p = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
-			p.setAktion(aktion);
+			p.setKontoid(Integer.parseInt(kontoid));
+			p.setAktion(aktion.toUpperCase());
 			p.setBuchungsinformationen(info);
-			p.setWertPapierName(name);
-			p.setWKN(wkn);
+			p.setWPid(wpid);
 			p.setAnzahl(anzahl);
 			p.setKurz(kurs);
 			p.setKurzW(kursW);
@@ -109,7 +114,7 @@ public class Utils {
 		}
 
 	}
-	public static void addBestand(Konto konto, Double anzahl, String wkn,
+	public static void addBestand(String wpid, Konto konto, Double anzahl, 
 			Double kurs, String kursw, double wert, String wertw, Date date) throws ApplicationException {
 		try {
 			Bestand p = (Bestand) Settings.getDBService().createObject(Bestand.class,null);
@@ -119,7 +124,7 @@ public class Utils {
 			p.setKursw(kursw);
 			p.setWert(wert);
 			p.setWertw(wertw);
-			p.setWkn(wkn);
+			p.setWPid(wpid);
 			p.setDatum(date);
 			p.store();
 		}
@@ -206,5 +211,61 @@ public class Utils {
 		}
 	}
 
+	public static String getWertPapierByWkn(String suche) throws RemoteException {
+		DBIterator liste = Settings.getDBService().createList(Wertpapier.class);
+		liste.addFilter("wkn=?", suche.toUpperCase());
+		if (!liste.hasNext()) {
+			return null; // Unbekanntes Wertpapier
+		}
+		return ((Wertpapier) liste.next()).getWpid();
+	}
+
+	public static String getWertPapierByIsin(String suche) throws RemoteException {
+		DBIterator liste = Settings.getDBService().createList(Wertpapier.class);
+		liste.addFilter("isin=?", suche.toUpperCase());
+		if (!liste.hasNext()) {
+			return null; // Unbekanntes Wertpapier
+		}
+		return ((Wertpapier) liste.next()).getWpid();
+	}
+
+	public static void addWertPapier(String wkn, String isin,
+			String name) throws ApplicationException {
+		try {
+			Wertpapier p = (Wertpapier) Settings.getDBService().createObject(Wertpapier.class,null);
+			p.setWkn(wkn.toUpperCase());
+			p.setIsin(isin.toUpperCase());
+			p.setWertpapiername(name);
+			p.store();
+		} catch (RemoteException e) {
+			System.out.println(e.toString());
+			e.printStackTrace();
+			throw new ApplicationException(Settings.i18n().tr("error while creating new Umsatz"),e);
+		}
+	}
+
+	public static String getORcreateWKN(String wkn, String isin, String name) throws ApplicationException, RemoteException {
+		if (wkn == null) {
+			wkn = "";
+		}
+		if (isin == null) {
+			isin = "";
+		}
+		if (wkn.isEmpty() && isin.isEmpty()) {
+			throw new ApplicationException("Entweder WKN oder ISIN muss angegeben werden!");
+		}
+		String wpid = null;
+		if (!wkn.isEmpty()) {
+			wpid = Utils.getWertPapierByWkn(wkn);
+		}
+		if (!isin.isEmpty() && wpid != null) {
+			wpid = Utils.getWertPapierByIsin(isin);
+		}
+		if (wpid == null) {
+			Utils.addWertPapier(wkn, isin, name);
+			return getORcreateWKN(wkn, isin, name);
+		}
+		return wpid;
+	}
 
 }

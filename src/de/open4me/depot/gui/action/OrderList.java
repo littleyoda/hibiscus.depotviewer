@@ -9,7 +9,7 @@ public class OrderList implements Action
 
   public void handleAction(Object context) throws ApplicationException
   {
-  	GUI.startView(de.open4me.depot.gui.view.OrderList.class.getName(),null);
+  	GUI.startView(de.open4me.depot.gui.view.OrderView.class.getName(),null);
   }
 
 }

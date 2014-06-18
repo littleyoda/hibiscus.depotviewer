@@ -27,24 +27,15 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 	}
 
 
-	public String getWertPapierName() throws RemoteException
+
+	public Integer getWPid() throws RemoteException
 	{
-		return (String) getAttribute("wertpapiername");
+		return (Integer) getAttribute("wpid");
 	}
 
-	public void setWertPapierName(String name) throws RemoteException
+	public void setWPid(String name) throws RemoteException
 	{
-		setAttribute("wertpapiername",name);
-	}
-
-	public String getWKN() throws RemoteException
-	{
-		return (String) getAttribute("wkn");
-	}
-
-	public void setWKN(String name) throws RemoteException
-	{
-		setAttribute("wkn",name);
+		setAttribute("wpid",Integer.parseInt(name));
 	}
 
 	public Double getAnzahl() throws RemoteException

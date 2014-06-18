@@ -1,0 +1,41 @@
+File: commons-csv-*-SNAPSHOT.jar
+
+Apache Commons CSV
+Copyright 2005-2014 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+src/main/resources/contract.txt
+This file was downloaded from
+http://www.ferc.gov/docs-filing/eqr/soft-tools/sample-csv/contract.txt and
+contains neither copyright notice nor license.
+
+src/main/resources/transaction.txt
+This file was downloaded from
+http://www.ferc.gov/docs-filing/eqr/soft-tools/sample-csv/transaction.txt
+and contains neither copyright notice nor license.
+
+http://commons.apache.org/
+
+=============================================================================
+Files: jcommon-*.jar
+JCommon is licensed under the terms of the GNU Lesser General Public Licence
+(LGPL) version 2.1 or later.
+
+http://www.jfree.org/jcommon/
+
+=============================================================================
+Files: jfreechart-*.jar, jfreechart-*-swt.jar, swtgraphics2d.jar
+
+JFreeChart is licensed under the terms of the GNU Lesser General
+Public Licence (LGPL).  A copy of the licence is included in the
+distribution.
+
+Please note that JFreeChart is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  Please refer to the licence for details.
+
+http://www.jfree.org/jfreechart/
+
+=============================================================================

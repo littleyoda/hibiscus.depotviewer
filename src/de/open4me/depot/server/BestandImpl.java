@@ -34,14 +34,14 @@ public class BestandImpl extends AbstractDBObject implements Bestand
 	{
 		setAttribute("kontoid",name);
 	}
-	public String getWkn() throws RemoteException
+	public String getWPid() throws RemoteException
 	{
-		return (String) getAttribute("wkn");
+		return (String) getAttribute("wpid");
 	}
 
-	public void setWkn(String name) throws RemoteException
+	public void setWPid(String name) throws RemoteException
 	{
-		setAttribute("wkn",name);
+		setAttribute("wpid",name);
 	}
 	public Double getAnzahl() throws RemoteException
 	{

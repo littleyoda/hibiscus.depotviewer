@@ -42,7 +42,7 @@ public class DVSynchronizeJobProviderKontoauszug implements DVSynchronizeJobProv
 				{
 					try
 					{
-						System.out.println("DV " + k.toString() + " " + backend.supports(type,k));
+						System.out.println("DV " + type + " " + k.getBezeichnung() +  " " + backend.supports(type,k));
 						if (!backend.supports(type,k)) // Checken, ob das ein AirPlus-Konto ist
 							continue;
 

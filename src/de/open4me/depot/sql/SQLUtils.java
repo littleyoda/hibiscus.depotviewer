@@ -2,9 +2,11 @@ package de.open4me.depot.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.willuhn.jameica.hbci.HBCI;
@@ -16,10 +18,54 @@ import de.willuhn.util.ApplicationException;
 
 public class SQLUtils {
 
-	private static Connection getConnection() throws Exception {
+	public static Connection getConnection() throws Exception {
 		HBCIDBServiceImpl db = (HBCIDBServiceImpl) Application.getServiceFactory().lookup(HBCI.class,"database");
 		DBSupportH2Impl driver = (DBSupportH2Impl) db.getDriver();
 		return DriverManager.getConnection(driver.getJdbcUrl(), driver.getJdbcUsername(), driver.getJdbcPassword());
+	}
+
+	public static int delete(GenericObjectSQL obj) {
+		int val = 0;
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			String sql = "DELETE FROM " + obj.getTable() + " WHERE " + obj.getIdfeld() +  "=?";
+			PreparedStatement prest = conn.prepareStatement(sql);
+			prest.setString(1, obj.getID());
+			val = prest.executeUpdate();
+			conn.close();
+		} catch (Exception e) {
+			Logger.error("Fehler beim Löschen", e);
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e1) {
+				}
+			}
+		}
+		return val;
+	}
+	public static List<GenericObjectSQL> getResultSet(String query, String table, String idfeld) {
+		List<GenericObjectSQL> list = new ArrayList<GenericObjectSQL>();
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			Statement statement = conn.createStatement();
+			ResultSet ret = statement.executeQuery(query);
+			while (ret.next()) {
+				list.add(new GenericObjectSQL(idfeld, table, ret));
+			}
+			conn.close();
+		} catch (Exception e) {
+			Logger.error("Fehler bei der SQL Anweisung", e);
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e1) {
+				}
+			}
+		}
+		return list;
 	}
 
 	private static int getCurrentDBVersion() {

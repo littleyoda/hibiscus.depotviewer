@@ -13,6 +13,7 @@ import de.willuhn.jameica.hbci.synchronize.SynchronizeJobProvider;
 import de.willuhn.jameica.hbci.synchronize.jobs.SynchronizeJob;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
+import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 import de.willuhn.util.ProgressMonitor;
 
@@ -52,12 +53,15 @@ public class DVSynchronizeBackend extends AbstractSynchronizeBackend
 
 		try
 		{
-			if (konto == null || !konto.hasFlag(Konto.FLAG_OFFLINE) || konto.hasFlag(Konto.FLAG_DISABLED)) {
+			if (konto == null || konto.hasFlag(Konto.FLAG_DISABLED)) {
 				return null;
 			}
 			return DepotAbrufFabrik.getDepotAbruf(konto).getPROP();
 		} catch (RemoteException re) {
 			Logger.error("unable to determine property-names",re);
+			return null;
+		} catch (ApplicationException e) {
+			Logger.error("unable to determine property-names", e);
 			return null;
 		}
 	}
@@ -74,15 +78,14 @@ public class DVSynchronizeBackend extends AbstractSynchronizeBackend
 
 		try
 		{
-			// Wir unterstuetzen nur Offline-Konten
-			if (!konto.hasFlag(Konto.FLAG_OFFLINE))
-				return false;
 
 			return DepotAbrufFabrik.getDepotAbruf(konto) != null;
 		}
 		catch (RemoteException re)
 		{
 			Logger.error("unable to check for Depotsupport",re);
+		} catch (ApplicationException e) {
+			Logger.error("unable to check for Depotsupport", e);
 		}
 		return false;
 	}

@@ -10,8 +10,8 @@ public interface Bestand extends DBObject
 {
 	public Integer getKontoid() throws RemoteException;
 	public void setKontoid(Integer name) throws RemoteException;
-	public String getWkn() throws RemoteException;
-	public void setWkn(String name) throws RemoteException;
+	public String getWPid() throws RemoteException;
+	public void setWPid(String name) throws RemoteException;
 	public Double getAnzahl() throws RemoteException;
 	public void setAnzahl(Double name) throws RemoteException;
 	public Double getKurs() throws RemoteException;

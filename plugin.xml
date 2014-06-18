@@ -28,6 +28,7 @@
     <item name="Depot" icon-close="folder.png" icon-open="folder-open.png" action="de.open4me.depot.gui.action.DepotViewerMainAction">
       <item name="Orderbuch" icon-close="text-x-generic.png" action="de.open4me.depot.gui.action.OrderList" />
       <item name="Bestand" icon-close="text-x-generic.png" action="de.open4me.depot.gui.action.BestandAction" />
+      <item name="Wertpapiere" icon-close="text-x-generic.png" action="de.open4me.depot.gui.action.WertpapierAction" />
     </item>
   </navigation>
 

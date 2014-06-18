@@ -124,12 +124,11 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 				} catch (ParseException e) {
 					throw new ApplicationException("Unbekanntes Datumsformat: " + infos.get("zeitpunkt der abrechnung"));	
 				}
-
-				Utils.addUmsatz(infos.get("wkn"), infos.get("fondsname"), infos.get("transaktion"), 
+				Utils.addUmsatz(konto.getID(), Utils.getORcreateWKN(infos.get("wkn"), "", infos.get("fondsname")), infos.get("transaktion"), 
 						infos.toString(),
 						Utils.getDoubleFromZahl(infos.get("stücke")),
 						Utils.getDoubleFromZahl(infos.get("ausführungspreis")), infos.get("ausführungspreis2"),
-						Utils.getDoubleFromZahl(infos.get("umsatz")), infos.get("umsatz2"),
+						((infos.get("transaktion").toUpperCase().equals("KAUF")) ? -1 : 1) * Utils.getDoubleFromZahl(infos.get("umsatz")), infos.get("umsatz2"),
 						d,
 						String.valueOf(orderid.hashCode())
 						);
@@ -147,7 +146,8 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 			Utils.clearBestand(konto);
 			double depotwert = 0.0;
 			for (HashMap<String, String> i : x) {
-				Utils.addBestand(konto, Utils.getDoubleFromZahl(i.get("bestand")), i.get("wkn"),
+				Utils.addBestand(
+						Utils.getORcreateWKN(infos.get("wkn"), "", ""), konto, Utils.getDoubleFromZahl(i.get("bestand")),
 						Utils.getDoubleFromZahl(i.get("akt. preis")), 
 						i.get("akt. preis1"), 
 						Utils.getDoubleFromZahl(i.get("akt. wert")),
@@ -217,6 +217,18 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 		List<String> result = super.getPROP();
 		result.add(0, PROP_PASSWORD);
 		return result;
+	}
+
+	@Override
+	public boolean isSupported(Konto konto) throws ApplicationException, RemoteException {
+		String unterkontoExtract = "";
+		if (konto.getUnterkonto().toLowerCase().startsWith("depot")) {
+			unterkontoExtract = konto.getUnterkonto().toLowerCase().substring(5).replace(" ", ""); 
+		}
+
+		return 	konto.getBLZ().equals("77322200") 
+				|| konto.getBic().toUpperCase().equals("FODBDE77XXX")
+				|| getName().toLowerCase().replace(" ", "").equals(unterkontoExtract);
 	}
 
 }

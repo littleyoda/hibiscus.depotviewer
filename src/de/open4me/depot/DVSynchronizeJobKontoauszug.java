@@ -30,6 +30,7 @@ public class DVSynchronizeJobKontoauszug extends SynchronizeJobKontoauszug imple
 
 		BasisDepotAbruf x = DepotAbrufFabrik.getDepotAbruf(konto);
 		
+		// TODO auf null prüfen
 		Logger.info("Genutztes DepotAbruf-Backend " + x.getName());
 		x.run(konto);
 	}

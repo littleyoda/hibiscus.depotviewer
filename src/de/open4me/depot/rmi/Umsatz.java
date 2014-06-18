@@ -12,14 +12,9 @@ public interface Umsatz extends DBObject
 	public Integer getKontoid() throws RemoteException;
 	public void setKontoid(Integer name) throws RemoteException;
 
-	public String getWertPapierName() throws RemoteException;
+	public Integer getWPid() throws RemoteException;
 	
-	public void setWertPapierName(String name) throws RemoteException;
-	
-
-	public String getWKN() throws RemoteException;
-	
-	public void setWKN(String name) throws RemoteException;
+	public void setWPid(String name) throws RemoteException;
 	
 
 	public String getAktion() throws RemoteException;
