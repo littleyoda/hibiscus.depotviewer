@@ -1,7 +1,6 @@
 package de.open4me.depot.tools;
 
 import java.math.BigDecimal;
-import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.Date;
@@ -9,7 +8,6 @@ import java.util.List;
 
 import jsq.config.Config;
 import jsq.datastructes.datacontainer;
-import jsq.fetcher.history.Ariva;
 import jsq.fetcher.history.BaseFetcher;
 import de.open4me.depot.gui.dialogs.KursAktualisierenAnbieterAuswahlDialog;
 import de.open4me.depot.gui.dialogs.KursAktualisierenDialog;
