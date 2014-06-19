@@ -1,5 +1,6 @@
 package de.open4me.depot.gui.menu;
 
+import de.open4me.depot.gui.action.UmsatzImportAction;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.open4me.depot.tools.Bestandspruefung;
@@ -38,23 +39,6 @@ public class OrderListMenu extends ContextMenu
 			}
 
 		}));
-		addItem(ContextMenuItem.SEPARATOR);
-		addItem(new CheckedContextMenuItem("Abgleich: Bestand gegen Orderbcuh prüfen",new Action() {
-
-			@Override
-			public void handleAction(Object context)
-					throws ApplicationException {
-				try {
-				Bestandspruefung.exec();
-				} catch (Exception e)
-				{
-					e.printStackTrace();
-					throw new ApplicationException("Fehler beim Abgleich");
-				}
-			}
-
-		}));
-
 	}
 }
 

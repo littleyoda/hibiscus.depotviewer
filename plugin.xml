@@ -32,5 +32,16 @@
     </item>
   </navigation>
 
+  <menu>
+    <item id="depotviewer.menu"                             name="Depot-&amp;Viewer">
+        <item id="depotviewer.import"        name="&amp;Import von Ordern/Umsätze..."       shortcut="ALT+I"                     action="de.open4me.depot.gui.action.UmsatzImportAction" />
+        <item id="depotviewer.abgleich"        name="&amp;Abgleich zwischen Orderbuch und Bestand..."       shortcut="ALT+A"                 action="de.open4me.depot.gui.action.BestandspruefungAction" />
+        
+      <item name="-" />
+<!--      <item id="hibiscus.menu.license"               name="&amp;Lizenzinformationen"                      icon="text-x-generic.png"              action="de.willuhn.jameica.hbci.gui.action.License" />
+      <item id="hibiscus.menu.about"                 name="&amp;Über"                                     icon="gtk-info.png"                    action="de.willuhn.jameica.hbci.gui.action.About" /> -->
+    </item>
+  </menu>
+
 </plugin>
 
