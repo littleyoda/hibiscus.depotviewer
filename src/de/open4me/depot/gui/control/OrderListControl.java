@@ -31,10 +31,14 @@ public class OrderListControl extends AbstractControl
       return orderList;
     }
    
-    List<GenericObjectSQL> list = SQLUtils.getResultSet("select *, concat(kosten, ' ', kostenw) as joinkosten from depotviewer_umsaetze left join depotviewer_wertpapier where  depotviewer_umsaetze.wpid = depotviewer_wertpapier.id", 
+    List<GenericObjectSQL> list = SQLUtils.getResultSet("select *, concat(kosten, ' ', kostenw) as joinkosten from depotviewer_umsaetze "
+    				+ "	left join depotviewer_wertpapier on  depotviewer_umsaetze.wpid = depotviewer_wertpapier.id"
+    				+ "	left join konto on  konto.id = depotviewer_umsaetze.kontoid"
+    		, 
     		"depotviewer_umsaetze", "id");
 
     orderList = new TablePart(list,new OrderList());
+    orderList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
     orderList.addColumn(Settings.i18n().tr("wkn"),"wkn");
     orderList.addColumn(Settings.i18n().tr("Name"),"wertpapiername"); 
     orderList.addColumn(Settings.i18n().tr("Anzahl"),"anzahl"); 

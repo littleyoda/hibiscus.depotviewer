@@ -33,7 +33,8 @@ public class BestandTableControl extends AbstractControl
       return bestandsList;
     }
     
-    List<GenericObjectSQL> list = SQLUtils.getResultSet("select *, concat(kurs,' ', kursw) as joinkurs, concat(wert,' ', wertw) as joinwert from depotviewer_bestand left join depotviewer_wertpapier where  depotviewer_bestand.wpid = depotviewer_wertpapier.id", 
+    List<GenericObjectSQL> list = SQLUtils.getResultSet("select *, concat(kurs,' ', kursw) as joinkurs, concat(wert,' ', wertw) as joinwert from depotviewer_bestand left join depotviewer_wertpapier on  depotviewer_bestand.wpid = depotviewer_wertpapier.id"
+    		     				+ "	left join konto on  konto.id = depotviewer_bestand.kontoid", 
     		"depotviewer_bestand", "id");
     bestandsList = new TablePart(list ,new OrderList()) {
 
@@ -59,6 +60,7 @@ public class BestandTableControl extends AbstractControl
     	
     };
 
+    bestandsList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
     bestandsList.addColumn(Settings.i18n().tr("wkn"),"wkn");
     bestandsList.addColumn(Settings.i18n().tr("Name"),"wertpapiername");
     bestandsList.addColumn(Settings.i18n().tr("Anzahl"),"anzahl"); 
