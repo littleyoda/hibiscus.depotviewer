@@ -114,6 +114,13 @@ public class SQLChange {
 					));
 			
 		}
+		if (currentversion < 5) {
+			liste.add(new SQLChange(5, 	
+					"ALTER TABLE depotviewer_umsaetze ADD CONSTRAINT fkdvumsaetze FOREIGN KEY (kontoid) REFERENCES konto (id) on delete cascade;",
+					"ALTER TABLE depotviewer_bestand ADD CONSTRAINT fkdvbestand FOREIGN KEY (kontoid) REFERENCES konto (id) on delete cascade;"
+					));
+		}
+	//
 		return liste;
 	}
 
