@@ -118,34 +118,6 @@ public class HBCIDepot extends BasisDepotAbruf {
 				throw new ApplicationException(result.getJobStatus().getErrorString());
 			}
 			parseDepotUmsatz(result, konto);
-			//
-			//			GVRWPDepotList result=(GVRWPDepotList)auszug.getJobResult();
-			//			Utils.clearBestand(konto);
-			//
-			////			double bestandswert = 0;
-			////			for (HashMap<String, String> i : liste) {
-			////				String[] bk = i.get("bewertungs­kurs").split(" ");
-			////				Utils.addBestand(konto, Utils.getDoubleFromZahl(i.get("stück/nominale")), i.get("wkn"),
-			////						Utils.getDoubleFromZahl(bk[0]), bk[1], 
-			////						Utils.getDoubleFromZahl(i.get("stück/nominale"))*Utils.getDoubleFromZahl(bk[0]),
-			////						bk[1], new Date());
-			////				bestandswert += Utils.getDoubleFromZahl(i.get("stück/nominale"))*Utils.getDoubleFromZahl(bk[0]);
-			////
-			////			}
-			//			if (!result.isOK()) {
-			//				throw new ApplicationException(result.getJobStatus().getErrorString());
-			//			}
-			//			if (result.getEntries().length > 1) {
-			//				throw new ApplicationException("Zuviele Depots wurden zurückgeliefert");
-			//			}
-			//			Entry depot = result.getEntries()[0];
-			//			konto.setSaldo(depot.total.getValue().doubleValue());
-			//			konto.store();
-			//			for (Gattung  g : depot.getEntries()) {
-			//				Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, g.saldo.getValue().doubleValue(), g.price.getValue().doubleValue(), 
-			//						g.price.getCurr(), g.depotwert.getValue().doubleValue(),  g.depotwert.getCurr(), depot.timestamp);
-			//		}
-			//
 			Logger.warn("So weit so gut! Umsatz");
 
 		} catch (Exception e) {
