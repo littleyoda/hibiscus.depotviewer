@@ -130,7 +130,7 @@ public class CortalConsorsMitHBCI extends HBCIDepot {
 												Utils.getDoubleFromZahl(kurs[0]), kurs[1],
 												
 												((infos.get("orderart").toUpperCase().equals("KAUF")) ? -1 : 1) *
-												Math.rint(Utils.getDoubleFromZahl(kurs[0]) * Utils.getDoubleFromZahl(infos.get("stück")) * 100 / 100),
+												Math.rint(Utils.getDoubleFromZahl(kurs[0]) * Utils.getDoubleFromZahl(infos.get("stück")) * 100) / 100,
 												 kurs[1],
 												d,
 												infos.get("ordernummer")
