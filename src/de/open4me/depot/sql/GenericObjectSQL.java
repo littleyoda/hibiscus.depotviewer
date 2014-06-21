@@ -14,6 +14,7 @@ public class GenericObjectSQL implements GenericObject {
 	private HashMap<String, Object> data;
 	private String idfeld;
 	private String table;
+	private String pa;
 
 	public String getIdfeld() {
 		return idfeld;
@@ -24,10 +25,15 @@ public class GenericObjectSQL implements GenericObject {
 		return table;
 	}
 
+	public GenericObjectSQL(String idfeld, String primaryattr, String table, ResultSet ret) throws SQLException {
+		this(idfeld, table, ret);
+		pa = primaryattr;
+	}
 
 	public GenericObjectSQL(String idfeld, String table, ResultSet ret) throws SQLException {
 		this.idfeld = idfeld;
 		this.table = table;
+		this.pa = idfeld;
 		ResultSetMetaData rsmd = ret.getMetaData();
 		data = new HashMap<String, Object>();
 		for (int i = 1; i <= rsmd.getColumnCount(); i++) {
@@ -61,7 +67,7 @@ public class GenericObjectSQL implements GenericObject {
 
 	@Override
 	public String getPrimaryAttribute() throws RemoteException {
-		return "";
+		return pa;
 	}
 
 	@Override
