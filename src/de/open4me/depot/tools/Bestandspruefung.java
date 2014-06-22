@@ -23,7 +23,7 @@ public class Bestandspruefung {
 			pruefe(konto);
 		}
 		if (output.isEmpty()) {
-			output = "Keine Abweichungen gefunden.<br>Der Bestand passt zu den Umsätzen im Orderbuch.";
+			output = "Keine Abweichungen gefunden.<br/>Der Bestand passt zu den Umsätzen im Orderbuch.";
 		} else {
 			output = "Folgende Abweichungen wurden gefunden: <p/>" + output; 
 		}
