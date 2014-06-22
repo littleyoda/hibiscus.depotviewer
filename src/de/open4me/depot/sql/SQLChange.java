@@ -27,8 +27,8 @@ public class SQLChange {
 		ArrayList<SQLChange> liste = new ArrayList<SQLChange>();
 
 //		// Clean up
-//		currentversion = 4;
-//	liste.add(new SQLChange(4, 		
+//		currentversion = 5;
+//	liste.add(new SQLChange(5, 		
 //		"truncate table depotviewer_umsaetze;",
 //		"truncate table depotviewer_bestand;",
 //		"truncate table depotviewer_wertpapier;",
@@ -118,6 +118,11 @@ public class SQLChange {
 			liste.add(new SQLChange(5, 	
 					"ALTER TABLE depotviewer_umsaetze ADD CONSTRAINT fkdvumsaetze FOREIGN KEY (kontoid) REFERENCES konto (id) on delete cascade;",
 					"ALTER TABLE depotviewer_bestand ADD CONSTRAINT fkdvbestand FOREIGN KEY (kontoid) REFERENCES konto (id) on delete cascade;"
+					));
+		}
+		if (currentversion < 6) {
+			liste.add(new SQLChange(6, 	
+					"ALTER TABLE depotviewer_bestand ADD bewertungszeitpunkt date;"
 					));
 		}
 	//

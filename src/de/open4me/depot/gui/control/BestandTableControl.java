@@ -66,7 +66,8 @@ public class BestandTableControl extends AbstractControl
     bestandsList.addColumn(Settings.i18n().tr("Anzahl"),"anzahl"); 
     bestandsList.addColumn(Settings.i18n().tr("Kurs"),"joinkurs"); 
     bestandsList.addColumn(Settings.i18n().tr("Wert"),"joinwert"); 
-    bestandsList.addColumn(Settings.i18n().tr("Datum"),"datum", new DateFormatter(Settings.DATEFORMAT)); 
+    bestandsList.addColumn(Settings.i18n().tr("Bewertungsdatum"),"bewertungszeitpunkt", new DateFormatter(Settings.DATEFORMAT)); 
+    bestandsList.addColumn(Settings.i18n().tr("Abrufdatum"),"datum", new DateFormatter(Settings.DATEFORMAT)); 
     bestandsList.setContextMenu(new BestandsListMenu(bestandsList));
     return bestandsList;
   }

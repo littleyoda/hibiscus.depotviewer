@@ -58,7 +58,6 @@ public class HBCIDepot extends BasisDepotAbruf {
 			}
 			handler.close();
 			handle.close();
-			Logger.warn("So weit so gut!");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -92,7 +91,7 @@ public class HBCIDepot extends BasisDepotAbruf {
 			konto.store();
 			for (Gattung  g : depot.getEntries()) {
 				Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, g.saldo.getValue().doubleValue(), g.price.getValue().doubleValue(), 
-						g.price.getCurr(), g.depotwert.getValue().doubleValue(),  g.depotwert.getCurr(), depot.timestamp);
+						g.price.getCurr(), g.depotwert.getValue().doubleValue(),  g.depotwert.getCurr(), depot.timestamp, g.timestamp_price);
 			}
 
 
@@ -137,10 +136,6 @@ public class HBCIDepot extends BasisDepotAbruf {
 				// Kauf Betrag = -9999, transaction_indicator: : 1: Settlement/Clearing; richtung: 2 Erhalt; bezahlung 2: frei
 				// Verkauf Betrag = 9999, transaction_indicator :1: Settlement/Clearing; richtung 1: Lieferung bezahlung 2: frei
 
-				t.betrag = null;
-				t.transaction_indicator = Transaction.INDICATOR_KAPITALMASSNAHME;
-				t.richtung = Transaction.RICHTUNG_ERHALT;
-
 				if (t.bezahlung != Transaction.BEZAHLUNG_FREI
 						|| t.anzahl.getType() != TypedValue.TYPE_STCK
 						|| t.storno) {
@@ -150,7 +145,7 @@ public class HBCIDepot extends BasisDepotAbruf {
 					continue;
 				}
 				String aktion = "";
-				if (t.transaction_indicator == Transaction.INDICATOR_KAPITALMASSNAHME 
+				if (t.transaction_indicator == Transaction.INDICATOR_CORPORATE_ACTION 
 						&& t.richtung == Transaction.RICHTUNG_ERHALT) {
 					aktion = "EINLAGE";
 				} else if (t.transaction_indicator == Transaction.INDICATOR_SETTLEMENT_CLEARING 

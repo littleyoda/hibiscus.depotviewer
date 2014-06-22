@@ -151,14 +151,18 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 						Utils.getDoubleFromZahl(i.get("akt. preis")), 
 						i.get("akt. preis1"), 
 						Utils.getDoubleFromZahl(i.get("akt. wert")),
-						i.get("akt. preis1"), new Date());
+						i.get("akt. preis1"), new Date(), df.parse(i.get("preisdatum")));
 				depotwert += Utils.getDoubleFromZahl(i.get("akt. wert"));
 			}
 			konto.setSaldo(depotwert);
 			konto.store();
 
 		} catch (IOException e) {
-			throw new ApplicationException(e);
+			e.printStackTrace();
+			throw new ApplicationException("Fehler beim Abruf der Daten", e);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			throw new ApplicationException("Ungültiges Datum", e);
 		}finally{
 			try {
 				debug(seiten, konto);

@@ -97,4 +97,14 @@ public class BestandImpl extends AbstractDBObject implements Bestand
 	{
 		setAttribute("datum",name);
 	}
+
+	@Override
+	public Date getBewertungsDatum() throws RemoteException {
+		return (Date) getAttribute("bewertungszeitpunkt");
+	}
+
+	@Override
+	public void setBewertungsDatum(Date name) throws RemoteException {
+		setAttribute("bewertungszeitpunkt",name);
+	}
 }

@@ -24,4 +24,6 @@ public interface Bestand extends DBObject
 	public void setWertw(String name) throws RemoteException;
 	public Date getDatum() throws RemoteException;
 	public void setDatum(Date name) throws RemoteException;
+	public Date getBewertungsDatum() throws RemoteException;
+	public void setBewertungsDatum(Date name) throws RemoteException;
 }

@@ -120,7 +120,7 @@ public class Utils {
 
 	}
 	public static void addBestand(String wpid, Konto konto, Double anzahl, 
-			Double kurs, String kursw, double wert, String wertw, Date date) throws ApplicationException {
+			Double kurs, String kursw, double wert, String wertw, Date date, Date bewertungsZeitpunkt) throws ApplicationException {
 		try {
 			Bestand p = (Bestand) Settings.getDBService().createObject(Bestand.class,null);
 			p.setAnzahl(anzahl);
@@ -131,6 +131,7 @@ public class Utils {
 			p.setWertw(wertw);
 			p.setWPid(wpid);
 			p.setDatum(date);
+			p.setBewertungsDatum(bewertungsZeitpunkt);
 			p.store();
 		}
 		catch (RemoteException e)
