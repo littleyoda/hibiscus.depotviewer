@@ -21,6 +21,7 @@ import de.open4me.depot.Settings;
 import de.open4me.depot.rmi.Bestand;
 import de.open4me.depot.rmi.Umsatz;
 import de.open4me.depot.rmi.Wertpapier;
+import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.gui.dialogs.YesNoDialog;
@@ -89,6 +90,10 @@ public class Utils {
 			if (!(aktion.toUpperCase().equals("KAUF") || aktion.toUpperCase().equals("VERKAUF") || aktion.toUpperCase().equals("EINLAGE"))) {
 				Logger.error("Unbekannte Buchungsart" + aktion);
 				return;
+			}
+			if ((aktion.toUpperCase().equals("KAUF") && (kosten >= 0.0f))
+				|| (aktion.toUpperCase().equals("VERKAUF") && (kosten <= 0.0f))) {
+				throw new ApplicationException("Bei Käufen muss der Gesamtbetrag negativ sein, beim Verkauf positiv.");
 			}
 			// create new project
 			Umsatz p = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
@@ -244,6 +249,7 @@ public class Utils {
 		}
 	}
 
+	
 	public static String getORcreateWKN(String wkn, String isin, String name) throws ApplicationException, RemoteException {
 		if (wkn == null) {
 			wkn = "";
@@ -268,4 +274,16 @@ public class Utils {
 		return wpid;
 	}
 
+	public static List<Konto> getKonten() throws RemoteException, ApplicationException {
+		List<Konto> list = new ArrayList<Konto>();
+		DBIterator liste = Settings.getDBService().createList(Konto.class);
+		while (liste.hasNext()) {
+			Konto k = (Konto) liste.next();
+			if (DepotAbrufFabrik.getDepotAbruf(k) != null) {
+				list.add(k);
+			}
+		}
+		return list;
+	}
+	
 }
