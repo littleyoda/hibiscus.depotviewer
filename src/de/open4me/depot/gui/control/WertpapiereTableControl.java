@@ -35,7 +35,7 @@ public class WertpapiereTableControl
 		}
 
 		List<GenericObjectSQL> list = SQLUtils.getResultSet("select * from depotviewer_wertpapier", 
-				"depotviewer_umsaetze", "id");
+				"depotviewer_wertpapier", "id", "wertpapiername");
 
 		orderList = new TablePart(list,new OrderList());
 		orderList.addColumn(Settings.i18n().tr("wkn"),"wkn");

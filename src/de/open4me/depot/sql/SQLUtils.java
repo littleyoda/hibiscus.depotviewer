@@ -45,7 +45,12 @@ public class SQLUtils {
 		}
 		return val;
 	}
+	
 	public static List<GenericObjectSQL> getResultSet(String query, String table, String idfeld) {
+		return getResultSet(query, table, idfeld, idfeld);
+	}
+
+	public static List<GenericObjectSQL> getResultSet(String query, String table, String idfeld, String pa) {
 		List<GenericObjectSQL> list = new ArrayList<GenericObjectSQL>();
 		Connection conn = null;
 		try {
@@ -53,7 +58,7 @@ public class SQLUtils {
 			Statement statement = conn.createStatement();
 			ResultSet ret = statement.executeQuery(query);
 			while (ret.next()) {
-				list.add(new GenericObjectSQL(idfeld, table, ret));
+				list.add(new GenericObjectSQL(idfeld, pa, table, ret));
 			}
 			conn.close();
 		} catch (Exception e) {
@@ -134,4 +139,5 @@ public class SQLUtils {
 			throw new ApplicationException(e);
 		}
 	}
+
 }
