@@ -25,25 +25,15 @@ public class DepotAbrufFabrik {
 
 
 	public static BasisDepotAbruf getDepotAbruf(Konto konto) throws RemoteException, ApplicationException {
+		if (konto == null) {
+			return null;
+		}
 		for (BasisDepotAbruf x : getDepotAbrufs()) {
 			if (x.isSupported(konto)) {
 				return x;
 			}
 		}
 		return null;
-//		return new CortalConsorsMitHBCI();
-//		return new HBCIDepot();
-//		if ((konto.getBackendClass() != null && !konto.getBackendClass().isEmpty())
-//			|| ((konto.getBLZ().equals("0000000")
-//				|| konto.getBLZ().equals("0")) && konto.getUnterkonto().toLowerCase().startsWith("depot"))) {
-//			String name = konto.getUnterkonto().toLowerCase().substring(5).replace(" ", "");
-//			for (BasisDepotAbruf x : getDepotAbrufs()) {
-//				if (name.equals(x.getName().toLowerCase().replace(" ", ""))) {
-//					return x;
-//				}
-//			}
-//		}
-//		return null;
 	}
 
 }
