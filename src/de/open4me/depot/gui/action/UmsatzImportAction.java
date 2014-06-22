@@ -93,7 +93,7 @@ public class UmsatzImportAction implements Action {
 						"", stueck,
 						kurs,
 						waehrung,
-						kurs * stueck,
+						((aktion.toUpperCase().equals("VERKAUF")) ? 1 : -1) * kurs * stueck,
 						waehrung,
 						date,
 						"" + record.toString().hashCode()
