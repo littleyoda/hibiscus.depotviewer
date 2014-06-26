@@ -24,27 +24,32 @@ public class MusterDepot extends HBCIDepot {
 	class MyGVUms  {
 		private TypedValue parseTypedValue(String st) {
 			String st_type=st.substring(7,11);
-			String curr="EUR";
+			String curr="";
+			boolean withCurr = false;
 
 			int saldo_type = -1;
 			if (st_type.equals("FAMT")) { 
 				saldo_type=TypedValue.TYPE_WERT;
-				curr=""; // TODO
+			} else if (st_type.equals("ACTU")) { 
+				saldo_type=TypedValue.TYPE_WERT;
+				withCurr = true;
 			} else if (st_type.equals("UNIT")) {
 				saldo_type=TypedValue.TYPE_STCK;
-				curr="";
+			} else if (st_type.equals("PRCT")) {
+				saldo_type=TypedValue.TYPE_PROZENT;
 			}
 			int pos1=12;
-			if (st.charAt(pos1)=='N')
-				return new TypedValue(
-						"-"+st.substring(pos1+1).replace(',','.'),
-						curr,
-						saldo_type);
-			else
-				return new TypedValue(
-						st.substring(pos1).replace(',','.'),
-						curr,
-						saldo_type);
+			boolean neg = (st.charAt(pos1)=='N');
+			if (neg)
+				pos1++;    
+			if (withCurr) {
+				curr = st.substring(pos1, pos1+3);
+				pos1 += 3;
+			} 
+			return new TypedValue(
+					(neg?"-":"")+st.substring(pos1).replace(',','.'),
+					curr,
+					saldo_type);
 		}
 
 		GVRWPDepotUms depot;
@@ -58,6 +63,7 @@ public class MusterDepot extends HBCIDepot {
 			StringBuffer paramName=new StringBuffer(header).append(".data536");
 			StringBuffer buffer = new StringBuffer();
 			buffer.append(Swift.decodeUmlauts(result.getProperty(paramName.toString())));
+
 
 			final SimpleDateFormat date_time_format = new SimpleDateFormat("yyyyMMdd hhmmss");
 			final SimpleDateFormat date_only_format = new SimpleDateFormat("yyyyMMdd");
@@ -103,19 +109,16 @@ public class MusterDepot extends HBCIDepot {
 					}
 
 					String st_depot=Swift.getTagValue(onerecord,"97A",0);
-					int pos1;
-					int pos2;
-					if (st_depot != null) {
-						pos1=st_depot.indexOf("//");
-						pos2=st_depot.indexOf("/",pos1+2);
-						if (pos2<0)
-							pos2=st_depot.length();
-						entry.depot=new org.kapott.hbci.structures.Konto();
-						entry.depot.blz=st_depot.substring(pos1+2,pos2);
-						if (pos2 < st_depot.length())
-							entry.depot.number=st_depot.substring(pos2+1);
-						//	                getMainPassport().fillAccountInfo(entry.depot);
-					}
+					int pos1=st_depot.indexOf("//");
+					int pos2=st_depot.indexOf("/",pos1+2);
+					if (pos2<0)
+						pos2=st_depot.length();
+					entry.depot= new org.kapott.hbci.structures.Konto();
+					entry.depot.blz=st_depot.substring(pos1+2,pos2);
+					if (pos2 < st_depot.length())
+						entry.depot.number=st_depot.substring(pos2+1);
+					//getMainPassport().fillAccountInfo(entry.depot);
+
 					String st;
 					i=0;
 					// Parse einzelnes Finanzinstrument (Repetitive Optional Subsequence B1 Financial Instrument)
@@ -134,7 +137,14 @@ public class MusterDepot extends HBCIDepot {
 
 							FinancialInstrument instrument=new GVRWPDepotUms.Entry.FinancialInstrument();
 
-							st=Swift.getTagValue(oneinstrument,"35B",0);
+							int trans_start = oneinstrument.indexOf(":16R:TRAN\r\n");
+							String oneinstrument_header;
+							if (trans_start >= 0)
+								oneinstrument_header = oneinstrument.substring(0, trans_start+9);
+							else
+								oneinstrument_header = oneinstrument;
+
+							st=Swift.getTagValue(oneinstrument_header,"35B",0);
 							boolean haveISIN=st.substring(0,5).equals("ISIN ");
 
 							if (haveISIN) {
@@ -167,26 +177,54 @@ public class MusterDepot extends HBCIDepot {
 							}
 							i=0;
 							while (true) {
-								st=Swift.getTagValue(oneinstrument,"93B",i++);
+								st=Swift.getTagValue(oneinstrument_header,"93B",i++);
 								if (st==null)
 									break;
 								String qualifier = st.substring(1,5);
 
-								if ("FIOP".equals(qualifier)) {
+								if ("FIOP".equals(qualifier) || (instrument.startSaldo == null && "INOP".equals(qualifier))) {
 									instrument.startSaldo = parseTypedValue(st);
-								} else if ("FICL".equals(qualifier)) {
+								} else if ("FICL".equals(qualifier) || (instrument.endSaldo == null && "INCL".equals(qualifier))) {
 									instrument.endSaldo   = parseTypedValue(st);
 								} else {
-									System.out.println("Unknown qualifier: " + qualifier + "; value=" + st);
+									System.out.println("Unbekannter 93B: " + st);
 								}
 							}
 
-							int trans_start = 0;
-							//Parse einzelne Transaktionen 
+							i=0;
 							while (true) {
-								trans_start = oneinstrument.indexOf(":16R:TRAN\r\n", trans_start);
-								if (trans_start<0)
+								st=Swift.getTagValue(oneinstrument_header,"98A",i++);
+								if (st==null)
 									break;
+								String qualifier = st.substring(1,5);
+
+								if ("PRIC".equals(qualifier)) {
+									instrument.preisdatum = date_only_format.parse(st.substring(7, 15));
+								} else {
+									System.out.println("Unbekannter 98A: " + st);
+								}
+							}
+
+							i=0;
+							while (true) {
+								st=Swift.getTagValue(oneinstrument_header,"90A",i++);
+								if (st==null)
+									break;
+
+								instrument.preis = parseTypedValue(st);
+							}
+
+							i=0;
+							while (true) {
+								st=Swift.getTagValue(oneinstrument_header,"90B",i++);
+								if (st==null)
+									break;
+
+								instrument.preis = parseTypedValue(st);
+							}
+
+							//Parse einzelne Transaktionen 
+							while (trans_start >= 0) {
 								int trans_end = oneinstrument.indexOf(":16S:TRAN\r\n", trans_start);
 								if (trans_end<0)
 									break;
@@ -199,7 +237,7 @@ public class MusterDepot extends HBCIDepot {
 								if (link_start >=0) {
 									int link_end = onetransaction.indexOf(":16S:LINK", link_start);
 									if (link_end >= 0) {
-										String onelink = onetransaction.substring(link_start, link_end);
+										String onelink = onetransaction.substring(link_start, link_end+8);
 										String rela = Swift.getTagValue(onelink, "20C", 0);
 
 										if (rela != null) {
@@ -212,7 +250,7 @@ public class MusterDepot extends HBCIDepot {
 								if (detail_start >= 0) {
 									int detail_end = onetransaction.indexOf(":16S:TRANSDET", detail_start);
 									if (detail_end >= 0) {
-										String onedetail = onetransaction.substring(detail_start, detail_end);
+										String onedetail = onetransaction.substring(detail_start, detail_end+12);
 
 										String quantity = Swift.getTagValue(onedetail, "36B", 0);
 										if (quantity != null)
@@ -221,22 +259,50 @@ public class MusterDepot extends HBCIDepot {
 											} else {
 												System.out.println("Unbekannter 36B: " + quantity);
 											}
-										String amount = Swift.getTagValue(onedetail, "19A", 0);
-										if (amount != null) 
-											if (amount.startsWith(":PSTA")) {
-												int off=7;
-												if (amount.charAt(off)=='N') 
-													off++;
-												transaction.betrag=new BigDecimalValue(
-														amount.substring(off+3).replace(',','.'),
-														amount.substring(off,off+3));
-												if (off>7)
-													transaction.betrag.setValue(transaction.betrag.getValue().negate());
+
+										String t99a = Swift.getTagValue(onedetail, "99A", 0);
+										if (t99a != null)
+											if (t99a.startsWith(":DAAC")) {
+												int neg = 0;
+												if (t99a.charAt(7) == 'N')
+													neg = 1;
+												transaction.stueckzins_tage = Integer.parseInt(t99a.substring(7+neg));
+												if (neg != 0)
+													transaction.stueckzins_tage = -transaction.stueckzins_tage;
 											} else {
-												System.out.println("Unbekannter 19A: " + amount);
+												System.out.println("Unbekannter 99A: " + t99a);
 											}
 
-										int tagidx=0;
+										int tagidx = 0;
+										while (true) {
+											String t19a = Swift.getTagValue(onedetail, "19A", tagidx++);
+											if (t19a == null)
+												break;
+
+											if (t19a.startsWith(":PSTA")) {
+												int off=7;
+												if (t19a.charAt(off)=='N') 
+													off++;
+												transaction.betrag=new BigDecimalValue(
+														t19a.substring(off+3).replace(',','.'),
+														t19a.substring(off,off+3));
+												if (off>7)
+													transaction.betrag.setValue(transaction.betrag.getValue().negate());
+											} else if (t19a.startsWith(":ACRU")) {
+												int off=7;
+												if (t19a.charAt(off)=='N') 
+													off++;
+												transaction.stueckzinsen=new BigDecimalValue(
+														t19a.substring(off+3).replace(',','.'),
+														t19a.substring(off,off+3));
+												if (off>7)
+													transaction.stueckzinsen.setValue(transaction.stueckzinsen.getValue().negate());
+											} else {
+												System.out.println("Unbekannter 19A: " + t19a);
+											}
+										}
+
+										tagidx=0;
 										while (true) {
 											String t22f = Swift.getTagValue(onedetail, "22F", tagidx++);
 											if (t22f == null)
@@ -246,7 +312,11 @@ public class MusterDepot extends HBCIDepot {
 												if (t22f.endsWith("SETT")) {
 													transaction.transaction_indicator = Transaction.INDICATOR_SETTLEMENT_CLEARING;
 												} else if (t22f.endsWith("CORP")) {
-													transaction.transaction_indicator = Transaction.INDICATOR_KAPITALMASSNAHME;
+													transaction.transaction_indicator = Transaction.INDICATOR_CORPORATE_ACTION;
+												} else if (t22f.endsWith("BOLE")) {
+													transaction.transaction_indicator = Transaction.INDICATOR_LEIHE;
+												} else if (t22f.endsWith("COLL")) {
+													transaction.transaction_indicator = Transaction.INDICATOR_SICHERHEITEN;
 												} else {
 													System.out.println("Unbekannter 22F->TRAN: " + t22f);
 													transaction.transaction_indicator = -1;
@@ -291,14 +361,22 @@ public class MusterDepot extends HBCIDepot {
 											}
 										}
 
-										String eset = Swift.getTagValue(onedetail, "98A", 0);
-										if (eset != null) 
-											if (eset.startsWith(":ESET")) {
-												String datum = eset.substring(7);
+										tagidx=0;
+										while (true) {
+											String t98a = Swift.getTagValue(onedetail, "98A", tagidx++);
+											if (t98a == null)
+												break;
+
+											if (t98a.startsWith(":ESET")) {
+												String datum = t98a.substring(7);
 												transaction.datum = date_only_format.parse(datum);
+											} else if (t98a.startsWith(":SETT")) {
+												String datum = t98a.substring(7);
+												transaction.datum_valuta = date_only_format.parse(datum);
 											} else {
-												System.out.println("Unbekannter 98A: " + eset);
+												System.out.println("Unbekannter 98A: " + t98a);
 											}
+										}
 
 										String move = Swift.getTagValue(onedetail, "25D", 0);
 										if (move != null) 
@@ -308,6 +386,14 @@ public class MusterDepot extends HBCIDepot {
 											} else  {
 												System.out.println("Unbekannter 25D: " + move);
 											}
+
+										String freitext = Swift.getTagValue(onedetail, "70E", 0);
+										if (freitext != null) 
+											if (freitext.startsWith(":TRDE")) {
+												transaction.freitext_details = freitext.substring(7);
+											} else  {
+												System.out.println("Unbekannter 70E: " + freitext);
+											}
 									}
 								}
 
@@ -315,7 +401,7 @@ public class MusterDepot extends HBCIDepot {
 								if (party_start >=0) {
 									int party_end = onetransaction.indexOf(":16S:SETPRTY", party_start);
 									if (party_end >= 0) {
-										String oneparty = onetransaction.substring(party_start, party_end);
+										String oneparty = onetransaction.substring(party_start, party_end+10);
 										String deag = Swift.getTagValue(oneparty, "95Q", 0);
 
 										if (deag != null) {
@@ -323,7 +409,9 @@ public class MusterDepot extends HBCIDepot {
 										}
 									}
 								}
+
 								instrument.transactions.add(transaction);
+								trans_start = oneinstrument.indexOf(":16R:TRAN\r\n", trans_start);
 							}
 							entry.instruments.add(instrument);
 						}
@@ -331,12 +419,13 @@ public class MusterDepot extends HBCIDepot {
 					depot.addEntry(entry);
 					buffer.delete(0,onerecord.length());
 				} catch (Exception e) {
-					e.printStackTrace();
 					throw new HBCI_Exception("*** error while extracting data",e);
 				}
 			}
-			depot.rest = buffer.toString();			//((GVRWPDepotUms)jobResult).rest=buffer.toString();                    
+
+			depot.rest = buffer.toString();                    
 		}          
+
 
 		public GVRWPDepotUms myExtract(String testdata) {
 			HBCIMsgStatus stat = new HBCIMsgStatus();
@@ -349,7 +438,7 @@ public class MusterDepot extends HBCIDepot {
 	@Override
 	public boolean isSupported(Konto konto) throws ApplicationException, RemoteException {
 		String unterkontoExtract = "";
-		if (konto.getUnterkonto().toLowerCase().startsWith("depot")) {
+		if (konto.getUnterkonto() != null && konto.getUnterkonto().toLowerCase().startsWith("depot")) {
 			unterkontoExtract = konto.getUnterkonto().toLowerCase().substring(5).replace(" ", ""); 
 		}
 
@@ -366,6 +455,7 @@ public class MusterDepot extends HBCIDepot {
 			throw new ApplicationException(e);
 		}
 		GVRWPDepotUms ret = test.myExtract(s);
+		System.out.println(ret.toString());
 		parseDepotUmsatz(ret, konto);
 	}
 
@@ -461,6 +551,7 @@ public class MusterDepot extends HBCIDepot {
 			"OjIyRjo6VFJBTi8vU0VUVA0KOjIySDo6UkVERS8vREVMSQ0KOjIySDo6UEFZTS8vRlJFRQ0KOjk4\n" + 
 			"QTo6RVNFVC8vMTk5OTA1MjENCjo5OEE6OlNFVFQvLzE5OTkwNTI2DQo6MTZTOlRSQU5TREVUDQo6\n" + 
 			"MTZTOlRSQU4NCjoxNlM6RklODQo=\n";
+
 
 	@Override
 	public String getName() {
