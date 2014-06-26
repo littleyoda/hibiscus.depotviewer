@@ -20,7 +20,16 @@ public class LizenzinformationControl extends AbstractControl {
 
 	    StringBuffer buffer = new StringBuffer();
 	    buffer.append("<form>");
-	    buffer.append("File: commons-csv-*-SNAPSHOT.jar<br/>" + 
+	    buffer.append(
+	    		"File: java-stock-quotes-*.jar<br/>" +
+	    	    "<br/>" +
+	    		"Java Stock Quotes<br/>" +
+	    		"<br/>" + 
+	    		"http://github.com/mikekorb/JavaStockQuotes<br/>" +
+				"Apache 2.0 - http://www.apache.org/licenses/LICENSE-2.0<br/>" + 
+	    		"<br/>" + 
+	    		"=============================================================================<br/>" + 
+	    		"File: commons-csv-*-SNAPSHOT.jar<br/>" + 
 	    		"<br/>" + 
 	    		"Apache Commons CSV<br/>" + 
 	    		"Copyright 2005-2014 The Apache Software Foundation<br/>" + 

@@ -1,13 +1,18 @@
 package de.open4me.depot.tools;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.Date;
 import java.util.List;
 
+import org.eclipse.swt.program.Program;
+
 import jsq.config.Config;
-import jsq.datastructes.datacontainer;
+import jsq.datastructes.Datacontainer;
 import jsq.fetcher.history.BaseFetcher;
 import de.open4me.depot.gui.dialogs.KursAktualisierenAnbieterAuswahlDialog;
 import de.open4me.depot.gui.dialogs.KursAktualisierenDialog;
@@ -43,10 +48,10 @@ public class UpdateStock {
 			del.setString(1, wertpapier.getID());
 			del.executeUpdate();
 			PreparedStatement insert = conn.prepareStatement("insert into depotviewer_kurse (wpid, kurs, kursw, kursdatum) values (?,?,?,?)");
-			for (datacontainer dc : base.getResult()) {
+			for (Datacontainer dc : base.getHistQuotes()) {
 				insert.setString(1, wertpapier.getID());
 				insert.setBigDecimal(2, (BigDecimal) dc.data.get("last")); 
-				insert.setString(3, "EUR");
+				insert.setString(3, (String) dc.data.get("currency")); 
 				insert.setDate(4,  new java.sql.Date(((Date) dc.data.get("date")).getTime()));
 				insert.executeUpdate();
 			}

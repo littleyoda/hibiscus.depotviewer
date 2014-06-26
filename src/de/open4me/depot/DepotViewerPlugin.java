@@ -1,10 +1,15 @@
 
 package de.open4me.depot;
 
+import java.io.File;
+
+import jsq.fetch.factory.Factory;
+import de.open4me.depot.depotabruf.Utils;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.plugin.Version;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
 /**
@@ -13,6 +18,9 @@ import de.willuhn.util.ApplicationException;
  */
 public class DepotViewerPlugin extends AbstractPlugin
 {
+	public static String getJSDirectory() {
+		return Utils.getWorkingDir(DepotViewerPlugin.class) + File.separatorChar + "js";
+	}
 
 	/**
 	 * This method is invoked on every startup.
@@ -25,9 +33,32 @@ public class DepotViewerPlugin extends AbstractPlugin
 	public void init() throws ApplicationException
 	{
 		super.init();
+
+		checkJavaStockQuotesDirectory();
 		SQLUtils.checkforupdates();
 
 		
+	}
+
+	private void checkJavaStockQuotesDirectory() {
+		File dir = new File(getJSDirectory());
+		if (dir.exists()) {
+			for (final File fileEntry : dir.listFiles()) {
+		        if (!fileEntry.isDirectory() && fileEntry.getName().toLowerCase().endsWith(".js")) {
+		        	try {
+		        		Factory.addJSFetcher(fileEntry.getAbsolutePath());
+		        	} catch (Exception e) {
+		        		Logger.error("Fehler beim Laden von " + fileEntry.getName(), e);
+		        	}
+		        }
+		    }
+		} else {
+        	try {
+    			dir.mkdirs();
+        	} catch (Exception e) {
+        		Logger.error("Fehler beim Anlegen von " + dir.getAbsolutePath(), e);
+        	}
+		}
 	}
 
 	/**

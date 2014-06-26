@@ -10,6 +10,7 @@ import jsq.fetcher.history.BaseFetcher;
 
 import org.eclipse.swt.widgets.Composite;
 
+import de.open4me.depot.gui.action.JSQweitereQuellenAction;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.dialogs.AbstractDialog;
 import de.willuhn.jameica.gui.input.CheckboxInput;
@@ -49,6 +50,20 @@ public class KursAktualisierenAnbieterAuswahlDialog extends AbstractDialog
 				+ "und sie zu einer Nutzung berechtigt sind!\n\n");
 		
 		ButtonArea buttons1 = new ButtonArea();
+		buttons1.addButton(i18n.tr("Weitere Datenquellen installieren"), new Action() {
+
+			@Override
+			public void handleAction(Object context)
+					throws ApplicationException {
+				(new JSQweitereQuellenAction()).handleAction(context);
+				throw new OperationCanceledException("Abgebrochen");
+			}
+			
+		}
+			
+
+		,null,true,"dialog-information.png");
+
 		buttons1.addButton(i18n.tr("Anbieter Webseite öffnen"), new Action() {
 			public void handleAction(Object context) throws ApplicationException
 			{

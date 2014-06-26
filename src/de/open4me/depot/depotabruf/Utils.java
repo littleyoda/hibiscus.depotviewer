@@ -21,7 +21,6 @@ import de.open4me.depot.Settings;
 import de.open4me.depot.rmi.Bestand;
 import de.open4me.depot.rmi.Umsatz;
 import de.open4me.depot.rmi.Wertpapier;
-import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.gui.dialogs.YesNoDialog;
