@@ -26,14 +26,14 @@ public class SQLChange {
 	public static List<SQLChange> getChangesSinceVersion(int currentversion) {
 		ArrayList<SQLChange> liste = new ArrayList<SQLChange>();
 
-//		// Clean up
-//		currentversion = 5;
-//	liste.add(new SQLChange(5, 		
-//		"truncate table depotviewer_umsaetze;",
-//		"truncate table depotviewer_bestand;",
-//		"truncate table depotviewer_wertpapier;",
-//		"truncate table depotviewer_kurse;"
-//		));	
+		//		// Clean up
+		//		currentversion = 5;
+		//	liste.add(new SQLChange(5, 		
+		//		"truncate table depotviewer_umsaetze;",
+		//		"truncate table depotviewer_bestand;",
+		//		"truncate table depotviewer_wertpapier;",
+		//		"truncate table depotviewer_kurse;"
+		//		));	
 		if (currentversion < 3) {
 
 			liste.add(new SQLChange(3, 		
@@ -112,7 +112,7 @@ public class SQLChange {
 							"  PRIMARY KEY (id)\n" + 
 							");"
 					));
-			
+
 		}
 		if (currentversion < 5) {
 			liste.add(new SQLChange(5, 	
@@ -125,7 +125,24 @@ public class SQLChange {
 					"ALTER TABLE depotviewer_bestand ADD bewertungszeitpunkt date;"
 					));
 		}
-	//
+		if (currentversion < 7) {
+			liste.add(new SQLChange(7, 		
+
+					"CREATE TABLE depotviewer_kursevent (\n" + 
+							"  id IDENTITY(1),\n" +
+							"  wpid int,\n" +
+							"  ratio varchar(30) NOT NULL,\n" +
+							"  value decimal(10,5),\n" +
+							"  aktion varchar(100) NOT NULL,\n" +
+							"  datum date,\n" + 
+							"  waehrung varchar(3) NOT NULL,\n" +
+							"  UNIQUE (id),\n" + 
+							"  PRIMARY KEY (id)\n" + 
+							");"
+					));
+
+		}
+
 		return liste;
 	}
 

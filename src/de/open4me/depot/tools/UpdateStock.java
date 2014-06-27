@@ -9,9 +9,8 @@ import java.sql.PreparedStatement;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.swt.program.Program;
-
 import jsq.config.Config;
+import jsq.datastructes.Const;
 import jsq.datastructes.Datacontainer;
 import jsq.fetcher.history.BaseFetcher;
 import de.open4me.depot.gui.dialogs.KursAktualisierenAnbieterAuswahlDialog;
@@ -31,8 +30,8 @@ public class UpdateStock {
 			} else if (!wertpapier.isEmpty("wkn")) {
 				searchterm = wertpapier.getAttribute("wkn").toString();
 			}
-			
-			
+
+
 			KursAktualisierenAnbieterAuswahlDialog dialog1 = new KursAktualisierenAnbieterAuswahlDialog(KursAktualisierenDialog.POSITION_CENTER);
 			BaseFetcher base = (BaseFetcher) dialog1.open();
 			Date d = new Date();
@@ -54,6 +53,34 @@ public class UpdateStock {
 				insert.setString(3, (String) dc.data.get("currency")); 
 				insert.setDate(4,  new java.sql.Date(((Date) dc.data.get("date")).getTime()));
 				insert.executeUpdate();
+			}
+			del = conn.prepareStatement("delete from depotviewer_kursevent where wpid = ? ");
+			del.setString(1, wertpapier.getID());
+			del.executeUpdate();
+			if (base.getHistEvents() != null) {
+				insert = conn.prepareStatement("insert into depotviewer_kursevent (wpid, ratio, value, aktion, datum, waehrung) values (?,?,?,?,?,?)");
+				for (Datacontainer dc : base.getHistEvents()) {
+					String action = (String) dc.data.get("action");
+					if (action.equals(Const.CASHDIVIDEND)) {
+						action = "D";
+					} else if (action.equals(Const.STOCKDIVIDEND)) {
+						action = "S";
+					} else if (action.equals(Const.SUBSCRIPTIONRIGHTS)) {
+						action = "B";
+					} else {
+						System.out.println("Warning: " + action + " is unknown!");
+						continue;
+					}
+ 
+					
+					insert.setString(1, wertpapier.getID());
+					insert.setString(2, (String) dc.data.get("ratio")); 
+					insert.setBigDecimal(3, (BigDecimal) dc.data.get("value")); 
+					insert.setString(4, action); 
+					insert.setDate(5,  new java.sql.Date(((Date) dc.data.get("date")).getTime()));
+					insert.setString(6, (String) dc.data.get("currency")); 
+					insert.executeUpdate();
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
