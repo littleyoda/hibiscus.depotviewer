@@ -264,7 +264,7 @@ public class Utils {
 		if (!wkn.isEmpty()) {
 			wpid = Utils.getWertPapierByWkn(wkn);
 		}
-		if (!isin.isEmpty() && wpid != null) {
+		if (!isin.isEmpty() && wpid == null) {
 			wpid = Utils.getWertPapierByIsin(isin);
 		}
 		if (wpid == null) {
