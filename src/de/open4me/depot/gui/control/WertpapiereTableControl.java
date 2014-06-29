@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Listener;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.gui.action.OrderList;
+import de.open4me.depot.gui.menu.WertpapierMenu;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.open4me.depot.tools.UpdateStock;
@@ -55,6 +56,7 @@ public class WertpapiereTableControl
 
 		});
 
+		orderList.setContextMenu(new WertpapierMenu());
 		return orderList;
 	}
 
