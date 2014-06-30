@@ -27,7 +27,7 @@ public class SQLChange {
 		ArrayList<SQLChange> liste = new ArrayList<SQLChange>();
 
 		//		// Clean up
-		//		currentversion = 5;
+				//currentversion = 6;
 		//	liste.add(new SQLChange(5, 		
 		//		"truncate table depotviewer_umsaetze;",
 		//		"truncate table depotviewer_bestand;",
@@ -127,20 +127,24 @@ public class SQLChange {
 		}
 		if (currentversion < 7) {
 			liste.add(new SQLChange(7, 		
-
 					"CREATE TABLE depotviewer_kursevent (\n" + 
 							"  id IDENTITY(1),\n" +
 							"  wpid int,\n" +
-							"  ratio varchar(30) NOT NULL,\n" +
+							"  ratio varchar(30) ,\n" +
 							"  value decimal(10,5),\n" +
 							"  aktion varchar(100) NOT NULL,\n" +
 							"  datum date,\n" + 
-							"  waehrung varchar(3) NOT NULL,\n" +
+							"  waehrung varchar(3) ,\n" +
 							"  UNIQUE (id),\n" + 
 							"  PRIMARY KEY (id)\n" + 
 							");"
 					));
 
+		}
+		if (currentversion < 8) {
+			liste.add(new SQLChange(8, 	
+					"ALTER TABLE depotviewer_kurse ADD kursperf decimal(20,2);"
+					));
 		}
 
 		return liste;

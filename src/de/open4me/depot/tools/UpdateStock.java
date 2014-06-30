@@ -1,11 +1,11 @@
 package de.open4me.depot.tools;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -64,6 +64,8 @@ public class UpdateStock {
 					if (action.equals(Const.CASHDIVIDEND)) {
 						action = "D";
 					} else if (action.equals(Const.STOCKDIVIDEND)) {
+						action = "G";
+					} else if (action.equals(Const.STOCKSPLIT)) {
 						action = "S";
 					} else if (action.equals(Const.SUBSCRIPTIONRIGHTS)) {
 						action = "B";
@@ -82,11 +84,57 @@ public class UpdateStock {
 					insert.executeUpdate();
 				}
 			}
+			calcPerformanceKurse(wertpapier, conn);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ApplicationException("Fehler beim Abruf der Kurse." , e);
 		}
 
 
+	}
+
+	private static void calcPerformanceKurse(GenericObjectSQL wertpapier,
+			Connection conn) throws SQLException, RemoteException {
+		// Performance Kurs berechnen
+		PreparedStatement update = conn.prepareStatement("update depotviewer_kurse set kursperf = ? where id = ?");
+		List<GenericObjectSQL> kurse = SQLUtils.getResultSet("select *   from depotviewer_kurse where wpid = " + wertpapier.getID() + " order by kursdatum desc", "", "id");
+		List<GenericObjectSQL> kursevt = SQLUtils.getResultSet("select *  from depotviewer_kursevent where wpid = " + wertpapier.getID() + " order by datum desc", "", "id");
+		int kurseEvtIdx = 0;
+		GenericObjectSQL currentEvt = null;
+		if (kursevt.size() > 0 ) {
+			currentEvt = kursevt.get(kurseEvtIdx);
+		}
+		BigDecimal korrektur = new BigDecimal("0.0000");
+		BigDecimal faktor = new BigDecimal("1.0000");
+		for (GenericObjectSQL kurs : kurse) {
+			
+			if (kurseEvtIdx < kursevt.size()) {
+				Date kursdatum = (Date) kurs.getAttribute("kursdatum");
+				Date evtdatum = (Date) currentEvt.getAttribute("datum");
+				if (evtdatum.getTime() > kursdatum.getTime()) {
+					String action = currentEvt.getAttribute("aktion").toString(); 
+					if (action.equals("D")) {
+						korrektur = korrektur.subtract(faktor.multiply((BigDecimal) currentEvt.getAttribute("value")));
+					}  else if (action.equals("S")) {
+						String[] s = ((String) currentEvt.getAttribute("ratio")).split(":");
+						BigDecimal splitfaktor = (new BigDecimal(s[0])).divide(new BigDecimal(s[1]), 10, RoundingMode.HALF_UP);
+						faktor = faktor.multiply(splitfaktor);
+					}  else if (action.equals("G")) {
+						String[] s = ((String) currentEvt.getAttribute("ratio")).split(":");
+						BigDecimal splitfaktor = (new BigDecimal(s[0])).divide((new BigDecimal(s[1])).add(new BigDecimal(s[0])), 10, RoundingMode.HALF_UP);
+						faktor = faktor.multiply(splitfaktor);
+					}
+					kurseEvtIdx++;
+					if (kurseEvtIdx < kursevt.size()) {
+						currentEvt = kursevt.get(kurseEvtIdx);
+					}
+				}
+			}
+			BigDecimal k = faktor.multiply((BigDecimal) kurs.getAttribute("kurs"));
+			k = k.add(korrektur);
+			update.setBigDecimal(1, k);
+			update.setString(2, kurs.getID());
+			update.executeUpdate();
+		}
 	}
 }

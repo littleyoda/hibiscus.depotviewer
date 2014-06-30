@@ -45,7 +45,7 @@ public class WertpaperHistoryControl {
 	private void readData(String nummer) {
 
 		try {
-			String sql = "SELECT kursdatum, kurs from depotviewer_kurse where wpid = " + nummer + " order by 1";
+			String sql = "SELECT kursdatum, kurs, kursperf from depotviewer_kurse where wpid = " + nummer + " order by 1";
 			data.executeQuery(sql);
 			String sql2 = "select *, (select top 1 kurs from depotviewer_kurse where wpid=depotviewer_kursevent.wpid and kursdatum >= datum order by kursdatum) as kurs from depotviewer_kursevent where wpid = " + nummer;
 			renderer.removeAnnotations();
