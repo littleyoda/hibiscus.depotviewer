@@ -1,6 +1,9 @@
 package de.open4me.depot.gui.menu;
 
+import de.open4me.depot.gui.action.AddWertpapierAction;
+import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
+import de.willuhn.jameica.gui.parts.ContextMenuItem;
 
 public class WertpapierMenu extends ContextMenu
 {
@@ -21,6 +24,8 @@ public class WertpapierMenu extends ContextMenu
 	
 
 	public WertpapierMenu() {
+		addItem(new CheckedContextMenuItem("Wertpapier hinzufügen...", new AddWertpapierAction()));
+		addItem(ContextMenuItem.SEPARATOR);
 		addMenu(new OpenInBrowserMenu("Webseiten (allgemein)", allgseiten));
 		addMenu(new OpenInBrowserMenu("Webseiten (Fonds)", fondsseiten));
 	}
