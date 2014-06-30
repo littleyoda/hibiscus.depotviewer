@@ -59,7 +59,6 @@ public class UmsatzImportAction implements Action {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ApplicationException("Fehler beim Import: " + e.getMessage() , e);
-			// TODO Auto-generated catch block
 		}
 
 	}
