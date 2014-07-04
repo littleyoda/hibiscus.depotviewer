@@ -50,6 +50,18 @@ public class SQLUtils {
 		return getResultSet(query, table, idfeld, idfeld);
 	}
 
+	public static List<GenericObjectSQL> getResultSet(PreparedStatement statement, String table, String idfeld, String pa) {
+		List<GenericObjectSQL> list = new ArrayList<GenericObjectSQL>();
+		try {
+			ResultSet ret = statement.executeQuery();
+			while (ret.next()) {
+				list.add(new GenericObjectSQL(idfeld, pa, table, ret));
+			}
+		} catch (Exception e) {
+			Logger.error("Fehler bei der SQL Anweisung", e);
+		}
+		return list;
+	}
 	public static List<GenericObjectSQL> getResultSet(String query, String table, String idfeld, String pa) {
 		List<GenericObjectSQL> list = new ArrayList<GenericObjectSQL>();
 		Connection conn = null;

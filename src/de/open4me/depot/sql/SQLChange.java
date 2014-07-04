@@ -27,13 +27,13 @@ public class SQLChange {
 		ArrayList<SQLChange> liste = new ArrayList<SQLChange>();
 
 		//		// Clean up
-				//currentversion = 6;
-		//	liste.add(new SQLChange(5, 		
-		//		"truncate table depotviewer_umsaetze;",
-		//		"truncate table depotviewer_bestand;",
-		//		"truncate table depotviewer_wertpapier;",
-		//		"truncate table depotviewer_kurse;"
-		//		));	
+				//currentversion = 8;
+//			liste.add(new SQLChange(8, 		
+//				"truncate table depotviewer_umsaetze;",
+//				"truncate table depotviewer_bestand;",
+//				"truncate table depotviewer_wertpapier;",
+//				"truncate table depotviewer_kurse;"
+//				));	
 		if (currentversion < 3) {
 
 			liste.add(new SQLChange(3, 		
