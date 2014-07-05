@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import de.open4me.depot.gui.control.UmsatzEditorControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
+import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.util.ColumnLayout;
 import de.willuhn.jameica.gui.util.Container;
@@ -49,6 +50,8 @@ public class UmsatzEditorView extends AbstractView {
 					throw new ApplicationException("Fehler beim Speichern.", e);
 				}
 		        Application.getMessagingFactory().sendMessage(new StatusBarMessage("Order / Umsatz gespeichert.",StatusBarMessage.TYPE_SUCCESS));
+				GUI.startView(OrderView.class, null);
+
 
 			}
 		},null,false,"document-save.png");

@@ -28,8 +28,31 @@ public class UmsatzEditorControl extends AbstractControl
 	private SelectInput konto;
 	private DecimalInput einzelkurs;
 
-	public UmsatzEditorControl(AbstractView view) {
+	public UmsatzEditorControl(AbstractView view) throws Exception {
 		super(view);
+		if (view.getCurrentObject() != null) {
+			GenericObjectSQL b = (GenericObjectSQL) view.getCurrentObject();
+			getAnzahl().setValue(b.getAttribute("anzahl"));
+			getEinzelkurs().setValue(b.getAttribute("kurs"));
+			getDate().setValue(b.getAttribute("buchungsdatum"));
+			
+			String id = b.getAttribute("wpid").toString();
+			for (Object o : getWertpapiere().getList()) {
+				GenericObjectSQL obj = (GenericObjectSQL) o;
+				if (obj.getID().equals(id)) {
+					getWertpapiere().setValue(obj);
+				}
+			}
+			
+			for (Object o : getKonto().getList()) {
+				Konto k = (Konto) o;
+				if (b.getAttribute("kontoid").toString().equals(k.getID())) {
+					getKonto().setValue(k);
+				}
+			}
+			
+			getAktionAuswahl().setValue((String) b.getAttribute("aktion")); 
+		}
 	}
 	
 	  /**
@@ -63,7 +86,7 @@ public class UmsatzEditorControl extends AbstractControl
 	    return einzelkurs;
 	  }
 
-	  public Input getKonto() throws RemoteException, ApplicationException 
+	  public SelectInput getKonto() throws RemoteException, ApplicationException 
 	  {
 		  if (konto != null) {
 			  return konto;
@@ -95,7 +118,7 @@ public class UmsatzEditorControl extends AbstractControl
 	  }
 	  
 	  
-	  public Input getWertpapiere() throws RemoteException 
+	  public SelectInput getWertpapiere() throws RemoteException 
 	  {
 		  if (wp != null) {
 			  return wp;
@@ -135,6 +158,10 @@ public class UmsatzEditorControl extends AbstractControl
 							
 									).hashCode()
 							); 
+		if (view.getCurrentObject() != null) {
+			GenericObjectSQL b = (GenericObjectSQL) view.getCurrentObject();
+			SQLUtils.delete(b);
+		}
 		
 	}
 }

@@ -31,7 +31,7 @@ public class OrderListControl extends AbstractControl
       return orderList;
     }
    
-    List<GenericObjectSQL> list = SQLUtils.getResultSet("select *, concat(kosten, ' ', kostenw) as joinkosten from depotviewer_umsaetze "
+    List<GenericObjectSQL> list = SQLUtils.getResultSet("select *, concat(kosten, ' ', kostenw) as joinkosten, konto.id as kontoid, depotviewer_umsaetze.id as umsatzid from depotviewer_umsaetze "
     				+ "	left join depotviewer_wertpapier on  depotviewer_umsaetze.wpid = depotviewer_wertpapier.id"
     				+ "	left join konto on  konto.id = depotviewer_umsaetze.kontoid order by buchungsdatum desc"
     		, 

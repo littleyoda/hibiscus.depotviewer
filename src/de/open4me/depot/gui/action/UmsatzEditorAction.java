@@ -8,16 +8,19 @@ import de.willuhn.util.ApplicationException;
 public class UmsatzEditorAction implements Action
 {
 
-	  public void handleAction(Object context) throws ApplicationException
-	  {
-		  System.out.println(context.getClass() + " " + context.toString());
-//	    Konto k = null;
-//	    if (context instanceof Konto)
-//	    {
-//	      k = (Konto) context;
-//	    }
-//	    
-			GUI.startView(UmsatzEditorView.class, null);
-	  }
+	private boolean createnew;
 
+	public UmsatzEditorAction(boolean b) {
+		createnew = b;
 	}
+
+	public void handleAction(Object context) throws ApplicationException
+	{
+		if (createnew) {
+			GUI.startView(UmsatzEditorView.class, null);
+		} else {
+			GUI.startView(UmsatzEditorView.class, context);
+		}
+	}
+
+}

@@ -12,10 +12,8 @@ import de.willuhn.util.ApplicationException;
  */
 public class BestandsListMenu extends ContextMenu
 {
-	private TablePart tablePart;
 
 	public BestandsListMenu(final TablePart tablePart) {
-		this.tablePart = tablePart;
 		addItem(new CheckedContextMenuItem("Löschen...",new Action() {
 
 			@Override

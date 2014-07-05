@@ -9,8 +9,8 @@ import java.util.List;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import de.open4me.de.depot.gui.input.DatumsSlider;
 import de.open4me.depot.Settings;
+import de.open4me.depot.gui.DatumsSlider;
 import de.open4me.depot.gui.action.OrderList;
 import de.open4me.depot.gui.menu.BestandsListMenu;
 import de.open4me.depot.sql.GenericObjectSQL;

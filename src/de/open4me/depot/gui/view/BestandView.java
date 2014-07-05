@@ -5,8 +5,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.TabFolder;
 
-import de.open4me.de.depot.gui.input.DatumsSlider;
 import de.open4me.depot.Settings;
+import de.open4me.depot.gui.DatumsSlider;
 import de.open4me.depot.gui.control.BestandPieChartControl;
 import de.open4me.depot.gui.control.BestandTableControl;
 import de.open4me.depot.gui.control.BestandsControl;

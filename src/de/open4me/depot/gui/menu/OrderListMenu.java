@@ -37,7 +37,8 @@ public class OrderListMenu extends ContextMenu
 			}
 
 		}));
-		addItem(new CheckedContextMenuItem("Hinzufügen", new UmsatzEditorAction()));
+		addItem(new CheckedContextMenuItem("Hinzufügen", new UmsatzEditorAction(true)));
+		addItem(new CheckedContextMenuItem("Bearbeiten", new UmsatzEditorAction(false)));
 	}
 }
 

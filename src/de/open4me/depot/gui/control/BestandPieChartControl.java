@@ -17,7 +17,7 @@ import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 import org.jfree.experimental.chart.swt.ChartComposite;
 
-import de.open4me.de.depot.gui.input.DatumsSlider;
+import de.open4me.depot.gui.DatumsSlider;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.tools.Bestandsabfragen;
 import de.willuhn.jameica.gui.AbstractView;
