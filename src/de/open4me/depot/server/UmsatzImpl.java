@@ -144,5 +144,16 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 	{
 		setAttribute("kontoid",name);
 	}
+
+	@Override
+	public String getKommentar() throws RemoteException {
+		return (String) getAttribute("kommentar");
+	}
+
+	@Override
+	public void setKommentar(String name) throws RemoteException {
+		setAttribute("kommentar",name);
+		
+	}
 }
 

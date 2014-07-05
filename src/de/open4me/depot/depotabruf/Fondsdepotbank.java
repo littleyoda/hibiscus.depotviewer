@@ -130,7 +130,7 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 						Utils.getDoubleFromZahl(infos.get("ausführungspreis")), infos.get("ausführungspreis2"),
 						((infos.get("transaktion").toUpperCase().equals("KAUF")) ? -1 : 1) * Utils.getDoubleFromZahl(infos.get("umsatz")), infos.get("umsatz2"),
 						d,
-						String.valueOf(orderid.hashCode())
+						String.valueOf(orderid.hashCode()), ""
 						);
 
 

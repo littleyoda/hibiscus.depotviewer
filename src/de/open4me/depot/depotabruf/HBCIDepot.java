@@ -1,7 +1,9 @@
 package de.open4me.depot.depotabruf;
 
+import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.kapott.hbci.GV.HBCIJob;
@@ -15,6 +17,8 @@ import org.kapott.hbci.manager.HBCIHandler;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.TypedValue;
 
+import de.open4me.depot.sql.GenericObjectSQL;
+import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.hbci.PassportRegistry;
 import de.willuhn.jameica.hbci.passport.Passport;
 import de.willuhn.jameica.hbci.passport.PassportHandle;
@@ -24,6 +28,7 @@ import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
 public class HBCIDepot extends BasisDepotAbruf {
+
 
 	@Override
 	public String getName() {
@@ -50,9 +55,26 @@ public class HBCIDepot extends BasisDepotAbruf {
 			if (!(handler.isSupported("WPDepotList") || handler.isSupported("WPDepotUms"))) {
 				throw new ApplicationException("Die Bank unterstützt keine Depots via HBCI!");
 			}
+
+			// Bestimmen, ob die Erzeugung der Umsätze aus den Bestandsveränderungen aktiviert werden soll
+			boolean simulateOrders = Boolean.parseBoolean(konto.getMeta(UMSAETZEERGAENZEN, "false"))
+					&& !handler.isSupported("WPDepotUms");
+
+			// Bestand abrufen
 			if (handler.isSupported("WPDepotList")) {
+				List<GenericObjectSQL> lastBestand = null;
+				if (simulateOrders) {
+					lastBestand = SQLUtils.getResultSet("select * from depotviewer_bestand where kontoid = " + konto.getID(),
+							"depotviewer_bestand", "id");
+				}
 				getDepotBestand(handler, konto);
+				if (simulateOrders) {
+					erzeugeUmsaetzeFuerBestandsdifferenz(konto, lastBestand);
+				}
+
 			}
+
+			// Umsatz abrufen
 			if (handler.isSupported("WPDepotUms")) {
 				getDepotUmsaetze(handler, konto);
 			}
@@ -68,7 +90,6 @@ public class HBCIDepot extends BasisDepotAbruf {
 
 	private void getDepotBestand(HBCIHandler handler, Konto konto) throws ApplicationException {
 		try {
-
 			HBCIJob auszug = handler.newJob("WPDepotList");
 			auszug.setParam("my", Converter.HibiscusKonto2HBCIKonto(konto));
 			auszug.addToQueue();
@@ -82,10 +103,12 @@ public class HBCIDepot extends BasisDepotAbruf {
 			if (!result.isOK()) {
 				throw new ApplicationException(result.getJobStatus().getErrorString());
 			}
-			Utils.clearBestand(konto);
 			if (result.getEntries().length > 1) {
 				throw new ApplicationException("Zuviele Depots wurden zurückgeliefert");
 			}
+
+
+			Utils.clearBestand(konto);
 			Entry depot = result.getEntries()[0];
 			konto.setSaldo((depot.total != null) ? depot.total.getValue().doubleValue() : 0); // Bei der DKB ist depot.total == null, wenn das Depot leer ist
 			konto.store();
@@ -100,6 +123,7 @@ public class HBCIDepot extends BasisDepotAbruf {
 			throw new ApplicationException(e);
 		}
 	}
+
 
 	private void getDepotUmsaetze(HBCIHandler handler, Konto konto) throws ApplicationException {
 		try {
@@ -176,7 +200,8 @@ public class HBCIDepot extends BasisDepotAbruf {
 							einzelbetrag, waehrung,
 							gesamtbetrag, waehrung,
 							t.datum,
-							String.valueOf(orderid.hashCode())
+							String.valueOf(orderid.hashCode()),
+							""
 							);
 				} catch (RemoteException e) {
 					e.printStackTrace();
@@ -199,5 +224,86 @@ public class HBCIDepot extends BasisDepotAbruf {
 	RemoteException {
 		return 	!isOffine(konto) && isBackendSelected(konto);
 	}
+
+	/**
+	 * Ermittelt die Bestandsänderung zwischen dem vorherigen und dem aktuellen Bestand und 
+	 * erzeugt hieraus Kauf und Verkauf Umsätze
+	 * 
+	 * @param konto Konto
+	 * @param lastBestand alter Bestand
+	 * @throws ApplicationException Fehler
+	 */
+	private void erzeugeUmsaetzeFuerBestandsdifferenz(Konto konto, List<GenericObjectSQL> lastBestand) throws ApplicationException {
+		try {
+			List<GenericObjectSQL> currentBestand = SQLUtils.getResultSet("select * from depotviewer_bestand where kontoid = " + konto.getID(),
+					"depotviewer_bestand", "id");
+
+			// Liste mit allen Wertpapier-ID erstellen
+			ArrayList<Integer> wpids = new ArrayList<Integer>();
+			for (GenericObjectSQL x : lastBestand) {
+				if (!wpids.contains(x.getAttribute("wpid"))) {
+					wpids.add((Integer) x.getAttribute("wpid"));
+				}
+			}
+			for (GenericObjectSQL x : currentBestand) {
+				if (!wpids.contains(x.getAttribute("wpid"))) {
+					wpids.add((Integer) x.getAttribute("wpid"));
+				}
+			}
+
+			// For jede Wertpaier-ID die Differenz bestimmen
+			for (Integer wpid : wpids) {
+				// Bestandsdaten zusammensuchen
+				GenericObjectSQL lastdata = null;
+				BigDecimal last = new BigDecimal("0");
+				BigDecimal current = new BigDecimal("0");
+				GenericObjectSQL currentdata = null;
+				for (GenericObjectSQL x : lastBestand) {
+					if (wpid.equals((Integer) x.getAttribute("wpid"))) {
+						lastdata = x;
+						last = (BigDecimal) x.getAttribute("anzahl");
+					}
+				}
+				for (GenericObjectSQL x : currentBestand) {
+					if (wpid.equals((Integer) x.getAttribute("wpid"))) {
+						currentdata = x;
+						current = (BigDecimal) x.getAttribute("anzahl");
+					}
+				}
+
+				// Differenz zwischen beiden Beständen bilden
+				BigDecimal diff = current.subtract(last);
+				if (diff.compareTo(BigDecimal.ZERO) == 0) {
+					continue;
+				}
+
+				// In Abhängigkeit davon, ob es ein Kauf oder Verkauf war, die Referenzdaten passen setzen 
+				boolean isKauf = (diff.compareTo(BigDecimal.ZERO) > 0);
+				GenericObjectSQL ref;
+				if (isKauf) {
+					ref = currentdata;
+				} else {
+					ref = lastdata;
+				}
+
+				// Umsatz hinzufügen
+				Utils.addUmsatz(konto.getID(), 
+						"" + wpid,
+						(isKauf) ? "KAUF" : "VERKAUF",
+								"",
+								diff.abs().doubleValue(),
+								((BigDecimal) ref.getAttribute("kurs")).doubleValue(),
+								(String) ref.getAttribute("kursw"),
+								(isKauf) ? ((BigDecimal) ref.getAttribute("wert")).negate().doubleValue() : ((BigDecimal) ref.getAttribute("wert")).doubleValue(),
+										(String) ref.getAttribute("kursw"),
+										(Date) ref.getAttribute("datum"),
+										null, "aus Bestandsänderungen generiert");
+			}
+		} catch (Exception e) {
+			throw new ApplicationException(e);
+		}
+
+	}
+
 }
 

@@ -78,7 +78,7 @@ public class Utils {
 	}
 
 	public static void addUmsatz(String kontoid, String wpid, String aktion, String info, Double anzahl, 
-			Double kurs, String kursW, Double kosten, String kostenW, Date date, String orderid) throws ApplicationException {
+			Double kurs, String kursW, Double kosten, String kostenW, Date date, String orderid, String kommentar) throws ApplicationException {
 		try {
 			DBIterator liste = Settings.getDBService().createList(Umsatz.class);
 			liste.addFilter("orderid=?", orderid);
@@ -94,6 +94,12 @@ public class Utils {
 				|| (aktion.toUpperCase().equals("VERKAUF") && (kosten <= 0.0f))) {
 				throw new ApplicationException("Bei Käufen muss der Gesamtbetrag negativ sein, beim Verkauf positiv.");
 			}
+			if (kurs <=  0.0f) {
+					throw new ApplicationException("Der Kurs muss immer positiv sein.");
+			}
+			if (orderid == null) {
+				orderid = "" + ("" + kontoid + wpid + aktion + date + anzahl + kurs + kursW).hashCode(); 
+			}
 			// create new project
 			Umsatz p = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
 			p.setKontoid(Integer.parseInt(kontoid));
@@ -107,6 +113,7 @@ public class Utils {
 			p.setKostenW(kostenW);
 			p.setBuchungsdatum(date);
 			p.setOrderid(orderid);
+			p.setKommentar(kommentar);
 			p.store();
 			// Liste der Objekte aus der Datenbank laden
 		}

@@ -122,19 +122,18 @@ public class CortalConsorsMitHBCI extends HBCIDepot {
 						throw new ApplicationException("Unbekanntes Datumsformat beim Abrechnungszeitpunkt: " + infos.get("zeitpunkt der abrechnung"));
 					}
 
-					System.out.println(infos.entrySet().toString());
 
-										Utils.addUmsatz(konto.getID(), Utils.getORcreateWKN(infos.get("wkn"), "", infos.get("wertpapiername")), infos.get("orderart"), 
-												infos.toString(),
-												Utils.getDoubleFromZahl(infos.get("stück")),
-												Utils.getDoubleFromZahl(kurs[0]), kurs[1],
-												
-												((infos.get("orderart").toUpperCase().equals("KAUF")) ? -1 : 1) *
-												Math.rint(Utils.getDoubleFromZahl(kurs[0]) * Utils.getDoubleFromZahl(infos.get("stück")) * 100) / 100,
-												 kurs[1],
-												d,
-												infos.get("ordernummer")
-												);
+					Utils.addUmsatz(konto.getID(), Utils.getORcreateWKN(infos.get("wkn"), "", infos.get("wertpapiername")), infos.get("orderart"), 
+							infos.toString(),
+							Utils.getDoubleFromZahl(infos.get("stück")),
+							Utils.getDoubleFromZahl(kurs[0]), kurs[1],
+
+							((infos.get("orderart").toUpperCase().equals("KAUF")) ? -1 : 1) *
+							Math.rint(Utils.getDoubleFromZahl(kurs[0]) * Utils.getDoubleFromZahl(infos.get("stück")) * 100) / 100,
+							kurs[1],
+							d,
+							infos.get("ordernummer"), ""
+							);
 				}
 			}
 
@@ -228,15 +227,16 @@ public class CortalConsorsMitHBCI extends HBCIDepot {
 		List<String> result = super.getPROP();
 		result.add(0, PROP_PASSWORD);
 		result.add(0, PROP_KUNDENNUMMER);
+		result.remove(UMSAETZEERGAENZENINCLFORMAT);
 		return result;
 	}
 
 	@Override
 	public boolean isSupported(Konto konto) throws ApplicationException,
-			RemoteException {
+	RemoteException {
 		return 	super.isSupported(konto) && 
 				(konto.getBLZ().equals("76030080") 
-				|| konto.getBic().toUpperCase().equals("CSDBDE71XXX"));
+						|| konto.getBic().toUpperCase().equals("CSDBDE71XXX"));
 	}
-	
+
 }

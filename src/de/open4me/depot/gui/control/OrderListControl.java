@@ -46,6 +46,7 @@ public class OrderListControl extends AbstractControl
     orderList.addColumn(Settings.i18n().tr("Kosten"),"joinkosten"); 
     orderList.addColumn(Settings.i18n().tr("Aktion"),"aktion"); 
     orderList.addColumn(Settings.i18n().tr("Datum"),"buchungsdatum", new DateFormatter(Settings.DATEFORMAT)); 
+    orderList.addColumn(Settings.i18n().tr("Kommentar"), "kommentar"); 
     orderList.setContextMenu(new OrderListMenu(orderList));
     
     return orderList;

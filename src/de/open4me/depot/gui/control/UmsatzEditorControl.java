@@ -156,7 +156,8 @@ public class UmsatzEditorControl extends AbstractControl
 							""  + (((GenericObjectSQL) getWertpapiere().getValue()).getID() + getAktionAuswahl().getValue().toString() +
 							getAnzahl().getValue().toString() + getEinzelkurs().getValue().toString() + "EUR" + getDate().getValue()
 							
-									).hashCode()
+									).hashCode(),
+									""
 							); 
 		if (view.getCurrentObject() != null) {
 			GenericObjectSQL b = (GenericObjectSQL) view.getCurrentObject();

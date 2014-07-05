@@ -51,4 +51,8 @@ public interface Umsatz extends DBObject
 
 	void setOrderid(String orderid) throws RemoteException;
 
+	public String getKommentar() throws RemoteException;
+	
+	public void setKommentar(String name) throws RemoteException;
+
 }

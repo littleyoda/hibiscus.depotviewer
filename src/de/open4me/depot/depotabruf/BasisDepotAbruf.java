@@ -11,6 +11,8 @@ import de.willuhn.util.ApplicationException;
 public abstract class BasisDepotAbruf {
 
 	final static String PROP_OPTIONS = "Optionen (kann leer bleiben)";
+	final static String UMSAETZEERGAENZEN = "Umsätze aus Bestandsänderungen ermitteln?";
+	final static String UMSAETZEERGAENZENINCLFORMAT = UMSAETZEERGAENZEN + "(true/false)";
 
 	public abstract String getName();
 	public abstract void run(Konto konto) throws ApplicationException;
@@ -20,6 +22,7 @@ public abstract class BasisDepotAbruf {
 		List<String> result = new ArrayList<String>();
 		result.add(getName());
 		result.add(PROP_OPTIONS);
+		result.add(UMSAETZEERGAENZENINCLFORMAT);
 		return result;
 		
 	}

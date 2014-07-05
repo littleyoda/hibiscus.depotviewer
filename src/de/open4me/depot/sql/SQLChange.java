@@ -27,8 +27,8 @@ public class SQLChange {
 		ArrayList<SQLChange> liste = new ArrayList<SQLChange>();
 
 		//		// Clean up
-				//currentversion = 8;
-//			liste.add(new SQLChange(8, 		
+				//currentversion = 9;
+//			liste.add(new SQLChange(9,
 //				"truncate table depotviewer_umsaetze;",
 //				"truncate table depotviewer_bestand;",
 //				"truncate table depotviewer_wertpapier;",
@@ -144,6 +144,17 @@ public class SQLChange {
 		if (currentversion < 8) {
 			liste.add(new SQLChange(8, 	
 					"ALTER TABLE depotviewer_kurse ADD kursperf decimal(20,2);"
+					));
+		}
+		if (currentversion < 9) {
+			liste.add(new SQLChange(9, 	
+					"ALTER TABLE depotviewer_umsaetze ADD kommentar varchar(2000);"
+					));
+		}
+		if (currentversion < 10) {
+			liste.add(new SQLChange(10, 	
+					"ALTER TABLE depotviewer_cfg ALTER COLUMN  value varchar(2000);",
+					"ALTER TABLE depotviewer_umsaetze ALTER COLUMN  buchungsinformationen varchar(2000);"
 					));
 		}
 

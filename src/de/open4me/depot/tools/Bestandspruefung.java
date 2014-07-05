@@ -17,7 +17,8 @@ public class Bestandspruefung {
 	
 	public static void exec() throws RemoteException {
 		output = "";
-		
+
+		// Überprüfe alle Konten für die es Umsätze bzw. Bestände gibt
 		List<GenericObjectSQL> konten = SQLUtils.getResultSet("select * from konto where id in (select distinct kontoid from depotviewer_bestand union select distinct kontoid from depotviewer_umsaetze)", null, "id");
 		for (GenericObjectSQL konto : konten) {
 			pruefe(konto);
