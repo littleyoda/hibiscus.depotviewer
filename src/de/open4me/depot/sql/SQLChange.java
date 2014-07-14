@@ -27,7 +27,7 @@ public class SQLChange {
 		ArrayList<SQLChange> liste = new ArrayList<SQLChange>();
 
 		//		// Clean up
-				//currentversion = 9;
+//				currentversion = 10;
 //			liste.add(new SQLChange(9,
 //				"truncate table depotviewer_umsaetze;",
 //				"truncate table depotviewer_bestand;",
@@ -155,6 +155,11 @@ public class SQLChange {
 			liste.add(new SQLChange(10, 	
 					"ALTER TABLE depotviewer_cfg ALTER COLUMN  value varchar(2000);",
 					"ALTER TABLE depotviewer_umsaetze ALTER COLUMN  buchungsinformationen varchar(2000);"
+					));
+		}
+		if (currentversion < 11) {
+			liste.add(new SQLChange(11, 	
+					"insert into depotviewer_cfg (key,value) values ('status_bestand_order', null);"
 					));
 		}
 

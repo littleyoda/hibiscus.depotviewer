@@ -142,6 +142,10 @@ public class UmsatzEditorControl extends AbstractControl
 		if ((Double) getAnzahl().getValue() <=0 || ((Double) getEinzelkurs().getValue() < 0)) {
 			throw new ApplicationException("Die Anzahl und der Kurs mmüssen positiv sein.");
 		}
+		if (view.getCurrentObject() != null) {
+			GenericObjectSQL b = (GenericObjectSQL) view.getCurrentObject();
+			SQLUtils.delete(b);
+		}
 		Utils.addUmsatz(((Konto) getKonto().getValue()).getID(), 
 						((GenericObjectSQL) getWertpapiere().getValue()).getID() , 
 							getAktionAuswahl().getValue().toString(), 

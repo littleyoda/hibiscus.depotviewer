@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.open4me.depot.depotabruf.Utils;
 import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.server.DBSupportH2Impl;
 import de.willuhn.jameica.hbci.server.HBCIDBServiceImpl;
@@ -28,6 +29,7 @@ public class SQLUtils {
 		int val = 0;
 		Connection conn = null;
 		try {
+			Utils.markRecalc();
 			conn = getConnection();
 			String sql = "DELETE FROM " + obj.getTable() + " WHERE " + obj.getIdfeld() +  "=?";
 			PreparedStatement prest = conn.prepareStatement(sql);

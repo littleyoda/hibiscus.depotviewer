@@ -84,4 +84,9 @@ public class GenericObjectSQL implements GenericObject {
 		Object o = getAttribute(s);
 		return  (o == null || o.toString().isEmpty());
 	}
+	
+	public void setAttribute(String key, Object value)  {
+		data.put(key, value);
+	}
+
 }

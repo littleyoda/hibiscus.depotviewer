@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -21,6 +20,7 @@ import de.open4me.depot.Settings;
 import de.open4me.depot.rmi.Bestand;
 import de.open4me.depot.rmi.Umsatz;
 import de.open4me.depot.rmi.Wertpapier;
+import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.gui.dialogs.YesNoDialog;
@@ -100,6 +100,7 @@ public class Utils {
 			if (orderid == null) {
 				orderid = "" + ("" + kontoid + wpid + aktion + date + anzahl + kurs + kursW).hashCode(); 
 			}
+			markRecalc();
 			// create new project
 			Umsatz p = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
 			p.setKontoid(Integer.parseInt(kontoid));
@@ -125,9 +126,41 @@ public class Utils {
 		}
 
 	}
+
+	/**
+	 * Wird aufgerufen, wenn sich im Bestand oder bei den Umästzen etwas geändert hat
+	 * 
+	 * Dient als Trigger, um notwendige Aktualisierungen anzustoßen
+	 * @throws ApplicationException 
+	 */
+	public static void markRecalc() throws ApplicationException {
+		setUmsatzBetsandTest(null);
+		
+	}
+	
+	public static void setUmsatzBetsandTest(Boolean value) throws ApplicationException {
+		SQLUtils.exec("update depotviewer_cfg set value = " + ((value == null) ? "NULL" : value.toString()) + " where key='status_bestand_order'");
+	}
+	
+	public static Boolean getUmsatzBestandTest() {
+		List<GenericObjectSQL> rs = SQLUtils.getResultSet("select value from depotviewer_cfg where key ='status_bestand_order'", "", "");
+		try {
+			Object ret = rs.get(0).getAttribute("value");
+			if (ret == null) {
+				return null;
+			}
+			return Boolean.parseBoolean(ret.toString());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+
 	public static void addBestand(String wpid, Konto konto, Double anzahl, 
 			Double kurs, String kursw, double wert, String wertw, Date date, Date bewertungsZeitpunkt) throws ApplicationException {
 		try {
+			markRecalc();
 			Bestand p = (Bestand) Settings.getDBService().createObject(Bestand.class,null);
 			p.setAnzahl(anzahl);
 			p.setKontoid(Integer.parseInt(konto.getID()));
@@ -149,9 +182,19 @@ public class Utils {
 
 	}
 
+	/**
+	 * Löscht für ein Konto den gesamten Bestand
+	 * 
+	 * @param konto Konto
+	 * @throws RemoteException
+	 * @throws ApplicationException
+	 */
 	public static void clearBestand(Konto konto) throws RemoteException, ApplicationException {
+		markRecalc();
 		SQLUtils.exec("delete from depotviewer_bestand where kontoid = " + konto.getID());
 	}
+
+
 	// Zerlegt einen String intelligent in max. 27 Zeichen lange Stücke
 	public static String[] parse(String line)
 	{
@@ -187,20 +230,6 @@ public class Utils {
 		return out.toArray(new String[0]);
 	}
 
-
-	public static void main(String [] args)
-	{
-		String[] s = new String[]{
-				"1", "1 2", "123456789012345678901234567890",
-				"123456789012345678901234567 890",
-				"1234567890123456789012345678 90",
-				"123456789012345678901234567 890",
-				"123456789012345678901234567 890 123456789012345678901234567 3342",
-		};
-		for (String t : s) {
-			System.out.println(t + ": " + Arrays.toString(parse(t)));
-		}
-	}
 
 
 	public static void writePage(HtmlPage page, String s) throws Exception {

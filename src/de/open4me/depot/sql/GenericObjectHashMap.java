@@ -13,12 +13,21 @@ public class GenericObjectHashMap implements GenericObject {
 		return map;
 	}
 	
+	public GenericObjectHashMap() {
+		map = new HashMap<Object, Object>();
+	}
+
 	public GenericObjectHashMap(HashMap<?, ?> map) {
 		this.map = map;
 	}
 	@Override
 	public Object getAttribute(String name) throws RemoteException {
 		return map.get(name);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void setAttribute(String key, Object value)  {
+		((HashMap<Object, Object>) getMap()).put(key, value);
 	}
 
 	@Override
