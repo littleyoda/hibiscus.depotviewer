@@ -25,10 +25,11 @@
   <extension extends="hibiscus.navi" class="de.open4me.depot.gui.Navi"/>
 </extensions> 
   <navigation>
-    <item name="Depot" icon-close="folder.png" icon-open="folder-open.png" action="de.open4me.depot.gui.action.DepotViewerMainAction">
-      <item name="Orderbuch" icon-close="text-x-generic.png" action="de.open4me.depot.gui.action.OrderList" />
-      <item name="Bestand" icon-close="text-x-generic.png" action="de.open4me.depot.gui.action.BestandAction" />
-      <item name="Wertpapiere" icon-close="text-x-generic.png" action="de.open4me.depot.gui.action.WertpapierAction" />
+    <item name="Depot-Viewer" icon-close="folder.png" icon-open="folder-open.png" action="de.open4me.depot.gui.action.DepotViewerMainAction">
+      <item name="Wertpapiere" icon-close="invest.png" action="de.open4me.depot.gui.action.WertpapierAction" />
+      <item name="Orderbuch" icon-close="emblem-documents.png" action="de.open4me.depot.gui.action.OrderList" />
+      <item name="Bestand" icon-close="system-file-manager.png" action="de.open4me.depot.gui.action.BestandAction" />
+      <item name="Gewinn/Verlust" icon-close="" action="de.open4me.depot.gui.action.BewertungsAction" />
     </item>
   </navigation>
 
