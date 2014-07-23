@@ -35,8 +35,8 @@ public class WertBerechnung {
 
 			// Die restlichen Order, die auch noch im Bestand sind
 			if (orders.size() > 0) {
-			erg = getKaufundBestandInformationen(list, bestaende, wpid, orders);
-			list.add(erg);
+				erg = getKaufundBestandInformationen(list, bestaende, wpid, orders);
+				list.add(erg);
 			}
 		}
 		
@@ -47,6 +47,9 @@ public class WertBerechnung {
 			if (jetzt == null) {
 				jetzt = (BigDecimal) l.getAttribute("wert");
 			}
+			if (jetzt == null) {
+				jetzt = BigDecimal.ZERO;
+			}
 			if (start.compareTo(BigDecimal.ZERO) == 0) {
 				l.setAttribute("abs", BigDecimal.ZERO);
 				l.setAttribute("absproz", BigDecimal.ZERO);
@@ -56,6 +59,7 @@ public class WertBerechnung {
 
 				BigDecimal absproz = jetzt.subtract(start).multiply(new BigDecimal("100.0")).divide(start, 2, RoundingMode.HALF_UP);
 				l.setAttribute("absproz", absproz);
+				l.setAttribute("währung", (String) l.getAttribute("währung")); 
 			}
 			
 		}
@@ -69,14 +73,18 @@ public class WertBerechnung {
 		// Es gilt as FIFO Prinzip
 		// Und jetzt alle Positionen addieren, die noch im Bestand sind und somit unverkauft sind
 		BigDecimal anzahl = BigDecimal.ZERO; 
-		BigDecimal kosten = BigDecimal.ZERO; 
+		BigDecimal kosten = BigDecimal.ZERO;
+		String waehrung = "";
 		for (GenericObjectSQL  order: orders) {
 			kosten = kosten.add((BigDecimal) order.getAttribute("kosten"));
-			anzahl = anzahl.add((BigDecimal) order.getAttribute("anzahl"));    			
+			anzahl = anzahl.add((BigDecimal) order.getAttribute("anzahl"));
+			// TODO Sicherstellen, dass immer mit der gleichen Währung gerechnet wird
+			waehrung = (String) order.getAttribute("kursw"); 
 		}
 		GenericObjectHashMap erg = new GenericObjectHashMap();
 		erg.setAttribute("anzahl", anzahl);
 		erg.setAttribute("einstand", kosten);
+		erg.setAttribute("währung", waehrung);
 		for (String s : new String[] {"wpid", "kontoid", "bezeichnung" ,"wertpapiername", "wkn", "isin"}) {
 			erg.setAttribute(s, wpid.getAttribute(s));
 		}
@@ -99,6 +107,7 @@ public class WertBerechnung {
 		orders.remove(idx);
 		BigDecimal anzahl = (BigDecimal) verkauf.getAttribute("anzahl"); 
 		GenericObjectHashMap erg = new GenericObjectHashMap();
+		erg.setAttribute("währung", verkauf.getAttribute("kostenw"));
 		erg.setAttribute("erloese", verkauf.getAttribute("kosten"));
 		erg.setAttribute("anzahl", verkauf.getAttribute("anzahl"));
 		erg.setAttribute("datum", verkauf.getAttribute("buchungsdatum"));
