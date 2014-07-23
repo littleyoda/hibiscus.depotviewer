@@ -11,6 +11,7 @@ import de.open4me.depot.gui.view.BestandsAbgleichView;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
 public class Bestandspruefung {
@@ -58,8 +59,8 @@ public class Bestandspruefung {
 		try {
 			Utils.setUmsatzBetsandTest(output.isEmpty());
 		} catch (ApplicationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Logger.error("Fehler beim Setzen des Umsatz/Bestand-Flags", e);
 		}
 		return output;
 	}
