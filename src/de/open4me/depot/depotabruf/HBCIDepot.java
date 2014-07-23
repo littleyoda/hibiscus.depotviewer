@@ -57,8 +57,9 @@ public class HBCIDepot extends BasisDepotAbruf {
 			}
 
 			// Bestimmen, ob die Erzeugung der Umsätze aus den Bestandsveränderungen aktiviert werden soll
-			boolean simulateOrders = Boolean.parseBoolean(konto.getMeta(UMSAETZEERGAENZEN, "false"))
-					&& !handler.isSupported("WPDepotUms");
+			boolean simulateOrders = getPROP().contains(UMSAETZEERGAENZENINCLFORMAT)  
+									&&  Boolean.parseBoolean(konto.getMeta(UMSAETZEERGAENZEN, "false"))
+									&& !handler.isSupported("WPDepotUms");
 
 			// Bestand abrufen
 			if (handler.isSupported("WPDepotList")) {
