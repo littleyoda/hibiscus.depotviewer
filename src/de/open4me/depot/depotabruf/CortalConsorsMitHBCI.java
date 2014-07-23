@@ -68,20 +68,18 @@ public class CortalConsorsMitHBCI extends HBCIDepot {
 				throw new ApplicationException("Password-Eingabe:" + e1.getMessage());
 			}
 
-			final WebClient webClient = new WebClient(BrowserVersion.INTERNET_EXPLORER_8);
+			final WebClient webClient = new WebClient();
 			webClient.setCssErrorHandler(new SilentCssErrorHandler());
 			webClient.setRefreshHandler(new ThreadedRefreshHandler());
 			webClient.getOptions().setJavaScriptEnabled(false); 
 			HtmlPage page = webClient.getPage("https://mobile.cortalconsors.de/euroWebDe/-?$part=sslm.login&s_requestedURL=https://mobile.cortalconsors.de/euroWebDe/-?$part=sslm.MobileDefault.depot&$event=orderInfoEntry");
 			seiten.add(page.asXml());
-			//		System.out.println(page.asText());
 			List<HtmlForm> forms = (List<HtmlForm>) page.getByXPath("//form[@id='login']");
 			if (forms.size() != 1) {
 				Utils.report((List<? extends HtmlElement>) page.getByXPath("//form"));
 				throw new ApplicationException("Konnte das Login-Formular nicht finden.");
 			}
 			HtmlForm form = forms.get(0);
-			//		System.out.println(form.asXml());
 			form.getInputByName("userId").setValueAttribute(username);
 			form.getInputByName("nip").setValueAttribute(password);
 			HtmlInput input = form.getInputByName("$$event_contentAreaCustomerLoginMobile");
