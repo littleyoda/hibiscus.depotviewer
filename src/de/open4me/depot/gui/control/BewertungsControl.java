@@ -3,6 +3,7 @@ package de.open4me.depot.gui.control;
 import de.open4me.depot.Settings;
 import de.open4me.depot.gui.action.OrderList;
 import de.open4me.depot.gui.formater.BigDecimalFormater;
+import de.open4me.depot.gui.parts.PrintfColumn;
 import de.open4me.depot.tools.WertBerechnung;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
@@ -30,14 +31,23 @@ public class BewertungsControl extends AbstractControl {
 		wertList.addColumn(Settings.i18n().tr("Name"),"wertpapiername"); 
 		wertList.addColumn(Settings.i18n().tr("ISIN"),"isin");
 		wertList.addColumn(Settings.i18n().tr("WKN"),"wkn");
-		wertList.addColumn(Settings.i18n().tr("Anzahl"),"anzahl"); 
-		wertList.addColumn(Settings.i18n().tr("Einstands-\npreis"),"einstand", new BigDecimalFormater(2)); 
-		wertList.addColumn(Settings.i18n().tr("Verkauf-\nerlöse"),"erloese", new BigDecimalFormater(2)); 
-		wertList.addColumn(Settings.i18n().tr("Aktueller\nWert"),"wert", new BigDecimalFormater(2)); 
-		wertList.addColumn(Settings.i18n().tr("Veränderung\n(Abs.)"),"abs", new BigDecimalFormater(2)); 
-		wertList.addColumn(Settings.i18n().tr("Veränderung\n(%)"),"absproz", new BigDecimalFormater(2)); 
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",
+				"%.5f", "anzahl"));
 
-		wertList.addColumn(Settings.i18n().tr("Bewertung-/\nVerkaufsdatum"),"datum", new DateFormatter(Settings.DATEFORMAT)); 
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Einstands-\npreis"), "einstand",
+				"%.2f %s", "einstand", "währung"));
+
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Verkauf-\nerlöse"), "erloese",
+				"%.2f %s", "erloese", "währung"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Aktueller\nWert"), "wert",
+				"%.2f %s", "wert", "währung"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Veränderung"), "abs",
+				"%.2f %s", "abs", "währung"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Veränderung"), "absproz",
+				"%.2f %%", "absproz"));
+		
+
+		wertList.addColumn(Settings.i18n().tr("Bewertung-/\nVerkaufsdatum"),"datum", new DateFormatter(Settings.DATEFORMAT));
 		return wertList;
 	}
 
