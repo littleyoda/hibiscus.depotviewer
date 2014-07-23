@@ -147,7 +147,7 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 			double depotwert = 0.0;
 			for (HashMap<String, String> i : x) {
 				Utils.addBestand(
-						Utils.getORcreateWKN(infos.get("wkn"), "", ""), konto, Utils.getDoubleFromZahl(i.get("bestand")),
+						Utils.getORcreateWKN(i.get("wkn"), "", ""), konto, Utils.getDoubleFromZahl(i.get("bestand")),
 						Utils.getDoubleFromZahl(i.get("akt. preis")), 
 						i.get("akt. preis1"), 
 						Utils.getDoubleFromZahl(i.get("akt. wert")),
