@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import de.open4me.depot.depotabruf.Utils;
+import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.open4me.depot.tools.VarDecimalFormat;
@@ -45,7 +46,7 @@ public class UmsatzEditorControl extends AbstractControl
 			}
 			
 			for (Object o : getKonto().getList()) {
-				Konto k = (Konto) o;
+				Konto k = (Konto) ((GenericObjectHashMap) o).getAttribute("kontoobj");
 				if (b.getAttribute("kontoid").toString().equals(k.getID())) {
 					getKonto().setValue(k);
 				}
@@ -91,7 +92,7 @@ public class UmsatzEditorControl extends AbstractControl
 		  if (konto != null) {
 			  return konto;
 		  }
-		   konto = new SelectInput(Utils.getKonten(), null);
+		   konto = new SelectInput(Utils.getDepotKonten(), null);
 		   konto.setAttribute("bezeichnung");
 		  return konto;
 	  }

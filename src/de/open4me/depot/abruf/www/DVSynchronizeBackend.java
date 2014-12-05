@@ -1,10 +1,11 @@
-package de.open4me.depot;
+package de.open4me.depot.abruf.www;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.open4me.depot.depotabruf.DepotAbrufFabrik;
+import de.open4me.depot.DepotViewerPlugin;
+import de.open4me.depot.abruf.impl.DepotAbrufFabrik;
 import de.willuhn.annotation.Lifecycle;
 import de.willuhn.annotation.Lifecycle.Type;
 import de.willuhn.jameica.hbci.rmi.Konto;
@@ -93,26 +94,20 @@ public class DVSynchronizeBackend extends AbstractSynchronizeBackend
 	/**
 	 * @see de.willuhn.jameica.hbci.synchronize.AbstractSynchronizeBackend#getSynchronizeKonten(de.willuhn.jameica.hbci.rmi.Konto)
 	 */
-	protected List<Konto> getSynchronizeKonten(Konto k)
+	public List<Konto> getSynchronizeKonten(Konto k)
 	{
 		List<Konto> list = super.getSynchronizeKonten(k);
 		List<Konto> result = new ArrayList<Konto>();
 
 		for (Konto konto:list)
 		{
-			try
-			{
-				if (konto.hasFlag(Konto.FLAG_OFFLINE))
 					result.add(konto);
-			}
-			catch (RemoteException re)
-			{
-				Logger.error("unable to determine flags of konto",re);
-			}
 		}
 
 		return result;
 	}
+
+	
 
 	/**
 	 * @see de.willuhn.jameica.hbci.synchronize.SynchronizeBackend#getName()
@@ -162,7 +157,6 @@ public class DVSynchronizeBackend extends AbstractSynchronizeBackend
 				for (SynchronizeJob job:this.jobs)
 				{
 					this.checkInterrupted();
-
 					DVSynchronizeJob j = (DVSynchronizeJob) job;
 					j.execute();
 

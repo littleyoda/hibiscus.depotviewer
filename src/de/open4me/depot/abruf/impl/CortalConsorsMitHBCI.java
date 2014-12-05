@@ -1,5 +1,4 @@
-package de.open4me.depot.depotabruf;
-
+package de.open4me.depot.abruf.impl;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.text.DateFormat;
@@ -10,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.ThreadedRefreshHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -26,13 +24,14 @@ import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
 import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 
 import de.open4me.depot.DepotViewerPlugin;
+import de.open4me.depot.abruf.utils.Utils;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
-public class CortalConsorsMitHBCI extends HBCIDepot {
+public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 
 	private final static I18N i18n = Application.getPluginLoader().getPlugin(DepotViewerPlugin.class).getResources().getI18N();
 	final static String PROP_KUNDENNUMMER = "Kundennummer (Webseite)";
@@ -50,6 +49,7 @@ public class CortalConsorsMitHBCI extends HBCIDepot {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public void runUmsaetze(Konto konto) throws ApplicationException {
 		ArrayList<String> seiten = new ArrayList<String>(); 
 		try {
@@ -85,6 +85,20 @@ public class CortalConsorsMitHBCI extends HBCIDepot {
 			HtmlInput input = form.getInputByName("$$event_contentAreaCustomerLoginMobile");
 			page = input.click();
 			seiten.add(page.asXml());
+
+			// Nach dem Link für das passende Depot suchen. Wichtig, wenn man mehr als ein depot hat
+			HtmlAnchor link = null;
+			for (HtmlAnchor x : page.getAnchors()) {
+				if (x.asText().equals("" + konto.getKontonummer())) {
+					link = x;
+				}
+			}
+			if (link == null) {
+				throw new ApplicationException("Link zum Konto " + konto.getKontonummer() + " nicht gefunden!");
+			}
+			page = link.click();
+			seiten.add(page.asXml());
+
 			try {
 				page = page.getAnchorByText("Orderinfo").click();
 			} catch (com.gargoylesoftware.htmlunit.ElementNotFoundException e) {
@@ -152,31 +166,6 @@ public class CortalConsorsMitHBCI extends HBCIDepot {
 
 	}
 
-	private ArrayList<HashMap<String, String>> tableRowsToHashs(HtmlTable tab) {
-		ArrayList<HashMap<String, String>> liste = new ArrayList<HashMap<String, String>>();
-		List<HtmlTableRow> rows = tab.getRows();
-		List<HtmlTableCell> headerRow = rows.get(0).getCells();
-		for (int zeile = 1; zeile < rows.size(); zeile++) {
-			HashMap<String, String> infos = new HashMap<String, String>(); 
-			List<HtmlTableCell> r2 = rows.get(zeile).getCells();
-			if (headerRow.size() != r2.size()) {
-				System.out.println("Warnung. Ungültige Anzahl an Zellen: " + headerRow.toString());
-				continue;
-			}
-			int missing=0;
-			for (int i = 0; i < headerRow.size(); i++) {
-				String header = headerRow.get(i).asText().toLowerCase();
-				if ("".equals(header)) {
-					header = "Missing" + missing;
-					missing++;
-				}
-
-				infos.put(header, r2.get(i).asText());
-			}
-			liste.add(infos);
-		}
-		return liste;
-	}
 
 	private void tohash(HashMap<String, String> infos, HtmlTable tab,
 			boolean b) {
@@ -225,7 +214,7 @@ public class CortalConsorsMitHBCI extends HBCIDepot {
 		List<String> result = super.getPROP();
 		result.add(0, PROP_PASSWORD);
 		result.add(0, PROP_KUNDENNUMMER);
-		result.remove(UMSAETZEERGAENZENINCLFORMAT);
+		//result.remove(PropHelper.UMSAETZEERGAENZENINCLFORMAT);
 		return result;
 	}
 

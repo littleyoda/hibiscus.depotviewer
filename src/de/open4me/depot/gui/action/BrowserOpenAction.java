@@ -21,16 +21,25 @@ public class BrowserOpenAction implements Action {
 			return;
 
 		GenericObjectSQL wp = (GenericObjectSQL) context;
+		String currenturl = url;
 		String st = "";
 		try {
 			if (wp.getAttribute("isin") != null && !((String) wp.getAttribute("isin")).isEmpty()) {
 				st = (String) wp.getAttribute("isin");
-			} else if (wp.getAttribute("wkn") != null && !((String) wp.getAttribute("wkn")).isEmpty()) {
-				st = (String) wp.getAttribute("wkn");
-			} else {
-				st = (String) wp.getAttribute("name");
+				currenturl = currenturl.replace("{}", st);
+				currenturl = currenturl.replace("{isin}", st);
 			}
-			Program.launch(url.replace("{}", st));
+			if (wp.getAttribute("wkn") != null && !((String) wp.getAttribute("wkn")).isEmpty()) {
+				st = (String) wp.getAttribute("wkn");
+				currenturl = currenturl.replace("{}", st);
+				currenturl = currenturl.replace("{wkn}", st);
+			}
+			st = (String) wp.getAttribute("name");
+			if (st != null) {
+			currenturl = currenturl.replace("{}", st);
+			currenturl = currenturl.replace("{name}", st);
+			}
+			Program.launch(currenturl);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			throw new ApplicationException(e);

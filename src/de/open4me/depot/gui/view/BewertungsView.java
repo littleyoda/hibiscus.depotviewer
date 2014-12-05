@@ -3,7 +3,7 @@ package de.open4me.depot.gui.view;
 import java.rmi.RemoteException;
 
 import de.open4me.depot.Settings;
-import de.open4me.depot.depotabruf.Utils;
+import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.control.BewertungsControl;
 import de.open4me.depot.tools.Bestandspruefung;
 import de.willuhn.jameica.gui.AbstractView;
@@ -23,7 +23,7 @@ public class BewertungsView extends AbstractView
 
 		GUI.getView().setTitle(Settings.i18n().tr("Gewinn/Verlust"));
 
-		if (!Boolean.TRUE.equals(Utils.getUmsatzBestandTest())) {
+		if (!Bestandspruefung.isOK()) {
 			LabelGroup group = new LabelGroup(this.getParent(),
 					Settings.i18n().tr("Inkonsistenzen zwischen Umsätzen und Beständen"));
 			group.addText("Der Abgleich zwischen Umsatz und Bestand hat Inkonsistenz ergeben.\n"

@@ -1,4 +1,4 @@
-package de.open4me.depot.depotabruf;
+package de.open4me.depot.abruf.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,14 +17,19 @@ import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import de.open4me.depot.Settings;
+import de.open4me.depot.abruf.hbci.DVHBCISynchronizeJobProviderDepotKontoauszug;
+import de.open4me.depot.abruf.impl.DepotAbrufFabrik;
+import de.open4me.depot.abruf.www.DVSynchronizeBackend;
 import de.open4me.depot.rmi.Bestand;
 import de.open4me.depot.rmi.Umsatz;
 import de.open4me.depot.rmi.Wertpapier;
+import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.gui.dialogs.YesNoDialog;
 import de.willuhn.jameica.hbci.rmi.Konto;
+import de.willuhn.jameica.hbci.synchronize.hbci.HBCISynchronizeBackend;
 import de.willuhn.jameica.plugin.Plugin;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
@@ -91,11 +96,15 @@ public class Utils {
 				return;
 			}
 			if ((aktion.toUpperCase().equals("KAUF") && (kosten >= 0.0f))
-				|| (aktion.toUpperCase().equals("VERKAUF") && (kosten <= 0.0f))) {
-				throw new ApplicationException("Bei Käufen muss der Gesamtbetrag negativ sein, beim Verkauf positiv.");
+					|| (aktion.toUpperCase().equals("VERKAUF") && (kosten <= 0.0f))) {
+				throw new ApplicationException("Bei Käufen muss der Gesamtbetrag negativ sein, beim Verkauf positiv. ("
+						+ aktion.toUpperCase() + " " + kosten + ")");
+			}
+			if (anzahl < 0.0f) {
+				throw new ApplicationException("Anzahl muss immer positiv sein.");
 			}
 			if (kurs <=  0.0f) {
-					throw new ApplicationException("Der Kurs muss immer positiv sein.");
+				throw new ApplicationException("Der Kurs muss immer positiv sein.");
 			}
 			if (orderid == null) {
 				orderid = "" + ("" + kontoid + wpid + aktion + date + anzahl + kurs + kursW).hashCode(); 
@@ -135,13 +144,13 @@ public class Utils {
 	 */
 	public static void markRecalc() throws ApplicationException {
 		setUmsatzBetsandTest(null);
-		
+
 	}
-	
+
 	public static void setUmsatzBetsandTest(Boolean value) throws ApplicationException {
 		SQLUtils.exec("update depotviewer_cfg set value = " + ((value == null) ? "NULL" : value.toString()) + " where key='status_bestand_order'");
 	}
-	
+
 	public static Boolean getUmsatzBestandTest() {
 		List<GenericObjectSQL> rs = SQLUtils.getResultSet("select value from depotviewer_cfg where key ='status_bestand_order'", "", "");
 		try {
@@ -285,7 +294,7 @@ public class Utils {
 		}
 	}
 
-	
+
 	public static String getORcreateWKN(String wkn, String isin, String name) throws ApplicationException, RemoteException {
 		if (wkn == null) {
 			wkn = "";
@@ -310,16 +319,57 @@ public class Utils {
 		return wpid;
 	}
 
-	public static List<Konto> getKonten() throws RemoteException, ApplicationException {
-		List<Konto> list = new ArrayList<Konto>();
+
+	//	public static List<Konto> getDepotKonten() throws RemoteException, ApplicationException {
+	//		DVHBCISynchronizeJobProviderDepotKontoauszug j = new DVHBCISynchronizeJobProviderDepotKontoauszug();
+	//		List<Konto> list = new ArrayList<Konto>();
+	//		DBIterator liste = Settings.getDBService().createList(Konto.class);
+	//		while (liste.hasNext()) {
+	//			Konto k = (Konto) liste.next();
+	//			if (DepotAbrufFabrik.getDepotAbruf(k) != null) {
+	//				list.add(k);
+	//			} else {
+	//				if (j.supports(null, k)) {
+	//					list.add(k);
+	//				}
+	//				
+	//			}
+	//		}
+	//		return list;
+	//	}
+
+	public static List<GenericObjectHashMap> getDepotKonten() throws RemoteException, ApplicationException {
+		DVHBCISynchronizeJobProviderDepotKontoauszug j = new DVHBCISynchronizeJobProviderDepotKontoauszug();
+		List<GenericObjectHashMap> list = new ArrayList<GenericObjectHashMap>();
 		DBIterator liste = Settings.getDBService().createList(Konto.class);
 		while (liste.hasNext()) {
 			Konto k = (Konto) liste.next();
-			if (DepotAbrufFabrik.getDepotAbruf(k) != null) {
-				list.add(k);
+			
+			boolean hbci = k.getBackendClass() == null || k.getBackendClass().equals(HBCISynchronizeBackend.class.getName());
+			boolean www = k.getBackendClass() != null && k.getBackendClass().equals(DVSynchronizeBackend.class.getName()); 
+			if (  hbci || www) {
+				GenericObjectHashMap m = new GenericObjectHashMap();
+				for (String attr : k.getAttributeNames()) {
+					m.setAttribute(attr, k.getAttribute(attr));
+				}
+				m.setAttribute("zugangsart", "keine Unterstützung");
+				m.setAttribute("kontoobj", k);
+				if (www && DepotAbrufFabrik.getDepotAbruf(k) != null) {
+					m.setAttribute("zugangsart", "nur Screen Scraping");
+				} else if (www && DepotAbrufFabrik.getDepotAbruf(k) == null) {
+					m.setAttribute("zugangsart", "kein Support für diese Bank via Screen Scraping");
+				} else  if (hbci && j.supports(null, k) && DepotAbrufFabrik.getDepotAbrufHBCI(k) != null) {
+					m.setAttribute("zugangsart", "HBCI mit Screen Scraping");
+					m.setAttribute("abruf", DepotAbrufFabrik.getDepotAbrufHBCI(k));
+				} else if (hbci && j.supports(null, k)) {
+					m.setAttribute("zugangsart", "nur HBCI");
+				} else {
+					continue;
+				}
+				list.add(m);
 			}
 		}
 		return list;
 	}
-	
+
 }

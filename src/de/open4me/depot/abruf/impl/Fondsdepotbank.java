@@ -1,4 +1,4 @@
-package de.open4me.depot.depotabruf;
+package de.open4me.depot.abruf.impl;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.TextPage;
@@ -24,6 +23,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPasswordInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
 
 import de.open4me.depot.DepotViewerPlugin;
+import de.open4me.depot.abruf.utils.Utils;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.util.ApplicationException;
@@ -36,6 +36,7 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 	final static String PROP_PASSWORD = "Passwort";
 
 
+	@SuppressWarnings("unchecked")
 	public void run(Konto konto) throws ApplicationException {
 		ArrayList<String> seiten = new ArrayList<String>(); 
 		try {
@@ -55,7 +56,7 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 			}
 			
 			
-			final WebClient webClient = new WebClient(BrowserVersion.INTERNET_EXPLORER_8);
+			final WebClient webClient = new WebClient();
 			webClient.setCssErrorHandler(new SilentCssErrorHandler());
 			webClient.setRefreshHandler(new ThreadedRefreshHandler());
 			HtmlPage page = webClient.getPage("https://banking.fondsdepotbank.de/i3/fodb/public/login_init.do");
@@ -76,86 +77,9 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 				throw new ApplicationException("Login fehlgeschlagen! Falsches Password?");
 			}
 
-			// Abfrage der Umsätze
-			forms = (List<HtmlForm>) page.getByXPath( "//form[@name='transactionsForm']");
-			if (forms.size() != 1) {
-				throw new ApplicationException("Konnte das Umsätze-Formular nicht finden.");
-			}
-			form = forms.get(0);
+			page = getUmsaetze(konto, seiten, page);
 
-			HtmlCheckBoxInput cb = form.getInputByName("showAllTransactions");
-			cb.setChecked(true);
-			page = form.getInputByValue("Suchen").click();
-			seiten.add(page.asXml());
-			//		System.out.println(page.asText());
-			//	System.out.println(page.asXml());
-			TextPage text = page.getAnchorByHref("/i3/fodb/transaction_list_export_csv.do").click();
-			//System.out.println();
-
-			Scanner scanner = new Scanner(text.getContent());
-			String[] header = null;
-			DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-			HashMap<String, String> infos = new HashMap<String, String>();
-			while (scanner.hasNextLine()) {
-				String line = scanner.nextLine();
-				if (header == null) {
-					if (!line.startsWith("Abrechnung")) {
-						continue;
-					}
-					header = (line + "_").replace(";;", ";_;").split(";");
-					continue;
-				}
-				infos.clear();
-				String[] data = line.split(";");
-				String pre = "";
-				for (int i = 0; i < data.length; i++) {
-					String headername = header[i].toLowerCase();
-					if (headername.equals("_")) {
-						headername = pre + "2";
-					}
-					infos.put(headername, data[i]);
-					pre = header[i].toLowerCase();
-				}
-
-				String orderid = infos.get("wkn") + infos.get("transaktion") + infos.get("ausführungspreis") + infos.get("umsatz") + infos.get("abrechnung") + infos.get("stücke");  
-				Date d;
-				try {
-					d = df.parse(infos.get("ausführungsdatum").substring(0,10));
-				} catch (ParseException e) {
-					throw new ApplicationException("Unbekanntes Datumsformat: " + infos.get("zeitpunkt der abrechnung"));	
-				}
-				Utils.addUmsatz(konto.getID(), Utils.getORcreateWKN(infos.get("wkn"), "", infos.get("fondsname")), infos.get("transaktion"), 
-						infos.toString(),
-						Utils.getDoubleFromZahl(infos.get("stücke")),
-						Utils.getDoubleFromZahl(infos.get("ausführungspreis")), infos.get("ausführungspreis2"),
-						((infos.get("transaktion").toUpperCase().equals("KAUF")) ? -1 : 1) * Utils.getDoubleFromZahl(infos.get("umsatz")), infos.get("umsatz2"),
-						d,
-						String.valueOf(orderid.hashCode()), ""
-						);
-
-
-
-			}
-			scanner.close();
-
-			// Depot Bestand
-			page = page.getAnchorByText("Depotübersicht").click();
-			seiten.add(page.asText());
-			text = page.getAnchorByHref("/i3/fodb/sec_account_asset_overview_export_csv.do").click();
-			ArrayList<HashMap<String, String>> x = parseCSV(text.getContent(), "Bestand");
-			Utils.clearBestand(konto);
-			double depotwert = 0.0;
-			for (HashMap<String, String> i : x) {
-				Utils.addBestand(
-						Utils.getORcreateWKN(i.get("wkn"), "", ""), konto, Utils.getDoubleFromZahl(i.get("bestand")),
-						Utils.getDoubleFromZahl(i.get("akt. preis")), 
-						i.get("akt. preis1"), 
-						Utils.getDoubleFromZahl(i.get("akt. wert")),
-						i.get("akt. preis1"), new Date(), df.parse(i.get("preisdatum")));
-				depotwert += Utils.getDoubleFromZahl(i.get("akt. wert"));
-			}
-			konto.setSaldo(depotwert);
-			konto.store();
+			getBestaende(konto, seiten, page);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -170,6 +94,102 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 				throw new ApplicationException(e);
 			}
 		}
+	}
+
+	private void getBestaende(Konto konto, ArrayList<String> seiten,
+			HtmlPage page) throws IOException, RemoteException,
+			ApplicationException, ParseException {
+		TextPage text;
+		DateFormat df;
+		// Depot Bestand
+		df = new SimpleDateFormat("dd.MM.yyyy");
+		page = page.getAnchorByText("Depotübersicht").click();
+		seiten.add(page.asText());
+		text = page.getAnchorByHref("/i3/fodb/sec_account_asset_overview_export_csv.do").click();
+		ArrayList<HashMap<String, String>> x = parseCSV(text.getContent(), "Bestand");
+		Utils.clearBestand(konto);
+		double depotwert = 0.0;
+		for (HashMap<String, String> i : x) {
+			Utils.addBestand(
+					Utils.getORcreateWKN(i.get("wkn"), "", ""), konto, Utils.getDoubleFromZahl(i.get("bestand")),
+					Utils.getDoubleFromZahl(i.get("akt. preis")), 
+					i.get("akt. preis1"), 
+					Utils.getDoubleFromZahl(i.get("akt. wert")),
+					i.get("akt. preis1"), new Date(), df.parse(i.get("preisdatum")));
+			depotwert += Utils.getDoubleFromZahl(i.get("akt. wert"));
+		}
+		konto.setSaldo(depotwert);
+		konto.store();
+	}
+
+	@SuppressWarnings("unchecked")
+	private HtmlPage getUmsaetze(Konto konto, ArrayList<String> seiten,
+			HtmlPage page) throws ApplicationException, IOException,
+			RemoteException {
+		List<HtmlForm> forms;
+		HtmlForm form;
+		// Abfrage der Umsätze
+		forms = (List<HtmlForm>) page.getByXPath( "//form[@name='transactionsForm']");
+		if (forms.size() != 1) {
+			throw new ApplicationException("Konnte das Umsätze-Formular nicht finden.");
+		}
+		form = forms.get(0);
+
+		HtmlCheckBoxInput cb = form.getInputByName("showAllTransactions");
+		cb.setChecked(true);
+		page = form.getInputByValue("Suchen").click();
+		seiten.add(page.asXml());
+		TextPage text = page.getAnchorByHref("/i3/fodb/transaction_list_export_csv.do").click();
+
+		Scanner scanner = new Scanner(text.getContent());
+		String[] header = null;
+		DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+		HashMap<String, String> infos = new HashMap<String, String>();
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+			if (header == null) {
+				if (!line.startsWith("Abrechnung")) {
+					continue;
+				}
+				header = (line + "_").replace(";;", ";_;").split(";");
+				continue;
+			}
+			infos.clear();
+			String[] data = line.split(";");
+			String pre = "";
+			for (int i = 0; i < data.length; i++) {
+				String headername = header[i].toLowerCase();
+				if (headername.equals("_")) {
+					headername = pre + "2";
+				}
+				infos.put(headername, data[i]);
+				pre = header[i].toLowerCase();
+			}
+
+			String orderid = infos.get("wkn") + infos.get("transaktion") + infos.get("ausführungspreis") + infos.get("umsatz") + infos.get("abrechnung") + infos.get("stücke");  
+			Date d;
+			try {
+				d = df.parse(infos.get("ausführungsdatum").substring(0,10));
+			} catch (ParseException e) {
+				throw new ApplicationException("Unbekanntes Datumsformat: " + infos.get("zeitpunkt der abrechnung"));	
+			}
+			Utils.addUmsatz(konto.getID(), Utils.getORcreateWKN(infos.get("wkn"), "", infos.get("fondsname")), 
+					infos.get("transaktion"), 
+					infos.toString(),
+					(infos.get("transaktion").toUpperCase().equals("KAUF")? 1 : -1) * Utils.getDoubleFromZahl(infos.get("stücke")), // Anzahl
+					Utils.getDoubleFromZahl(infos.get("ausführungspreis")), // Kurs 
+					infos.get("ausführungspreis2"),
+					-1 * Utils.getDoubleFromZahl(infos.get("umsatz")), // Kosten 
+					infos.get("umsatz2"),
+					d,
+					String.valueOf(orderid.hashCode()), ""
+					);
+
+
+
+		}
+		scanner.close();
+		return page;
 	}
 
 	private ArrayList<HashMap<String, String>> parseCSV(String csv, String search) {

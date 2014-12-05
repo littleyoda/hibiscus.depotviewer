@@ -19,6 +19,7 @@ public class DepotViewerMainView extends AbstractView
 
 	}
 
+
 	public void unbind() throws ApplicationException {
 	}
 

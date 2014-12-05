@@ -52,13 +52,13 @@ public class BestandTableControl extends AbstractControl implements Listener
 	}
 
 	@SuppressWarnings("rawtypes")
-	public Part getProjectsTable() throws RemoteException
+	public Part getProjectsTable() throws Exception
 	{
 		if (bestandsList != null) {
 			return bestandsList;
 		}
 
-		bestandsList = new TablePart(new ArrayList() ,new OrderList()) {
+		bestandsList = new TablePart(Bestandsabfragen.getBestand(null),new OrderList()) {
 
 			@SuppressWarnings("unchecked")
 			@Override
@@ -68,6 +68,9 @@ public class BestandTableControl extends AbstractControl implements Listener
 					double sum = 0.0d;
 					for (GenericObjectSQL k: (List<GenericObjectSQL>) getItems())
 					{
+						if (k.getAttribute("wert") == null) {
+							continue;
+						}
 						if (k.getAttribute("wert") instanceof BigDecimal) {
 							sum += ((BigDecimal) k.getAttribute("wert")).doubleValue();
 						} else {

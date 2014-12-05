@@ -2,7 +2,6 @@ package de.open4me.depot.gui.control;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.gui.action.OrderList;
-import de.open4me.depot.gui.formater.BigDecimalFormater;
 import de.open4me.depot.gui.parts.PrintfColumn;
 import de.open4me.depot.tools.WertBerechnung;
 import de.willuhn.jameica.gui.AbstractControl;

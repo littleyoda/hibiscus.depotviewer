@@ -20,6 +20,7 @@ public class WertpapierMenu extends ContextMenu
 			{ "Fondsweb.de", "http://www.fondsweb.de/suche?QUERY={}" },
 			{ "Justetf.com", "https://www.justetf.com/de/etf-profile.html?isin={}"},
 			{ "Morningstar.de", "http://www.morningstar.de/de/funds/SecuritySearchResults.aspx?type=ALL&search={}" },
+		//	{ "Moneymeets.de", "https://moneymeets.depotstand.de/app.php/produkt/Factsheet/{isin}" }
 		};
 	
 

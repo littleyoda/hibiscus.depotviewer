@@ -1,4 +1,4 @@
-package de.open4me.depot;
+package de.open4me.depot.abruf.www;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -83,6 +83,13 @@ public class DVSynchronizeJobProviderKontoauszug implements DVSynchronizeJobProv
 				// damit die oben gesendeten Ueberweisungen gleich mit
 				// erscheinen, insofern die Bank das unterstuetzt.
 				return 1;
+			}
+
+			@Override
+			public boolean supports(Class<? extends SynchronizeJob> type,
+					Konto k) {
+				// TODO Auto-generated method stub
+				return true;
 			}
 
 }

@@ -6,11 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import de.open4me.depot.depotabruf.Utils;
-import de.open4me.depot.gui.view.BestandsAbgleichView;
+import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
-import de.willuhn.jameica.gui.GUI;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 

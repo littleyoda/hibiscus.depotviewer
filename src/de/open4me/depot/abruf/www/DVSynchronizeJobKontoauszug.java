@@ -1,9 +1,9 @@
-package de.open4me.depot;
+package de.open4me.depot.abruf.www;
 
 import javax.annotation.Resource;
 
-import de.open4me.depot.depotabruf.BasisDepotAbruf;
-import de.open4me.depot.depotabruf.DepotAbrufFabrik;
+import de.open4me.depot.abruf.impl.BasisDepotAbruf;
+import de.open4me.depot.abruf.impl.DepotAbrufFabrik;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.synchronize.jobs.SynchronizeJobKontoauszug;
 import de.willuhn.logging.Logger;

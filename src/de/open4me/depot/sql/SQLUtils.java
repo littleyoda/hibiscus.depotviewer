@@ -9,7 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.open4me.depot.depotabruf.Utils;
+import de.open4me.depot.abruf.utils.Utils;
 import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.server.DBSupportH2Impl;
 import de.willuhn.jameica.hbci.server.HBCIDBServiceImpl;

@@ -54,7 +54,7 @@
       		      <fileset dir="${define.htmlunit.dir}/lib" >
        			 <include name="**/*.jar" />
       		      </fileset>
-      		      <fileset dir="${define.jameica.dir}/lib/swt" >
+      		      <fileset dir="${define.jameica.dir}/lib/" >
        			 <include name="**/*.jar" />
       		      </fileset>
       		      

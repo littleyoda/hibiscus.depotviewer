@@ -93,7 +93,7 @@ public class WertBerechnung {
 			if (wpid.getAttribute("wpid").equals(bestand.getAttribute("wpid")) &&
 					wpid.getAttribute("kontoid").equals(bestand.getAttribute("kontoid"))) {
 				erg.setAttribute("wert", bestand.getAttribute("wert"));
-				erg.setAttribute("datum", bestand.getAttribute("datum"));
+				erg.setAttribute("datum", bestand.getAttribute("bewertungszeitpunkt"));
 			}
 		}
 		return erg;

@@ -1,12 +1,11 @@
-package de.open4me.depot;
+package de.open4me.depot.abruf.www;
 
 import de.willuhn.jameica.hbci.synchronize.SynchronizeJobProvider;
 
 /**
- * Marker-Interface fuer die vom Plugin unterstuetzten Jobs.
- */
+* MarkerInterface fuer die vom Plugin unterstuetzten Jobs.
+*/
 public interface DVSynchronizeJobProvider extends SynchronizeJobProvider
 {
 }
-
 

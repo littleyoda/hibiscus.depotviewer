@@ -20,7 +20,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 
-import de.open4me.depot.depotabruf.Utils;
+import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.dialogs.KursAktualisierenDialog;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;

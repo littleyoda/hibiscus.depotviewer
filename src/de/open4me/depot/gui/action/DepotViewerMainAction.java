@@ -1,7 +1,6 @@
 package de.open4me.depot.gui.action;
 
 import de.willuhn.jameica.gui.Action;
-
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.util.ApplicationException;
 

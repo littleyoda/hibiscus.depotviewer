@@ -12,6 +12,8 @@ import de.open4me.depot.gui.control.BestandTableControl;
 import de.open4me.depot.gui.control.BestandsControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.jameica.gui.util.Container;
+import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.jameica.gui.util.TabGroup;
 
 public class BestandView extends AbstractView
@@ -25,26 +27,21 @@ public class BestandView extends AbstractView
 		GUI.getView().setTitle(Settings.i18n().tr("Bestand"));
 
 		DatumsSlider datumsSlider = new DatumsSlider(bestandsControl.getDates());
-		final TabFolder folder = new TabFolder(getParent(), SWT.NONE);
-//	    folder.addSelectionListener(new SelectionAdapter() {
-//	      public void widgetSelected(SelectionEvent e)
-//	      {
-//	        if (folder.getSelectionIndex() == 1)
-//	          control.handleRefreshChart();
-//	      }
-//	    });
-	    folder.setLayoutData(new GridData(GridData.FILL_BOTH));
-	    
-	    TabGroup tg1 = new TabGroup(folder, "Tabellarisch");
+
+		//  	Implementierung funktioniert mit der aktuellen SWT Version nicht
+		final TabFolder folder = new TabFolder(getParent(), SWT.CENTER);
+		folder.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		TabGroup tabellenTab = new TabGroup(folder, "Tabellarisch");
 		BestandTableControl control = new BestandTableControl(this, datumsSlider);
+		Container container = new SimpleContainer(tabellenTab.getComposite());
+		container.addPart(control.getProjectsTable());
 
-		
-	    final TabGroup tg2 = new TabGroup(folder, "Graphisch");
-	    tg2.getComposite().setLayout(new FillLayout());
-	    BestandPieChartControl chart = new BestandPieChartControl(this, datumsSlider);
+		final TabGroup piechartTab = new TabGroup(folder, "Graphisch");
+		piechartTab.getComposite().setLayout(new FillLayout());
+		BestandPieChartControl chart = new BestandPieChartControl(this, datumsSlider);
+		chart.getBestandChart(piechartTab.getComposite());
 
-		control.getProjectsTable().paint(tg1.getComposite());
-	    chart.getBestandChart(tg2.getComposite());
 		datumsSlider.paint(getParent());
 
 	}

@@ -16,7 +16,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlTable;
 
 import de.open4me.depot.Settings;
-import de.open4me.depot.depotabruf.Utils;
+import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.action.OrderList;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.willuhn.jameica.gui.AbstractControl;

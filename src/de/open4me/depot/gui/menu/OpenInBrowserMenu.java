@@ -6,9 +6,9 @@ import de.willuhn.jameica.gui.parts.ContextMenu;
 
 public class OpenInBrowserMenu extends ContextMenu {
 	
-	public OpenInBrowserMenu(String name, String[][] seiten) {
+	public OpenInBrowserMenu(String name, String[][] fondsseiten) {
 		this.setText(name);
-		for (String[] seite : seiten) {
+		for (String[] seite : fondsseiten) {
 			addItem(new CheckedContextMenuItem(seite[0], new BrowserOpenAction(seite[1])));
 		}
 

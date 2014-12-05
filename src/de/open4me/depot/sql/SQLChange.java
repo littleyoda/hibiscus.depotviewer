@@ -162,7 +162,15 @@ public class SQLChange {
 					"insert into depotviewer_cfg (key,value) values ('status_bestand_order', null);"
 					));
 		}
-
+		//		// Clean up
+////		currentversion = 10;
+//	liste.add(new SQLChange(11,
+//		"truncate table depotviewer_umsaetze;",
+//		"truncate table depotviewer_bestand;",
+//		"truncate table depotviewer_wertpapier;",
+//		"truncate table depotviewer_kurse;"
+//		));	
+//
 		return liste;
 	}
 
