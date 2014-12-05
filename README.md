@@ -2,6 +2,7 @@ hibiscus.depotviewer
 ====================
 
 Depot-Viewer-Plugin für Hibiscus
+Kontakt via depotviewer@open4me.de
 
 Stand 05.12.2014 funktioniert dieses Plugin nur mit einer Nightly-Build Version von Hibiscus und nicht mit der 2.6.10. Voraussichtlich wird es mit der 2.6.11 funktionieren.
 

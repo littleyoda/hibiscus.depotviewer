@@ -21,6 +21,7 @@ Sollte die Bank Umsätze via HBCI nicht unterstützen, äußert sich dieses in d
 
 
 
+Ergänzungen bitte an depotviewer@open4me.de. Auch Banken, die HBCI nicht unterstützen, dokumentiere ich gerne.
 
 Sonstige nicht HBCI-Banken
 --------------------------
