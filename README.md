@@ -3,56 +3,26 @@ hibiscus.depotviewer
 
 Depot-Viewer-Plugin für Hibiscus
 
+Stand 05.12.2014 funktioniert dieses Plugin nur mit einer Nightly-Build Version von Hibiscus und nicht mit der 2.6.10. Voraussichtlich wird es mit der 2.6.11 funktionieren.
 
 Mit Hilfe dieses Plugins können für die folgenden Banken Depot-Informationen abgerufen werden:
-* Cortal Consors
-* Fondsdepot Bank
+* Banken, die Depotzugriffe via HBCI unterstützen
+* Fondsdepotbank
+[Mehr Informationen](banken.md)
+
 
 Installation des Plugins:
-- Menü Datei/Einstellungen
-- Reiter "Updates"
-- Neues Repository hinzufügen
-- "http://www.open4me.de/hibiscus/" in die Textbox eintragen
-- Doppel-Klick auf "http://www.open4me.de/hibiscus/"
-- Die Einstallation des gewünschten Plugins durch Doppel-Klick beginnen
-- Hibiscus neu starten
-
-Einrichtung eines Kontos:
-
-Unter dem Punkt "Konten" den Button "Konto manuell anlegen" anklicken.
-
-Folgende Einstellungen sind im Dialog nötig:
-
-Für CortalConsors
-
-| Feld | Inhalt |
-| --------- | ------ |
-| Bezeichnung des Kontos | frei wählbar |
-| Kontoinhalber | frei wählbar |
-| IBAN | leer lassen |
-| BIC | leer lassen |
-| Verfahren | keine Auswahl nötig |
-| Kundenkennung | Kontonummer bzw. UserID, wie auf der Webseite genutzt wird |
-| Unterkontonummer | Depot Cortal Consors |
-| Bankleitzahl | 0 |
-| Offline-Konto | muss aktiv sein |
-
-Für Fondsdepot Bank
-
-| Feld | Inhalt |
-| --------- | ------ |
-| Bezeichnung des Kontos | frei wählbar |
-| Kontoinhalber | frei wählbar |
-| IBAN | leer lassen |
-| BIC | leer lassen |
-| Verfahren | keine Auswahl nötig |
-| Kundenkennung | Zugangsnummer, wie auf der Webseite genutzt wird |
-| Unterkontonummer | Depot Fondsdepot Bank |
-| Bankleitzahl | 0 |
-| Offline-Konto | muss aktiv sein |
+* Menü Datei/Einstellungen
+* Reiter "Updates"
+* Falls hier "http://www.open4me.de/hibiscus/" noch nicht aufgeführt ist:
+⋅⋅* Neues Repository hinzufügen
+⋅⋅* "http://www.open4me.de/hibiscus/" in die Textbox eintragen
+* Doppel-Klick auf "http://www.open4me.de/hibiscus/"
+* Die Installation des gewünschten Plugins durch Doppel-Klick beginnen
+* Hibiscus neu starten
 
 
-
+[Einrichtungen von Depots](banken.md)
 
 Nach dem Speichern kann unter Synchronisierungsoptionen das Password hinterlegt werden.
 
