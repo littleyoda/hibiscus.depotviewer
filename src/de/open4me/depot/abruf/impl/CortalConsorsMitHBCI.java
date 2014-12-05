@@ -45,6 +45,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 	@Override
 	public void run(Konto konto) throws ApplicationException {
 		super.run(konto); // Bestand via HBCI
+		Logger.info("Starte Screen Scraping für Cortal Consors");
 		runUmsaetze(konto);
 
 	}
