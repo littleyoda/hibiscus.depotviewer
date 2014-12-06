@@ -44,7 +44,7 @@ public class DepotListControl extends AbstractControl
 		orderList.addColumn(Settings.i18n().tr("BLZ"), "blz");
 		orderList.addColumn(Settings.i18n().tr("Konto"), "kontonummer");
 		orderList.addColumn(Settings.i18n().tr("zugangsart"), "zugangsart"); 
-		orderList.setContextMenu(new OrderListMenu(orderList));
+		//orderList.setContextMenu(new OrderListMenu(orderList));
 		return orderList;
 	}
 
