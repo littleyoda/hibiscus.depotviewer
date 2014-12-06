@@ -48,7 +48,7 @@ public class UmsatzEditorControl extends AbstractControl
 			for (Object o : getKonto().getList()) {
 				Konto k = (Konto) ((GenericObjectHashMap) o).getAttribute("kontoobj");
 				if (b.getAttribute("kontoid").toString().equals(k.getID())) {
-					getKonto().setValue(k);
+					getKonto().setValue(o);
 				}
 			}
 			
@@ -147,7 +147,9 @@ public class UmsatzEditorControl extends AbstractControl
 			GenericObjectSQL b = (GenericObjectSQL) view.getCurrentObject();
 			SQLUtils.delete(b);
 		}
-		Utils.addUmsatz(((Konto) getKonto().getValue()).getID(), 
+		Konto k = (Konto) ((GenericObjectHashMap) getKonto().getValue()).getAttribute("kontoobj");
+
+		Utils.addUmsatz(k.getID(), 
 						((GenericObjectSQL) getWertpapiere().getValue()).getID() , 
 							getAktionAuswahl().getValue().toString(), 
 							"", 
