@@ -9,6 +9,7 @@ import java.util.List;
 import org.kapott.hbci.GV_Result.GVRWPDepotList;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry.Gattung;
+import org.kapott.hbci.status.HBCIRetVal;
 
 import de.open4me.depot.abruf.impl.BasisDepotAbruf;
 import de.open4me.depot.abruf.utils.Utils;
@@ -18,8 +19,13 @@ import de.willuhn.jameica.hbci.HBCIProperties;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.rmi.Protokoll;
 import de.willuhn.jameica.hbci.server.Converter;
+import de.willuhn.jameica.hbci.synchronize.SynchronizeSession;
+import de.willuhn.jameica.hbci.synchronize.hbci.HBCISynchronizeBackend;
+import de.willuhn.jameica.services.BeanService;
+import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
+import de.willuhn.util.ProgressMonitor;
 
 /**
  * Job fuer "Umsatz-Abfrage".
@@ -125,7 +131,14 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 		}
 		Logger.info("umsatz list fetched successfully");
 		if (abruf != null) {
+			BeanService service = Application.getBootLoader().getBootable(BeanService.class);
+			SynchronizeSession session = service.get(HBCISynchronizeBackend.class).getCurrentSession();
+			// Loggen
+			ProgressMonitor monitor = session.getProgressMonitor();
+			monitor.setPercentComplete(10);
+			monitor.log("Umsatzabruf gestartet");
 			abruf.run(konto);
+			monitor.log("Umsatzabruf beendet");
 		}
 	}
 
@@ -208,7 +221,7 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 		}
 
 	}
-	
+
 	/**
 	 * @see de.willuhn.jameica.hbci.server.hbci.AbstractHBCIJob#markFailed(java.lang.String)
 	 */
