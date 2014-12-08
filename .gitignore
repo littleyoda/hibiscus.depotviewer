@@ -11,3 +11,4 @@ bin/*
 .settings
 .project
 build/BUILD
+/bin
