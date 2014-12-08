@@ -70,6 +70,11 @@ public class DVHBCISynchronizeJobDepotKontoauszug extends SynchronizeJobKontoaus
 		// Hier können wir die Umsatzabfrage via Screen Screen Scraping erledigen 
 		BasisDepotAbruf x = DepotAbrufFabrik.getDepotAbrufHBCI(k);
 		
+		// ggf. kann der Abruf über Screenscraping deaktiviert sein.
+		if (!supportDepotUmsatz) {
+			x = null;
+		}
+		
 		// Bestimmen, ob die Erzeugung der Umsätze aus den Bestandsveränderungen aktiviert werden soll
 		boolean simulateOrders =  (x == null) && !supportDepotUmsatz;
 
