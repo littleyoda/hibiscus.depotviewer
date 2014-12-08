@@ -22,7 +22,7 @@ import de.willuhn.util.ProgressMonitor;
  * Implementierung eines Sync-Backends.
  */
 @Lifecycle(Type.CONTEXT)
-public class DVSynchronizeBackend extends AbstractSynchronizeBackend
+public class DVSynchronizeBackend extends AbstractSynchronizeBackend<DVSynchronizeJobProvider>
 {
 	private final static I18N i18n = Application.getPluginLoader().getPlugin(DepotViewerPlugin.class).getResources().getI18N();
 
@@ -40,7 +40,7 @@ public class DVSynchronizeBackend extends AbstractSynchronizeBackend
 	 * @see de.willuhn.jameica.hbci.synchronize.AbstractSynchronizeBackend#getJobProviderInterface()
 	 */
 	@Override
-	protected Class<? extends SynchronizeJobProvider> getJobProviderInterface()
+	protected Class<DVSynchronizeJobProvider> getJobProviderInterface()
 	{
 		return DVSynchronizeJobProvider.class;
 	}

@@ -93,7 +93,7 @@ public class DVHBCISynchronizeJobDepotKontoauszug extends SynchronizeJobKontoaus
     return jobs.toArray(new AbstractHBCIJob[jobs.size()]);
   }
 
-  public List<String> getProf(Konto k) throws RemoteException, ApplicationException {
+  public static List<String> getProf(Konto k) throws RemoteException, ApplicationException {
 		BasisDepotAbruf x = DepotAbrufFabrik.getDepotAbrufHBCI(k);
 		if (x == null) {
 			List<String> liste = Arrays.asList(new String[]{PropHelper.NURBESTANDINKLFORMAT});
