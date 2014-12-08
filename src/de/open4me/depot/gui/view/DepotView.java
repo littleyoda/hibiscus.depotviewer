@@ -11,6 +11,7 @@ import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.parts.ButtonArea;
+import de.willuhn.jameica.gui.parts.FormTextPart;
 import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.jameica.hbci.gui.action.KontoFetchUmsaetze;
@@ -28,12 +29,9 @@ public class DepotView extends AbstractView
 
 		GUI.getView().setTitle(Settings.i18n().tr("Depots"));
 
-	      getText(getParent());
+	      Container container = getText(getParent());
 		final DepotListControl control = new DepotListControl(this);
-
-
-
-		control.getOrderInfoTable().paint(this.getParent());
+		container.addPart(control.getOrderInfoTable());
 
 		ButtonArea buttons1 = new ButtonArea();
 		buttons1.addButton("Abrufen", new Action() {
@@ -74,13 +72,12 @@ public class DepotView extends AbstractView
 
 
 		,null,true,"dialog-information.png");
-		buttons1.paint(this.getParent());
-
+		container.addPart(buttons1);
 
 
 	}
 
-	public void getText(Composite composite) {
+	public Container getText(Composite composite) {
 		Container container = new SimpleContainer(composite);
 	      container.addHeadline("Unterstütze Banken:");
 	      container.addText("Es werden im wesentlichen nur Banken unterstützt, die für ihre Depots HBCI Support zu Verfügung stellen.\nFür alle anderen Banken müssen handisch Erweiterungen programmiert werden.\n", true);
@@ -90,11 +87,27 @@ public class DepotView extends AbstractView
 	      container.addText("Zugangsarten: \n" +
 	      					"        HBCI, falls die Bank dieses tatsächlich unterstützt\n" +
 	    		  			"        DepotViewer (z.Z. nur für die  Fondsdepot Bank)\n", true);
+//	      FormTextPart text = new FormTextPart();
+//	      text.setText("<form>Mehr Informationen: [" + Links.einrichtung.getHTML() +"]" 
+//	    		  + "</form>");
+//	      container.addPart(text);
+	      
+//	      FormTextPart text = new FormTextPart();
+//	      text.setText("<form>" +
+//	        "<p><b>Hibiscus - HBCI-Onlinebanking für Jameica</b></p>" +
+//	        "<p>Lizenz: GPL [<a href=\"http://www.gnu.org/copyleft/gpl.html\">www.gnu.org/copyleft/gpl.html</a>]<br/>" +
+//	        "Copyright by Olaf Willuhn [<a href=\"mailto:hibiscus@willuhn.de\">hibiscus@willuhn.de</a>]<br/>" +
+//	        "<a href=\"http://www.willuhn.de/products/hibiscus/\">www.willuhn.de/products/hibiscus/</a></p>" +
+//	        "</form>");
+//
+//	      container.addPart(text);
+
 	      container.addHeadline("Geschäftsvorfall WPDepotUms wird nicht unterstützt");
 	      container.addText("Teilweise unterstützen die Banken bei HBCI nur den Bestandsabruf und nicht den Abruf von Umsätzen.\n" +
 	    		  			"Falls die Fehlermeldung 'Geschäftsvorfall WPDepotUms wird nicht unterstützt' erscheint, so ist unter Einstellungen der Punkt 'Nur Bestand via HBCI abrufen' zu aktivieren. " +
 	    		  			"In diesem Fall wird versucht, die fehlenden Informationen aus der Differenz zwischen dem aktuellen und dem letzten Bestand zu ermitteln.\n"
 	    		  			, true);
 	      container.addHeadline("Folgende Depots sind aktuell dem Depot-Viewer zugewiesen:");
+	      return container;
 	}
 }
