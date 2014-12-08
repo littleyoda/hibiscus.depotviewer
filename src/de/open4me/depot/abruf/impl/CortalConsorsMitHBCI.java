@@ -1,6 +1,7 @@
 package de.open4me.depot.abruf.impl;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.ThreadedRefreshHandler;
@@ -64,6 +66,10 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 			throw new ApplicationException("Kontonummer nicht gefunden", e2);
 		}
 		ArrayList<String> seiten = new ArrayList<String>(); 
+		final WebClient webClient = new WebClient();
+		webClient.setCssErrorHandler(new SilentCssErrorHandler());
+		webClient.setRefreshHandler(new ThreadedRefreshHandler());
+		webClient.getOptions().setJavaScriptEnabled(false);
 		try {
 			String username = konto.getMeta(PROP_KUNDENNUMMER, null);
 			if (username == null || username.length() == 0) {
@@ -80,10 +86,6 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 				throw new ApplicationException("Password-Eingabe:" + e1.getMessage());
 			}
 
-			final WebClient webClient = new WebClient();
-			webClient.setCssErrorHandler(new SilentCssErrorHandler());
-			webClient.setRefreshHandler(new ThreadedRefreshHandler());
-			webClient.getOptions().setJavaScriptEnabled(false);
 
 			// Viel Ajax auf der Webseite, mit dem HTMLUnit nicht zu recht kommt.
 			// Also brauchen wir uns den Login-Request selber zusammen
@@ -156,7 +158,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 			}
 
 			if (missingOrderDate) {
-				throw new ApplicationException("Nicht alle Order könnten übernommen werden, da das Orderdatum fehlt");
+				throw new ApplicationException("Nicht alle Order konnten übernommen werden, da das Orderdatum fehlt");
 			}
 
 
@@ -164,6 +166,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 			throw new ApplicationException(e);
 		} finally {
 			try {
+				forcelogoff(webClient);
 				debug(seiten, konto);
 			} catch (RemoteException e) {
 				throw new ApplicationException(e);
@@ -173,6 +176,14 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 	}
 
 
+
+	private void forcelogoff(WebClient webClient) {
+		try {
+			webClient.getPage("https://www.consorsbank.de/euroWebDe/-?$part=Home.login-status&$event=logout");
+		} catch (FailingHttpStatusCodeException | IOException e) {
+			// Mehr kann ich dann auch nicht tun
+		}
+	}
 
 	@Override
 	public List<String> getPROP() {
