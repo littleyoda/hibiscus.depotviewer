@@ -37,6 +37,7 @@ public class BestandTableControl extends AbstractControl implements Listener
 		this.datumsSlider = datumsSlider;
 		datumsSlider.addListener(this);
 	}
+	
 	public void showForDate(Date d) throws RemoteException {
 		try {
 			List<GenericObjectSQL> list = Bestandsabfragen.getBestand(d);
