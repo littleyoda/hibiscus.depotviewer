@@ -28,7 +28,6 @@ public class BestandView extends AbstractView
 
 		DatumsSlider datumsSlider = new DatumsSlider(bestandsControl.getDates());
 
-		//  	Implementierung funktioniert mit der aktuellen SWT Version nicht
 		final TabFolder folder = new TabFolder(getParent(), SWT.CENTER);
 		folder.setLayoutData(new GridData(GridData.FILL_BOTH));
 
