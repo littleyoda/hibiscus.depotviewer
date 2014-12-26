@@ -12,6 +12,8 @@ import java.util.List;
 import de.open4me.depot.abruf.utils.Utils;
 import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.server.AbstractDBSupportImpl;
+import de.willuhn.jameica.hbci.server.DBSupportH2Impl;
+import de.willuhn.jameica.hbci.server.DBSupportMySqlImpl;
 import de.willuhn.jameica.hbci.server.HBCIDBServiceImpl;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
@@ -19,9 +21,12 @@ import de.willuhn.util.ApplicationException;
 
 public class SQLUtils {
 
+	private static AbstractDBSupportImpl driver = null;
 	public static Connection getConnection() throws Exception {
-		HBCIDBServiceImpl db = (HBCIDBServiceImpl) Application.getServiceFactory().lookup(HBCI.class,"database");
-		AbstractDBSupportImpl driver = (AbstractDBSupportImpl) db.getDriver();
+		if (driver == null) {
+			HBCIDBServiceImpl db = (HBCIDBServiceImpl) Application.getServiceFactory().lookup(HBCI.class,"database");
+			driver = (AbstractDBSupportImpl) db.getDriver();
+		}
 		return DriverManager.getConnection(driver.getJdbcUrl(), driver.getJdbcUsername(), driver.getJdbcPassword());
 	}
 
@@ -60,7 +65,7 @@ public class SQLUtils {
 				list.add(new GenericObjectSQL(idfeld, pa, table, ret));
 			}
 		} catch (Exception e) {
-			Logger.error("Fehler bei der SQL Anweisung", e);
+			Logger.error("Fehler bei der SQL Anweisung: " + statement.toString(), e);
 		}
 		return list;
 	}
@@ -76,7 +81,7 @@ public class SQLUtils {
 			}
 			conn.close();
 		} catch (Exception e) {
-			Logger.error("Fehler bei der SQL Anweisung", e);
+			Logger.error("Fehler bei der SQL Anweisung: " + query, e);
 			if (conn != null) {
 				try {
 					conn.close();
@@ -109,6 +114,27 @@ public class SQLUtils {
 		return version;
 	}
 
+	public static Object getObject(PreparedStatement statement) {
+		Connection conn = null;
+		Object obj = null;
+		try {
+			conn = getConnection();
+			ResultSet ret = statement.executeQuery();
+			ret.next();
+			obj = ret.getObject(1);
+			conn.close();
+		} catch (Exception e) {
+			Logger.error("Fehler beim Query", e);
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e1) {
+				}
+			}
+		}
+		return obj;
+	}
+
 	public static void checkforupdates() throws ApplicationException {
 		List<SQLChange> liste = SQLChange.getChangesSinceVersion(getCurrentDBVersion());
 		Connection conn = null;
@@ -138,6 +164,17 @@ public class SQLUtils {
 			throw new ApplicationException(e);
 		}
 	}
+	
+	public static String getDateDiff(String value1, String value2) throws ApplicationException {
+		if (driver instanceof DBSupportH2Impl) {
+			return "datediff('day'," + value1 + ", "+value2+")";
+		}
+		
+		if (driver instanceof DBSupportMySqlImpl) {
+			return "datediff(" + value1 + ", "+value2+")";
+		}
+		throw new ApplicationException("Unbekannte Datenbank " + driver.getClass().getName());
+	}
 
 	public static void exec(String sql) throws ApplicationException {
 		try {
@@ -152,6 +189,23 @@ public class SQLUtils {
 			Logger.error("Fehler beim der Ausführung: " + sql, e);
 			throw new ApplicationException(e);
 		}
+	}
+	
+	public static PreparedStatement getPreparedSQL(String query) throws Exception {
+		Connection conn = SQLUtils.getConnection();
+		PreparedStatement prest = conn.prepareStatement(query);
+		return prest;
+	}
+
+	public static String addTop(int i, String string) throws ApplicationException {
+		if (driver instanceof DBSupportH2Impl) {
+			return string.replace("select ",  "select top " + i);
+		}
+		
+		if (driver instanceof DBSupportMySqlImpl) {
+			return string + " limit " + i;
+		}
+		throw new ApplicationException("Unbekannte Datenbank " + driver.getClass().getName());
 	}
 
 }

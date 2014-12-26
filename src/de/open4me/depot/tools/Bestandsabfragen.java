@@ -23,9 +23,9 @@ public class Bestandsabfragen {
 				+ "		kontoid, "
 				+ "		wpid, " 
 				+ "		round(sum( case when aktion='VERKAUF' then -anzahl else anzahl end),6) as anzahl, "
-				+ "   (select top 1 kurs from depotviewer_kurse where wpid=depotviewer_umsaetze.wpid and kursdatum >= ? order by kursdatum) as kurs ,"
-				+ "   (select top 1 kursw from depotviewer_kurse where wpid=depotviewer_umsaetze.wpid and kursdatum >= ? order by kursdatum) as kursw ,"
-				+ "   (select top 1 kursdatum from depotviewer_kurse where wpid=depotviewer_umsaetze.wpid and kursdatum >= ? order by kursdatum) as bewertungszeitpunkt "
+				+ "   (" + SQLUtils.addTop(1, "select kurs from depotviewer_kurse where wpid=depotviewer_umsaetze.wpid and kursdatum >= ? order by kursdatum") + ") as kurs ,"
+				+ "   (" + SQLUtils.addTop(1, "select kursw from depotviewer_kurse where wpid=depotviewer_umsaetze.wpid and kursdatum >= ? order by kursdatum") + ") as kursw ,"
+				+ "   (" + SQLUtils.addTop(1, "select kursdatum from depotviewer_kurse where wpid=depotviewer_umsaetze.wpid and kursdatum >= ? order by kursdatum") + ") as bewertungszeitpunkt "
 				+ "	from depotviewer_umsaetze where buchungsdatum <= ? \n" 
 				+ "	group by kontoid, wpid";
 		PreparedStatement prest = conn.prepareStatement(
