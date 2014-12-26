@@ -11,7 +11,7 @@ import java.util.List;
 
 import de.open4me.depot.abruf.utils.Utils;
 import de.willuhn.jameica.hbci.HBCI;
-import de.willuhn.jameica.hbci.server.DBSupportH2Impl;
+import de.willuhn.jameica.hbci.server.AbstractDBSupportImpl;
 import de.willuhn.jameica.hbci.server.HBCIDBServiceImpl;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
@@ -21,7 +21,7 @@ public class SQLUtils {
 
 	public static Connection getConnection() throws Exception {
 		HBCIDBServiceImpl db = (HBCIDBServiceImpl) Application.getServiceFactory().lookup(HBCI.class,"database");
-		DBSupportH2Impl driver = (DBSupportH2Impl) db.getDriver();
+		AbstractDBSupportImpl driver = (AbstractDBSupportImpl) db.getDriver();
 		return DriverManager.getConnection(driver.getJdbcUrl(), driver.getJdbcUsername(), driver.getJdbcPassword());
 	}
 
@@ -93,7 +93,7 @@ public class SQLUtils {
 		try {
 			conn = getConnection();
 			Statement statement = conn.createStatement();
-			ResultSet ret = statement.executeQuery("select value from depotviewer_cfg where key='dbversion'");
+			ResultSet ret = statement.executeQuery("select value from depotviewer_cfg where `key`='dbversion'");
 			ret.next();
 			version = Integer.parseInt(ret.getString(1));
 			conn.close();
@@ -121,7 +121,7 @@ public class SQLUtils {
 				for (String query : changeset.getQuery()) {
 					statement.execute(query);
 				}
-				statement.execute("update depotviewer_cfg set value = " + changeset.getVersion() + " where key='dbversion'");
+				statement.execute("update depotviewer_cfg set value = " + changeset.getVersion() + " where `key`='dbversion'");
 				conn.commit();
 				conn.close();
 			}
@@ -142,7 +142,7 @@ public class SQLUtils {
 	public static void exec(String sql) throws ApplicationException {
 		try {
 			HBCIDBServiceImpl db = (HBCIDBServiceImpl) Application.getServiceFactory().lookup(HBCI.class,"database");
-			DBSupportH2Impl driver = (DBSupportH2Impl) db.getDriver();
+			AbstractDBSupportImpl driver = (AbstractDBSupportImpl) db.getDriver();
 			Connection conn = DriverManager.getConnection(driver.getJdbcUrl(), driver.getJdbcUsername(), driver.getJdbcPassword());
 
 			Statement statement = conn.createStatement();

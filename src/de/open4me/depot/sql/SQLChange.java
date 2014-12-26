@@ -26,8 +26,6 @@ public class SQLChange {
 	public static List<SQLChange> getChangesSinceVersion(int currentversion) {
 		ArrayList<SQLChange> liste = new ArrayList<SQLChange>();
 
-		//		// Clean up
-//				currentversion = 10;
 //			liste.add(new SQLChange(9,
 //				"truncate table depotviewer_umsaetze;",
 //				"truncate table depotviewer_bestand;",
@@ -42,9 +40,9 @@ public class SQLChange {
 					"drop table IF EXISTS depotviewer_cfg;",
 
 					"CREATE TABLE depotviewer_umsaetze (\n" + 
-							"  id IDENTITY(1),\n" +
+							"  id int NOT NULL auto_increment,\n" + 
 							" wpid int,\n" +
-							"  kontoid NUMERIC,\n" + 
+							"  kontoid 	int(10),\n" + 
 							"  anzahl decimal(20,10),\n" + 
 							"  \n" + 
 							"  kurs decimal(20,2),\n" + 
@@ -56,13 +54,12 @@ public class SQLChange {
 							"  buchungsdatum date,\n" + 
 							"  buchungsinformationen text,\n" + 
 							"  orderid varchar(50),\n" + 
-							"  UNIQUE (id),\n" + 
 							"  PRIMARY KEY (id)\n" + 
 							");",
 							"create table depotviewer_bestand (\n" + 
-									"  id IDENTITY(1),\n" + 
+									"  id int NOT NULL auto_increment,\n" + 
 									"  wpid int,\n" +
-									"  kontoid NUMERIC,\n" + 
+									"  kontoid 	int(10),\n" + 
 									"  anzahl decimal(20,10),\n" + 
 									"  kurs decimal(20,2),\n" + 
 									"  kursw varchar(3) NOT NULL,\n" + 
@@ -72,28 +69,27 @@ public class SQLChange {
 									"  \n" + 
 									"  datum date NOT NULL,\n" + 
 									"  \n" + 
-									"  UNIQUE (id),\n" + 
 									"  PRIMARY KEY (id)\n" + 
 									");",
 
 
 									"create table depotviewer_cfg (\n" + 
-											"  id NUMERIC NOT NULL auto_increment,\n" + 
-											"  key varchar(200),\n" + 
+											"  id int NOT NULL auto_increment,\n" + 
+											"  `key` varchar(200),\n" + 
 											"  value text,\n" + 
 											"  \n" + 
-											"  UNIQUE (id),\n" + 
 											"  PRIMARY KEY (id)\n" + 
 											");",
 
-											"insert into depotviewer_cfg (key,value) values ('dbversion','1');",
+											"insert into depotviewer_cfg (`key`,value) values ('dbversion','1');",
+											
+											"drop table IF EXISTS depotviewer_wertpapier;",
 
 											"CREATE TABLE depotviewer_wertpapier (\n" + 
-													"  id IDENTITY(1),\n" + 
+													"  id int NOT NULL auto_increment,\n" + 
 													"  wertpapiername varchar(255) NOT NULL,\n" + 
 													"  wkn varchar(6) NOT NULL,\n" + 
 													"  isin varchar(12) NOT NULL,\n" + 
-													"  UNIQUE (id),\n" + 
 													"  PRIMARY KEY (id)\n" + 
 													");"
 
@@ -101,14 +97,13 @@ public class SQLChange {
 		}
 		if (currentversion < 4) {
 			liste.add(new SQLChange(4, 		
-
+					"drop table IF EXISTS depotviewer_kurse;",
 					"CREATE TABLE depotviewer_kurse (\n" + 
-							"  id IDENTITY(1),\n" +
+							"  id int NOT NULL auto_increment,\n" + 
 							"  wpid int,\n" +
 							"  kurs decimal(20,2),\n" + 
 							"  kursw varchar(3) NOT NULL,\n" + 
 							"  kursdatum date,\n" + 
-							"  UNIQUE (id),\n" + 
 							"  PRIMARY KEY (id)\n" + 
 							");"
 					));
@@ -127,15 +122,15 @@ public class SQLChange {
 		}
 		if (currentversion < 7) {
 			liste.add(new SQLChange(7, 		
+					"drop table IF EXISTS depotviewer_kursevent;",
 					"CREATE TABLE depotviewer_kursevent (\n" + 
-							"  id IDENTITY(1),\n" +
+							"  id int NOT NULL auto_increment,\n" + 
 							"  wpid int,\n" +
 							"  ratio varchar(30) ,\n" +
 							"  value decimal(10,5),\n" +
 							"  aktion varchar(100) NOT NULL,\n" +
 							"  datum date,\n" + 
 							"  waehrung varchar(3) ,\n" +
-							"  UNIQUE (id),\n" + 
 							"  PRIMARY KEY (id)\n" + 
 							");"
 					));
@@ -153,13 +148,13 @@ public class SQLChange {
 		}
 		if (currentversion < 10) {
 			liste.add(new SQLChange(10, 	
-					"ALTER TABLE depotviewer_cfg ALTER COLUMN  value varchar(2000);",
-					"ALTER TABLE depotviewer_umsaetze ALTER COLUMN  buchungsinformationen varchar(2000);"
+					"ALTER TABLE depotviewer_cfg MODIFY  COLUMN  `value` varchar(2000);",
+					"ALTER TABLE depotviewer_umsaetze MODIFY COLUMN  buchungsinformationen varchar(2000);"
 					));
 		}
 		if (currentversion < 11) {
 			liste.add(new SQLChange(11, 	
-					"insert into depotviewer_cfg (key,value) values ('status_bestand_order', null);"
+					"insert into depotviewer_cfg (`key`,value) values ('status_bestand_order', null);"
 					));
 		}
 		//		// Clean up

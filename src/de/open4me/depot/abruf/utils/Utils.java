@@ -148,11 +148,11 @@ public class Utils {
 	}
 
 	public static void setUmsatzBetsandTest(Boolean value) throws ApplicationException {
-		SQLUtils.exec("update depotviewer_cfg set value = " + ((value == null) ? "NULL" : value.toString()) + " where key='status_bestand_order'");
+		SQLUtils.exec("update depotviewer_cfg set value = " + ((value == null) ? "NULL" : value.toString()) + " where `key`='status_bestand_order'");
 	}
 
 	public static Boolean getUmsatzBestandTest() {
-		List<GenericObjectSQL> rs = SQLUtils.getResultSet("select value from depotviewer_cfg where key ='status_bestand_order'", "", "");
+		List<GenericObjectSQL> rs = SQLUtils.getResultSet("select value from depotviewer_cfg where `key` ='status_bestand_order'", "", "");
 		try {
 			Object ret = rs.get(0).getAttribute("value");
 			if (ret == null) {
