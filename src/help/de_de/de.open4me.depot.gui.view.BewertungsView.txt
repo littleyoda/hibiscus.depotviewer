@@ -1,0 +1,4 @@
+Um den Gewinn/Verlust korrekt zu berechnen, müssen die Einstandskurse korrekt bekannt sein.
+Hierfür müssen die Umsätze im Orderbuch gepflegt sein.
+
+Das Programm prüft automatisch, ob die Bestände zu den Umsätzen passen und listet ggf. Abweichungen auf.
