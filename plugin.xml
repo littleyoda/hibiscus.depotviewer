@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.willuhn.de/schema/jameica-plugin"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.willuhn.de/schema/jameica-plugin http://www.willuhn.de/schema/jameica-plugin-1.2.xsd"
-        name="hibiscus.depotviewer" version="0.3.3" class="de.open4me.depot.DepotViewerPlugin">
+        name="hibiscus.depotviewer" version="0.3.4" class="de.open4me.depot.DepotViewerPlugin">
 
   <description>Depot Viewer -- Beta-Version für Tester </description>
   <url>http://www.open4me.de/hibiscus/hibiscus.depotviewer/hibiscus.depotviewer.zip</url>
@@ -11,7 +11,7 @@
   <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
 
   <requires jameica="2.6.0+">
-    <import plugin="hibiscus" version="2.6.11+" />
+    <import plugin="hibiscus" version="2.6.12+" />
     <import plugin="hibiscus.scripting.htmlunit" version="2.13+" />
   </requires>
 
