@@ -5,10 +5,12 @@ import java.math.RoundingMode;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -57,7 +59,7 @@ public class WertpaperHistoryControl {
 
 		try {
 			// Normale Graphen zeichen
-			String sql = "SELECT kursdatum, kurs, kursperf from depotviewer_kurse where wpid = " + nummer + " order by 1";
+			String sql = "SELECT kursdatum, kurs as Kurs, kursperf as Performance from depotviewer_kurse where wpid = " + nummer + " order by 1";
 			data.executeQuery(sql);
 			
 			
@@ -144,7 +146,7 @@ public class WertpaperHistoryControl {
 
 		chart = ChartFactory.createTimeSeriesChart(
 				"",  "Datum",
-				"Kurs", data, false, true, false);
+				"Kurs", data, true, true, false);
 		renderer = chart.getXYPlot().getRenderer();
 		new ChartComposite(piechartTab.getComposite(), SWT.NONE, chart, true);
 	}
@@ -163,6 +165,40 @@ public class WertpaperHistoryControl {
 		}
 	}
 
+	public void update(GenericObjectSQL[] selection) {
+		try {
+			chart.setTitle("Performancevergleich");
+			String ids = "";
+			String spalten = "datum.kursdatum";
+//			String sql = "SELECT kursdatum, kurs, kursperf from depotviewer_kurse where wpid = " + nummer + " order by 1";
+
+			String sql = "";
+			for (GenericObjectSQL d : selection) {
+				if (!ids.isEmpty()) {
+					ids += ",";
+				}
+				System.out.println(d.toString());
+				String id = d.getAttribute("id").toString(); 
+				ids += id;
+				spalten += ", A" + id + ".kurs as \"" + StringEscapeUtils.escapeSql(d.getAttribute("wertpapiername").toString()) + "\" ";
+				System.out.println(d.getAttribute("id").toString());
+			//	sql +="left join (select kurs, kursdatum from depotviewer_kurse where wpid = " + id  + ") as A" + id + " on A" + id + ".kursdatum = datum.kursdatum\n";
+				sql +="left join depotviewer_kurse as A" + id + " on A" + id + ".wpid = " + id + " and A" + id + ".kursdatum = datum.kursdatum\n";
+			}
+			sql = "select "  + spalten + " from (select distinct kursdatum from depotviewer_kurse where wpid in (" + ids + ") order by 1) as datum\n" + sql;
+			System.out.println(sql);
+			renderer.removeAnnotations();
+			data.executeQuery(sql);
+
+			
+		} catch (RemoteException | SQLException e) {
+			e.printStackTrace();
+			Logger.error("Fehler beim aktualisieren des Wertpapierdiagrammes", e);
+		}
+	}
+
+	
+	
 	public Part getProjectsTable() throws Exception
 	{
 		if (bestandsList != null) {
@@ -174,6 +210,9 @@ public class WertpaperHistoryControl {
 		calcKennzahlen("-1");
 		return bestandsList;
 	}
+
+
+
 
 
 }

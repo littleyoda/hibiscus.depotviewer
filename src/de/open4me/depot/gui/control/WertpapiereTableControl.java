@@ -47,16 +47,21 @@ public class WertpapiereTableControl
 
 			@Override
 			public void handleEvent(Event event) {
-				if (event.data == null || !(event.data instanceof GenericObjectSQL)) {
-					return;
+				if (orderList.getSelection() == null) {
+					return; 
 				}
-				GenericObjectSQL d = (GenericObjectSQL) event.data;
-				history.update(d);
+				if (orderList.getSelection() instanceof Object[]) {
+					history.update((GenericObjectSQL[]) orderList.getSelection());
+					System.out.println("Array");
+				} else {
+					GenericObjectSQL d = (GenericObjectSQL) event.data;
+					history.update(d);
+				}
 
 			}
 
 		});
-
+		orderList.setMulti(true);
 		orderList.setContextMenu(new WertpapierMenu());
 		return orderList;
 	}
