@@ -20,10 +20,12 @@ Die Zugangsart ist auf HBCI zusetzen, nicht auf "Depot Viewer".
 | 1822direkt | ja | Nein | 4Q 2014 | |
 
 Nicht unterstützte Banken
+
 | Bank | Stand | Anmerkungen |
 | ---- | --------------------- | -------------------- | 
 | Wüstenrot | 4Q 2014 | |
 | ING-Diba | 4Q 2014 | |
+
 Sollte die Bank Umsätze via HBCI nicht unterstützen, äußert sich dieses in der Regel in der Fehlermeldung "Geschäftsvorfall WPDepotUms wird nicht unterstützt". In diesem Fall ist in den Einstellung die Option "Nur Bestand via HBCI abrufen" zu aktivieren!
 
 
