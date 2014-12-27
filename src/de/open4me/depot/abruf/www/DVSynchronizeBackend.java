@@ -10,7 +10,6 @@ import de.willuhn.annotation.Lifecycle;
 import de.willuhn.annotation.Lifecycle.Type;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.synchronize.AbstractSynchronizeBackend;
-import de.willuhn.jameica.hbci.synchronize.SynchronizeJobProvider;
 import de.willuhn.jameica.hbci.synchronize.jobs.SynchronizeJob;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;

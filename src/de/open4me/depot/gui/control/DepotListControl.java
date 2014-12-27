@@ -29,7 +29,7 @@ public class DepotListControl extends AbstractControl
 	}
 
 
-	public Part getOrderInfoTable() throws RemoteException, ApplicationException
+	public Part getDepotOverview() throws RemoteException, ApplicationException
 	{
 		if (orderList != null) {
 			return orderList;
@@ -44,7 +44,6 @@ public class DepotListControl extends AbstractControl
 		orderList.addColumn(Settings.i18n().tr("BLZ"), "blz");
 		orderList.addColumn(Settings.i18n().tr("Konto"), "kontonummer");
 		orderList.addColumn(Settings.i18n().tr("zugangsart"), "zugangsart"); 
-		//orderList.setContextMenu(new OrderListMenu(orderList));
 		return orderList;
 	}
 

@@ -31,7 +31,7 @@ public class DepotView extends AbstractView
 
 	      Container container = getText(getParent());
 		final DepotListControl control = new DepotListControl(this);
-		container.addPart(control.getOrderInfoTable());
+		container.addPart(control.getDepotOverview());
 
 		ButtonArea buttons1 = new ButtonArea();
 		buttons1.addButton("Abrufen", new Action() {
