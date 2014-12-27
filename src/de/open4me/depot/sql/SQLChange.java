@@ -157,6 +157,14 @@ public class SQLChange {
 					"insert into depotviewer_cfg (`key`,value) values ('status_bestand_order', null);"
 					));
 		}
+		if (currentversion < 12) {
+			liste.add(new SQLChange(12, 	
+					"create index idxKurseWpid on depotviewer_kurse(wpid);",
+					"create index idxKurseDatum on depotviewer_kurse(kursdatum);"
+					));
+		}
+		
+		
 		//		// Clean up
 ////		currentversion = 10;
 //	liste.add(new SQLChange(11,
