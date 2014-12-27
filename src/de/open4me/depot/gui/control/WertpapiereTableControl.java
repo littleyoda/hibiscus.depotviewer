@@ -13,6 +13,7 @@ import de.open4me.depot.Settings;
 import de.open4me.depot.gui.action.OrderList;
 import de.open4me.depot.gui.menu.WertpapierMenu;
 import de.open4me.depot.sql.GenericObjectSQL;
+import de.open4me.depot.sql.SQLQueries;
 import de.open4me.depot.sql.SQLUtils;
 import de.open4me.depot.tools.UpdateStock;
 import de.willuhn.jameica.gui.Action;
@@ -35,13 +36,13 @@ public class WertpapiereTableControl
 			return orderList;
 		}
 
-		List<GenericObjectSQL> list = SQLUtils.getResultSet("select * from depotviewer_wertpapier", 
-				"depotviewer_wertpapier", "id", "wertpapiername");
+		List<GenericObjectSQL> list = SQLQueries.getWertpapiereMitKursdatum();
 
 		orderList = new TablePart(list,new OrderList());
 		orderList.addColumn(Settings.i18n().tr("wkn"),"wkn");
 		orderList.addColumn(Settings.i18n().tr("ISIN"),"isin");
 		orderList.addColumn(Settings.i18n().tr("Name"),"wertpapiername");
+		orderList.addColumn(Settings.i18n().tr("Letzter Kurs"),"kursdatum");
 		orderList.addSelectionListener(new Listener() {
 
 			@Override
