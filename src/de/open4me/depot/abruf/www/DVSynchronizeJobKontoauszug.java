@@ -24,13 +24,12 @@ public class DVSynchronizeJobKontoauszug extends SynchronizeJobKontoauszug imple
 	@Override
 	public void execute() throws Exception
 	{
-		Konto konto = (Konto) this.getContext(CTX_ENTITY); // wurde von AirPlusSynchronizeJobProviderKontoauszug dort abgelegt
+		Konto konto = (Konto) this.getContext(CTX_ENTITY);
 
 		Logger.info("Rufe Umsätze ab für " + backend.getName());
 
 		BasisDepotAbruf x = DepotAbrufFabrik.getDepotAbruf(konto);
 		
-		// TODO auf null prüfen
 		Logger.info("Genutztes DepotAbruf-Backend " + x.getName());
 		x.run(konto);
 	}
