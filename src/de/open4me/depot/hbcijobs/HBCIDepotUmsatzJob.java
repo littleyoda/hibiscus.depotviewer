@@ -1,4 +1,4 @@
-package de.willuhn.jameica.hbci.server.hbci;
+package de.open4me.depot.hbcijobs;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -12,7 +12,9 @@ import org.kapott.hbci.structures.TypedValue;
 import de.open4me.depot.abruf.utils.Utils;
 import de.willuhn.jameica.hbci.HBCIProperties;
 import de.willuhn.jameica.hbci.rmi.Konto;
+import de.willuhn.jameica.hbci.rmi.Protokoll;
 import de.willuhn.jameica.hbci.server.Converter;
+import de.willuhn.jameica.hbci.server.hbci.AbstractHBCIJob;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
@@ -21,7 +23,7 @@ import de.willuhn.util.ApplicationException;
  */
 public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 {
-//	private final static Settings settings = Application.getPluginLoader().getPlugin(HBCI.class).getResources().getSettings();
+	//	private final static Settings settings = Application.getPluginLoader().getPlugin(HBCI.class).getResources().getSettings();
 
 	private Konto konto     = null;
 
@@ -35,7 +37,7 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 	{
 		try
 		{
-	//		PluginResources res = Application.getPluginLoader().getPlugin(HBCI.class).getResources();
+			//		PluginResources res = Application.getPluginLoader().getPlugin(HBCI.class).getResources();
 			if (konto == null)
 				throw new ApplicationException("Bitte wählen Sie ein Konto aus"); 
 
@@ -83,7 +85,7 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 	/**
 	 * @see de.willuhn.jameica.hbci.server.hbci.AbstractHBCIJob#markExecuted()
 	 */
-	void markExecuted() throws RemoteException, ApplicationException
+	protected void markExecuted() throws RemoteException, ApplicationException
 	{
 
 		try {
@@ -174,10 +176,15 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 	}
 
 	@Override
-	String markFailed(String error) throws RemoteException,
-			ApplicationException {
-		// TODO Auto-generated method stub
-		return null;
+
+	/**
+	 * @see de.willuhn.jameica.hbci.server.hbci.AbstractHBCIJob#markFailed(java.lang.String)
+	 */
+	protected String markFailed(String error) throws RemoteException, ApplicationException
+	{
+		String msg = i18n.tr("Fehler beim Abrufen der Umsätze: {0}",error);
+		konto.addToProtokoll(msg,Protokoll.TYP_ERROR);
+		return msg;
 	}
 
 

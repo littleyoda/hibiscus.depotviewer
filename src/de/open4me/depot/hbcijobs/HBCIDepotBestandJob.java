@@ -1,4 +1,4 @@
-package de.willuhn.jameica.hbci.server.hbci;
+package de.open4me.depot.hbcijobs;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
@@ -18,6 +18,7 @@ import de.willuhn.jameica.hbci.HBCIProperties;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.rmi.Protokoll;
 import de.willuhn.jameica.hbci.server.Converter;
+import de.willuhn.jameica.hbci.server.hbci.AbstractHBCIJob;
 import de.willuhn.jameica.hbci.synchronize.SynchronizeSession;
 import de.willuhn.jameica.hbci.synchronize.hbci.HBCISynchronizeBackend;
 import de.willuhn.jameica.services.BeanService;
@@ -98,7 +99,7 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 	/**
 	 * @see de.willuhn.jameica.hbci.server.hbci.AbstractHBCIJob#markExecuted()
 	 */
-	void markExecuted() throws RemoteException, ApplicationException
+	protected void markExecuted() throws RemoteException, ApplicationException
 	{
 		GVRWPDepotList result=(GVRWPDepotList) getJobResult();
 		if (!result.isOK()) {
@@ -224,7 +225,7 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 	/**
 	 * @see de.willuhn.jameica.hbci.server.hbci.AbstractHBCIJob#markFailed(java.lang.String)
 	 */
-	String markFailed(String error) throws RemoteException, ApplicationException
+	protected String markFailed(String error) throws RemoteException, ApplicationException
 	{
 		String msg = i18n.tr("Fehler beim Abrufen der Umsätze: {0}",error);
 		konto.addToProtokoll(msg,Protokoll.TYP_ERROR);
