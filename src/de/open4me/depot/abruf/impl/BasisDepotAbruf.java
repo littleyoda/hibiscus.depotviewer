@@ -17,23 +17,10 @@ public abstract class BasisDepotAbruf {
 
 	public abstract void run(Konto konto) throws ApplicationException;
 	
-	public abstract boolean isSupported(Konto konto) throws ApplicationException, RemoteException;
+	public boolean isSupported(Konto konto) throws ApplicationException, RemoteException {
+		return Utils.hasRightKontoType(konto);
+	}
 
-//	public SecurePwdCfgImpl getConfig(Konto konto) throws ApplicationException {
-//		SecurePwdCfgImpl config = null;
-//		try {
-//			PassportImpl p = new PassportImpl();
-//			p.init(konto, DepotViewerPlugin.class, "Depot-Viewer: " + getName());
-//			config = p.getConfig();
-//			if (config == null) {
-//				config = p.createConfig();
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			throw new ApplicationException("Fehler beim Zugriff auf die Config: ", e);
-//		}
-//		return config;
-//	}
 	public List<String> getPROP() {
 		List<String> result = new ArrayList<String>();
 		result.add(getName());

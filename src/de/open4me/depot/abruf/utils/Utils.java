@@ -8,8 +8,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -29,7 +32,9 @@ import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.gui.dialogs.YesNoDialog;
 import de.willuhn.jameica.hbci.rmi.Konto;
+import de.willuhn.jameica.hbci.rmi.KontoType;
 import de.willuhn.jameica.hbci.synchronize.hbci.HBCISynchronizeBackend;
+import de.willuhn.jameica.hbci.synchronize.jobs.SynchronizeJobKontoauszug;
 import de.willuhn.jameica.plugin.Plugin;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
@@ -338,36 +343,74 @@ public class Utils {
 	//		return list;
 	//	}
 
+
+	// Die vom Job-Provider unterstuetzten Konto-Arten
+	private final static Set<KontoType> SUPPORTED = new HashSet<KontoType>(Arrays.asList(KontoType.FONDSDEPOT, KontoType.WERTPAPIERDEPOT));
+
+
+	public static boolean hasRightKontoType(Konto k) {
+		if (k == null)
+			return false;
+
+		KontoType kt = null;
+		try
+		{
+			// Kontotyp ermitteln
+			kt = KontoType.find(k.getAccountType());
+
+			// Wenn kein konkreter Typ angegeben ist, dann unterstuetzen wir es nicht
+			if (kt == null)
+				return false;
+
+			// Ansonsten dann, wenn er in supported ist
+			return SUPPORTED.contains(kt);
+		}
+		catch (RemoteException re)
+		{
+			Logger.error("unable to determine support for account-type " + kt,re);
+		}
+		return false;
+
+
+	}
+
 	public static List<GenericObjectHashMap> getDepotKonten() throws RemoteException, ApplicationException {
-		DVHBCISynchronizeJobProviderDepotKontoauszug j = new DVHBCISynchronizeJobProviderDepotKontoauszug();
+		DVHBCISynchronizeJobProviderDepotKontoauszug hbciBackend = new DVHBCISynchronizeJobProviderDepotKontoauszug();
+		DVSynchronizeBackend screenScrapingBackend = new DVSynchronizeBackend();
 		List<GenericObjectHashMap> list = new ArrayList<GenericObjectHashMap>();
 		DBIterator liste = Settings.getDBService().createList(Konto.class);
 		while (liste.hasNext()) {
 			Konto k = (Konto) liste.next();
-			
-			boolean hbci = k.getBackendClass() == null || k.getBackendClass().equals(HBCISynchronizeBackend.class.getName());
-			boolean www = k.getBackendClass() != null && k.getBackendClass().equals(DVSynchronizeBackend.class.getName()); 
-			if (  hbci || www) {
-				GenericObjectHashMap m = new GenericObjectHashMap();
-				for (String attr : k.getAttributeNames()) {
-					m.setAttribute(attr, k.getAttribute(attr));
-				}
-				m.setAttribute("zugangsart", "keine Unterstützung");
-				m.setAttribute("kontoobj", k);
-				if (www && DepotAbrufFabrik.getDepotAbruf(k) != null) {
-					m.setAttribute("zugangsart", "nur Screen Scraping");
-				} else if (www && DepotAbrufFabrik.getDepotAbruf(k) == null) {
-					m.setAttribute("zugangsart", "kein Support für diese Bank via Screen Scraping");
-				} else  if (hbci && j.supports(null, k) && DepotAbrufFabrik.getDepotAbrufHBCI(k) != null) {
-					m.setAttribute("zugangsart", "HBCI mit Screen Scraping");
-					m.setAttribute("abruf", DepotAbrufFabrik.getDepotAbrufHBCI(k));
-				} else if (hbci && j.supports(null, k)) {
-					m.setAttribute("zugangsart", "nur HBCI");
-				} else {
-					continue;
-				}
-				list.add(m);
+
+			if (k.hasFlag(Konto.FLAG_DISABLED) || !Utils.hasRightKontoType(k)) {
+				continue;
 			}
+			boolean offline = k.hasFlag(Konto.FLAG_OFFLINE);
+			boolean hbci = (k.getBackendClass() == null || k.getBackendClass().equals(HBCISynchronizeBackend.class.getName())) && hbciBackend.supports(null, k);
+			boolean www = (k.getBackendClass() != null && k.getBackendClass().equals(DVSynchronizeBackend.class.getName())) && screenScrapingBackend.supports(SynchronizeJobKontoauszug.class, k);
+
+
+			GenericObjectHashMap m = new GenericObjectHashMap();
+			for (String attr : k.getAttributeNames()) {
+				m.setAttribute(attr, k.getAttribute(attr));
+			}
+			m.setAttribute("zugangsart", "keine Unterstützung");
+			m.setAttribute("kontoobj", k);
+			if (offline) {
+				m.setAttribute("zugangsart", "Offline-Nutzung");
+			} else if (www && DepotAbrufFabrik.getDepotAbruf(k) != null) {
+				m.setAttribute("zugangsart", "nur Screen Scraping");
+			} else if (www && DepotAbrufFabrik.getDepotAbruf(k) == null) {
+				m.setAttribute("zugangsart", "kein Support für diese Bank via Screen Scraping. Ggf. auf HBCI wechseln");
+			} else  if (hbci && DepotAbrufFabrik.getDepotAbrufHBCI(k) != null) {
+				m.setAttribute("zugangsart", "HBCI mit Screen Scraping");
+				m.setAttribute("abruf", DepotAbrufFabrik.getDepotAbrufHBCI(k));
+			} else if (hbci) {
+				m.setAttribute("zugangsart", "nur HBCI");
+			} else {
+				continue;
+			}
+			list.add(m);
 		}
 		return list;
 	}

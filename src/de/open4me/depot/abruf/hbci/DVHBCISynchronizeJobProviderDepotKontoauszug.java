@@ -2,18 +2,16 @@ package de.open4me.depot.abruf.hbci;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
+import de.open4me.depot.abruf.utils.Utils;
 import de.willuhn.annotation.Lifecycle;
 import de.willuhn.annotation.Lifecycle.Type;
 import de.willuhn.jameica.hbci.SynchronizeOptions;
 import de.willuhn.jameica.hbci.rmi.Konto;
-import de.willuhn.jameica.hbci.rmi.KontoType;
 import de.willuhn.jameica.hbci.synchronize.hbci.HBCISynchronizeBackend;
 import de.willuhn.jameica.hbci.synchronize.hbci.HBCISynchronizeJobProvider;
 import de.willuhn.jameica.hbci.synchronize.jobs.SynchronizeJob;
@@ -35,12 +33,6 @@ public class DVHBCISynchronizeJobProviderDepotKontoauszug implements HBCISynchro
 				add(DVHBCISynchronizeJobDepotKontoauszug.class);
 			}};
 
-			// Die vom Job-Provider unterstuetzten Konto-Arten
-			private final static Set<KontoType> SUPPORTED = new HashSet<KontoType>()
-					{{
-						add(KontoType.FONDSDEPOT);
-						add(KontoType.WERTPAPIERDEPOT);
-					}};
 
 
 					/**
@@ -84,28 +76,7 @@ public class DVHBCISynchronizeJobProviderDepotKontoauszug implements HBCISynchro
 					@Override
 					public boolean supports(Class<? extends SynchronizeJob> type, Konto k)
 					{
-						// Kein Konto angegeben. Dann gehen wir mal davon aus, dass es nicht geht
-						if (k == null)
-							return false;
-
-						KontoType kt = null;
-						try
-						{
-							// Checken, ob das vielleicht ein nicht unterstuetztes Konto ist
-							kt = KontoType.find(k.getAccountType());
-
-							// Wenn kein konkreter Typ angegeben ist, dann unterstuetzen wir es nicht
-							if (kt == null)
-								return false;
-
-							// Ansonsten dann, wenn er in supported ist
-							return SUPPORTED.contains(kt);
-						}
-						catch (RemoteException re)
-						{
-							Logger.error("unable to determine support for account-type " + kt,re);
-						}
-						return false;
+						return Utils.hasRightKontoType(k);
 					}
 
 					/**

@@ -245,6 +245,9 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 
 	@Override
 	public boolean isSupported(Konto konto) throws ApplicationException, RemoteException {
+		if (!Utils.hasRightKontoType(konto)) {
+			return false;
+		}
 		String unterkontoExtract = "";
 		if (konto.getUnterkonto() != null && konto.getUnterkonto().toLowerCase().startsWith("depot")) {
 			unterkontoExtract = konto.getUnterkonto().toLowerCase().substring(5).replace(" ", ""); 
