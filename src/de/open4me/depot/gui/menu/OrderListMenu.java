@@ -1,5 +1,6 @@
 package de.open4me.depot.gui.menu;
 
+import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.action.UmsatzEditorAction;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
@@ -28,6 +29,7 @@ public class OrderListMenu extends ContextMenu
 				try {
 					SQLUtils.delete(b);
 					tablePart.removeItem(b);
+					Utils.markRecalc(null);
 				}
 				catch (Exception e)
 				{

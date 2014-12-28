@@ -2,6 +2,7 @@ package de.open4me.depot.gui.view;
 
 import java.rmi.RemoteException;
 
+import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.control.UmsatzEditorControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
@@ -10,6 +11,7 @@ import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.util.ColumnLayout;
 import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.SimpleContainer;
+import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.messaging.StatusBarMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.util.ApplicationException;

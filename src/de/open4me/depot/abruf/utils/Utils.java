@@ -114,7 +114,7 @@ public class Utils {
 			if (orderid == null) {
 				orderid = "" + ("" + kontoid + wpid + aktion + date + anzahl + kurs + kursW).hashCode(); 
 			}
-			markRecalc();
+			markRecalc(null); // Kein Konto-obj im Moment verfügbar
 			// create new project
 			Umsatz p = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
 			p.setKontoid(Integer.parseInt(kontoid));
@@ -145,9 +145,10 @@ public class Utils {
 	 * Wird aufgerufen, wenn sich im Bestand oder bei den Umästzen etwas geändert hat
 	 * 
 	 * Dient als Trigger, um notwendige Aktualisierungen anzustoßen
+	 * @param konto Konto (für zukünftige Optimierungsmöglichkeiten)
 	 * @throws ApplicationException 
 	 */
-	public static void markRecalc() throws ApplicationException {
+	public static void markRecalc(Konto konto) throws ApplicationException {
 		setUmsatzBetsandTest(null);
 
 	}
@@ -174,7 +175,7 @@ public class Utils {
 	public static void addBestand(String wpid, Konto konto, Double anzahl, 
 			Double kurs, String kursw, double wert, String wertw, Date date, Date bewertungsZeitpunkt) throws ApplicationException {
 		try {
-			markRecalc();
+			markRecalc(konto);
 			Bestand p = (Bestand) Settings.getDBService().createObject(Bestand.class,null);
 			p.setAnzahl(anzahl);
 			p.setKontoid(Integer.parseInt(konto.getID()));
@@ -204,7 +205,7 @@ public class Utils {
 	 * @throws ApplicationException
 	 */
 	public static void clearBestand(Konto konto) throws RemoteException, ApplicationException {
-		markRecalc();
+		markRecalc(konto);
 		SQLUtils.exec("delete from depotviewer_bestand where kontoid = " + konto.getID());
 	}
 
@@ -374,6 +375,15 @@ public class Utils {
 
 	}
 
+	public static Konto getKontoByID(String id) throws RemoteException {
+		DBIterator liste = Settings.getDBService().createList(Konto.class);
+		liste.addFilter("id=" + id);
+		if (liste.hasNext()) {
+			return (Konto) liste.next();
+		}
+		return null;
+	}
+	
 	public static List<GenericObjectHashMap> getDepotKonten() throws RemoteException, ApplicationException {
 		DVHBCISynchronizeJobProviderDepotKontoauszug hbciBackend = new DVHBCISynchronizeJobProviderDepotKontoauszug();
 		DVSynchronizeBackend screenScrapingBackend = new DVSynchronizeBackend();

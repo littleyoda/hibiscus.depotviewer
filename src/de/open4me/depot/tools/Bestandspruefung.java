@@ -2,6 +2,7 @@ package de.open4me.depot.tools;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -9,6 +10,7 @@ import java.util.Map.Entry;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
+import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
@@ -30,15 +32,15 @@ public class Bestandspruefung {
 			return ret;
 		}
 		try {
-			check();
-		} catch (RemoteException e) {
+			checkAndRecalcOfflineDepots();
+		} catch (RemoteException | ApplicationException e) {
 			e.printStackTrace();
 		}
 		return Utils.getUmsatzBestandTest();
 	}
 
-	public static String exec() throws RemoteException {
-		String output = check();
+	public static String exec() throws RemoteException, ApplicationException {
+		String output = checkAndRecalcOfflineDepots();
 		if (output.isEmpty()) {
 			output = "Keine Abweichungen gefunden.<br/>Der Bestand passt zu den Umsätzen im Orderbuch.";
 		} else {
@@ -46,13 +48,26 @@ public class Bestandspruefung {
 		}
 		return output;
 	}
-	private static String check() throws RemoteException {
+	
+	/**
+	 * 
+	 * @return
+	 * @throws RemoteException
+	 * @throws ApplicationException
+	 */
+	private static String checkAndRecalcOfflineDepots() throws RemoteException, ApplicationException {
 		String output = "";
 
 		// Überprüfe alle Konten für die es Umsätze bzw. Bestände gibt
 		List<GenericObjectSQL> konten = SQLUtils.getResultSet("select * from konto where id in (select distinct kontoid from depotviewer_bestand union select distinct kontoid from depotviewer_umsaetze)", null, "id");
 		for (GenericObjectSQL konto : konten) {
-			output = pruefe(konto, output);
+			String outputKonto = pruefe(konto);
+			if (konto.getAttribute("flags") != null
+					&& (((Integer) konto.getAttribute("flags")) & Konto.FLAG_OFFLINE) == Konto.FLAG_OFFLINE) {
+				createOfflineBestand(konto);
+				outputKonto = pruefe(konto);
+			}
+			output +=  outputKonto;
 		}
 		try {
 			Utils.setUmsatzBetsandTest(output.isEmpty());
@@ -63,25 +78,46 @@ public class Bestandspruefung {
 		return output;
 	}
 
-	private static String pruefe(GenericObjectSQL konto, String output) throws RemoteException {
-		HashMap<Integer, BigDecimal> bestandLautOrder = new HashMap<Integer, BigDecimal>(); 
+	/**
+	 * Bestimmt den Bestand von Offline Konten aus den Umsätzen und 
+	 * bewertet ihn falls Kursdaten vorhanden sind
+	 * @param konto Konto
+	 * @throws RemoteException
+	 * @throws ApplicationException
+	 */
+	private static void createOfflineBestand(GenericObjectSQL konto) throws RemoteException, ApplicationException {
+		Konto k = Utils.getKontoByID(konto.getAttribute("id").toString());
+		HashMap<Integer, BigDecimal> bestand = getBestandLautOrder(konto);
+		Utils.clearBestand(k);
+		for (Entry<Integer, BigDecimal> position : bestand.entrySet()) {
+			BigDecimal wert = BigDecimal.ZERO;
+			String wertW =  "EUR";
+			BigDecimal kurs = BigDecimal.ZERO;
+			String kursW =  "EUR";
+			Date bewertung = null;
+			String id = position.getKey().toString();
 
-		// Alle Umsätze nehmen und daraus einen Bestand berechnen.
-		List<GenericObjectSQL> buchungen = SQLUtils.getResultSet("select * from depotviewer_umsaetze where kontoid = " + konto.getID() + " order by buchungsdatum asc", null, null);
-		for (GenericObjectSQL x : buchungen) {
-			Integer wpid = (Integer) x.getAttribute("wpid");
-			String aktion = (String) x.getAttribute("aktion");
-			BigDecimal transactionanzahl = (BigDecimal) x.getAttribute("anzahl");
-
-			BigDecimal aktuellerBestand = (bestandLautOrder.containsKey(wpid)) ? bestandLautOrder.get(wpid) : new BigDecimal(0);
-
-			if (aktion.equals("KAUF") || aktion.equals("EINLAGE")) {
-				aktuellerBestand = aktuellerBestand.add(transactionanzahl);
-			} else if (aktion.equals("VERKAUF")) {
-				aktuellerBestand = aktuellerBestand.subtract(transactionanzahl);
+			// Falls Kursdaten vorhanden sind, bitte diese nutzen
+			List<GenericObjectSQL> res = SQLUtils.getResultSet(SQLUtils.addTop(1, "select * from depotviewer_kurse where wpid = " + id +" order by kursdatum desc"), "depotviewer_kurse", id, id);
+			if (res.size() == 1) {
+				GenericObjectSQL data = res.get(0);
+				kurs = new BigDecimal(data.getAttribute("kurs").toString());
+				kursW = data.getAttribute("kursw").toString();
+				wertW = kursW;
+				wert = kurs.multiply(position.getValue());
+				bewertung = (Date) data.getAttribute("kursdatum");
 			}
-			bestandLautOrder.put(wpid, aktuellerBestand);
+			
+			// Bestand hinzufügen
+			Utils.addBestand(position.getKey().toString(), k, position.getValue().doubleValue(), kurs.doubleValue(), kursW, wert.doubleValue(), wertW, new Date(), bewertung);
 		}
+		
+	}
+
+	private static String pruefe(GenericObjectSQL konto) throws RemoteException {
+		String output = "";
+		HashMap<Integer, BigDecimal> bestandLautOrder = getBestandLautOrder(konto);
+		
 		// Abgleich tatsächlicher Bestand vs. errechneter Bestand
 		List<GenericObjectSQL> bestaende = SQLUtils.getResultSet("select * from depotviewer_bestand  where kontoid = " + konto.getID() , null, null);
 		for (GenericObjectSQL bestand : bestaende) {
@@ -104,6 +140,28 @@ public class Bestandspruefung {
 		}
 		return output;
 
+	}
+
+	private static HashMap<Integer, BigDecimal> getBestandLautOrder(GenericObjectSQL konto) throws RemoteException {
+		HashMap<Integer, BigDecimal> bestandLautOrder = new HashMap<Integer, BigDecimal>(); 
+
+		// Alle Umsätze nehmen und daraus einen Bestand berechnen.
+		List<GenericObjectSQL> buchungen = SQLUtils.getResultSet("select * from depotviewer_umsaetze where kontoid = " + konto.getID() + " order by buchungsdatum asc", null, null);
+		for (GenericObjectSQL x : buchungen) {
+			Integer wpid = (Integer) x.getAttribute("wpid");
+			String aktion = (String) x.getAttribute("aktion");
+			BigDecimal transactionanzahl = (BigDecimal) x.getAttribute("anzahl");
+
+			BigDecimal aktuellerBestand = (bestandLautOrder.containsKey(wpid)) ? bestandLautOrder.get(wpid) : new BigDecimal(0);
+
+			if (aktion.equals("KAUF") || aktion.equals("EINLAGE")) {
+				aktuellerBestand = aktuellerBestand.add(transactionanzahl);
+			} else if (aktion.equals("VERKAUF")) {
+				aktuellerBestand = aktuellerBestand.subtract(transactionanzahl);
+			}
+			bestandLautOrder.put(wpid, aktuellerBestand);
+		}
+		return bestandLautOrder;
 	}
 
 	private static String addDifferenz(GenericObjectSQL konto, Integer wpid, BigDecimal lautUmsaetze,

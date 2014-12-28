@@ -34,7 +34,7 @@ public class SQLUtils {
 		int val = 0;
 		Connection conn = null;
 		try {
-			Utils.markRecalc();
+			Utils.markRecalc(null);
 			conn = getConnection();
 			String sql = "DELETE FROM " + obj.getTable() + " WHERE " + obj.getIdfeld() +  "=?";
 			PreparedStatement prest = conn.prepareStatement(sql);
