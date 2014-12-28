@@ -13,6 +13,7 @@ import jsq.config.Config;
 import jsq.datastructes.Const;
 import jsq.datastructes.Datacontainer;
 import jsq.fetcher.history.BaseFetcher;
+import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.dialogs.KursAktualisierenAnbieterAuswahlDialog;
 import de.open4me.depot.gui.dialogs.KursAktualisierenDialog;
 import de.open4me.depot.sql.GenericObjectSQL;
@@ -85,6 +86,7 @@ public class UpdateStock {
 				}
 			}
 			calcPerformanceKurse(wertpapier, conn);
+			Utils.markRecalc(null);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ApplicationException("Fehler beim Abruf der Kurse." , e);
