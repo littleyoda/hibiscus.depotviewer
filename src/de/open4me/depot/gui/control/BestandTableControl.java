@@ -53,7 +53,7 @@ public class BestandTableControl extends AbstractControl implements Listener
 	}
 
 	@SuppressWarnings("rawtypes")
-	public Part getProjectsTable() throws Exception
+	public Part getBestandsTabelle() throws Exception
 	{
 		if (bestandsList != null) {
 			return bestandsList;

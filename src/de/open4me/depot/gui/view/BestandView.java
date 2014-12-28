@@ -34,7 +34,7 @@ public class BestandView extends AbstractView
 		TabGroup tabellenTab = new TabGroup(folder, "Tabellarisch");
 		BestandTableControl control = new BestandTableControl(this, datumsSlider);
 		Container container = new SimpleContainer(tabellenTab.getComposite());
-		container.addPart(control.getProjectsTable());
+		container.addPart(control.getBestandsTabelle());
 
 		final TabGroup piechartTab = new TabGroup(folder, "Graphisch");
 		piechartTab.getComposite().setLayout(new FillLayout());

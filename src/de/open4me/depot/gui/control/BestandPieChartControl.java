@@ -28,7 +28,7 @@ public class BestandPieChartControl implements Listener
 
 
 	private DatumsSlider datumsSlider;
-	private Date currentdate;
+	private Date currentdate = new Date();
 	private DefaultPieDataset dataset;
 
 	public BestandPieChartControl(AbstractView view, DatumsSlider datumsSlider) {
@@ -65,6 +65,7 @@ public class BestandPieChartControl implements Listener
 		            return result;
 		        }			
 		}); 
+		handleEvent(null);
 		return new ChartComposite(comp, SWT.NONE, chart, true);
 	}
 
