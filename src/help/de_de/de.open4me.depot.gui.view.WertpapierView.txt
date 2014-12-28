@@ -1,0 +1,11 @@
+<form>
+<p>
+<b>Graphisch</b>:
+</p>
+<p>
+Sofern nur ein Wertpapier ausgewählt wurde, wird der Kurs und, falls verfügbar, der Performance-Kurs angezeigt.
+Der Kurs entspricht dem Kaufkurs zum jeweiligen Zeitpunkt.<br/>
+Um eine objektive Vergleichsmöglichkeit zu ermöglichen, wird der Performance-Kurs bzgl. Ausschüttungen und Splitts bereinigt. 
+</p><p>Sofern mehrere Wertpapiere ausgewählt wurden, wird der Performance-Kurs als Vergleich genutzt.
+</p>
+</form>

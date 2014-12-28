@@ -26,7 +26,7 @@ public class BewertungsView extends AbstractView
 			LabelGroup group = new LabelGroup(this.getParent(),
 					Settings.i18n().tr("Inkonsistenzen zwischen Umsätzen und Beständen"));
 			group.addText("Der Abgleich zwischen Umsatz und Bestand hat Inkonsistenz ergeben.\n"
-						+ "Aus diesem Grund ist die Auswertung wahrscheinlich fehlerhaft.\nBitte korrigieren sie die Fehler!", true);
+						+ "Aus diesem Grund ist die Auswertung wahrscheinlich fehlerhaft.\nFalls sie eine Transaktion vor wenigen Tagen getätig haben, hat die Bank sie evtl. noch nicht als Umsatz und im Bestand gebucht.\nBitte korrigieren sie die Fehler, falls nötig!", true);
 			group.addPart(new Button("Inkonsistenzen anzeigen",new Action() {
 
 				@Override
