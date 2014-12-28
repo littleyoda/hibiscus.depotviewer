@@ -1,0 +1,10 @@
+<form>
+<p>
+Die Depots werden automatisch abgerufen,  wenn auf der globalen Startseite unter "Konten synchronisieren" 
+der Button "Synchronisierung starten" betätigt wird. 
+Voraussetzung ist, dass bei den Konten die Option "Umsätze/Salden holen" aktiv ist.
+</p><p>
+Die Funktion "Abrufen" ist primär zum Testen gedacht.
+</p>
+</form>
+ 
