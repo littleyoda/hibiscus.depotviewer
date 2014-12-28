@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.dialogs.ExtendedSynchronizeOptionsDialog;
-import de.open4me.depot.gui.menu.OrderListMenu;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;

@@ -20,7 +20,6 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import de.open4me.depot.abruf.hbci.DVHBCISynchronizeJobDepotKontoauszug;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.dialogs.AbstractDialog;
@@ -98,20 +97,6 @@ public class ExtendedSynchronizeOptionsDialog extends AbstractDialog
             }
           }
           
-          Object x = backend.create(SynchronizeJobKontoauszug.class, konto);
-          if (x instanceof DVHBCISynchronizeJobDepotKontoauszug) {
-        	  DVHBCISynchronizeJobDepotKontoauszug sj = (DVHBCISynchronizeJobDepotKontoauszug) x;
-        	  names = sj.getProf(konto);
-              if (names != null && names.size() > 0)
-              {
-                for (String name:names)
-                {
-                	System.out.println(name);
-                  this.createCustomProperty(name);
-                }
-              }
-          }
-          System.out.println(x.getClass());
 
         }
         catch (ApplicationException ae)
