@@ -1,0 +1,11 @@
+<form><p>
+<b>Weitere Informationen</b><br/>
+<br/>Bekannte Fehler und Verbesserungsvorschl‰ge:
+<br/><a href="https://github.com/littleyoda/hibiscus.depotviewer/issues">https://github.com/littleyoda/hibiscus.depotviewer/issues</a>
+<br/><br/><br/>Fragen und Anmerkungen:
+<br/><a href="http://www.onlinebanking-forum.de/forum/index.php?f=33">http://www.onlinebanking-forum.de/forum/index.php?f=33</a>
+<br/><a href="mailto:depotviewer@open4me.de?subject=Depotviewer">depotviewer@open4me.de</a>
+<br/><br/><br/><br/>
+Viel Spaﬂ noch bei der Nutzung des Depot-Viewers.<br/>
+<a href="QUIT">Schlieﬂen</a>
+</p></form>

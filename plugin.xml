@@ -38,7 +38,9 @@
     <item id="depotviewer.menu"                             name="Depot-&amp;Viewer">
         <item id="depotviewer.import"        name="&amp;Import von Ordern/Umsätze..."       shortcut="ALT+I"                     action="de.open4me.depot.gui.action.UmsatzImportAction" />
         <item id="depotviewer.abgleich"        name="&amp;Abgleich zwischen Orderbuch und Bestand..."       shortcut="ALT+A"                 action="de.open4me.depot.gui.action.BestandspruefungAction" />
-        <item id="depotviewer.wpadd"        name="Neues &amp;Wertpapier hinzufügen..."       shortcut="ALT+A"                 action="de.open4me.depot.gui.action.AddWertpapierAction" />
+        <item id="depotviewer.wpadd"        name="Neues &amp;Wertpapier hinzufügen..."       shortcut="ALT+W"                 action="de.open4me.depot.gui.action.AddWertpapierAction" />
+      <item name="-" />
+        <item id="depotviewer.einrichtugnsass"        name="&amp;Einrichtungsassistenten..."       shortcut="ALT+E"                 action="de.open4me.depot.gui.action.EinrichtungsassistentenAction" />
         
       <item name="-" />
       <item id="LizenzinformationAction"               name="&amp;Lizenzinformationen"                      icon="text-x-generic.png"              action="de.open4me.depot.gui.action.LizenzinformationAction" />

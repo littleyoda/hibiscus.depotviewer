@@ -1,0 +1,21 @@
+<form>
+<p><b>Offline Depot</b><br/><br/>
+Es muss manuell ein Konto angelegt werden:<br/>
+<br/>
+<b>Eigenschaften</b><br/>
+Bezeichnung des Kontos:          frei wählbar<br/>
+Kontoart:                          Wertpapierdepot<br/>
+Kontoinhalber:                     frei wählbar<br/>
+<b>Zugangsdaten</b><br/>
+Kundenkennung:                     frei wählbar<br/>
+IBAN:                               leer lassen<br/>
+Kontonummer:                     0<br/>
+BIC:                               leer lassen<br/>
+Bankleitzahl:                     0<br/>
+Offline-Konto:                     muss aktiviert sein<br/>
+Unterkontonummer:                leer lassen<br/>
+"Speichern"
+</p>
+<!-- Next: KontoDepotuebersichtOffline -->
+<!-- Action: de.willuhn.jameica.hbci.gui.action.KontoNew -->
+</form>

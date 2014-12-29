@@ -28,56 +28,57 @@ public class DepotView extends AbstractView
 
 		GUI.getView().setTitle(Settings.i18n().tr("Depots"));
 
-	      Container container = getText(getParent());
 		final DepotListControl control = new DepotListControl(this);
-		container.addPart(control.getDepotOverview());
-
-		ButtonArea buttons1 = new ButtonArea();
-		buttons1.addButton("Abrufen", new Action() {
-
-			@Override
-			public void handleAction(Object context)
-					throws ApplicationException {
-				try {
-					Object obj = control.getSelectedItem();
-					if (obj == null || !(obj instanceof GenericObjectHashMap)) {
-						return;
-					}
-						GenericObjectHashMap o = (GenericObjectHashMap) obj;
-						Konto k = (Konto) o.getAttribute("kontoobj");
-					(new KontoFetchUmsaetze()).handleAction(k);
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-		}
-
-		,null,true,"dialog-information.png");
-		buttons1.addButton("Einstellungen", new Action() {
-
-			@Override
-			public void handleAction(Object context)
-					throws ApplicationException {
-				Object obj = control.getSelectedItem();
-				if (obj == null || !(obj instanceof GenericObjectHashMap)) {
-					return;
-				}
-				control.exec(obj);
-			}
-
-		}
-
-
-		,null,true,"dialog-information.png");
-		container.addPart(buttons1);
+	      Container container = getText(getParent(), control);
 
 
 	}
 
-	public Container getText(Composite composite) {
+	public Container getText(Composite composite, final DepotListControl control) throws RemoteException, ApplicationException {
 		Container container = new SimpleContainer(composite);
+	      container.addHeadline("Folgende Depots sind aktuell dem Depot-Viewer zugewiesen:");
+			container.addPart(control.getDepotOverview());
+			ButtonArea buttons1 = new ButtonArea();
+			buttons1.addButton("Abrufen", new Action() {
+
+				@Override
+				public void handleAction(Object context)
+						throws ApplicationException {
+					try {
+						Object obj = control.getSelectedItem();
+						if (obj == null || !(obj instanceof GenericObjectHashMap)) {
+							return;
+						}
+							GenericObjectHashMap o = (GenericObjectHashMap) obj;
+							Konto k = (Konto) o.getAttribute("kontoobj");
+						(new KontoFetchUmsaetze()).handleAction(k);
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+			}
+
+			,null,true,"dialog-information.png");
+			buttons1.addButton("Einstellungen", new Action() {
+
+				@Override
+				public void handleAction(Object context)
+						throws ApplicationException {
+					Object obj = control.getSelectedItem();
+					if (obj == null || !(obj instanceof GenericObjectHashMap)) {
+						return;
+					}
+					control.exec(obj);
+				}
+
+			}
+
+
+			,null,true,"dialog-information.png");
+			container.addPart(buttons1);
+
 	      container.addHeadline("Unterstütze Banken:");
 	      container.addText("Es werden im wesentlichen nur Banken unterstützt, die für ihre Depots HBCI Support zu Verfügung stellen.\nFür alle anderen Banken müssen handisch Erweiterungen programmiert werden.\n", true);
 	      container.addHeadline("Notwendige Konto-Einstellungen für die Nutzung:");
@@ -106,7 +107,6 @@ public class DepotView extends AbstractView
 	    		  			"Falls die Fehlermeldung 'Geschäftsvorfall WPDepotUms wird nicht unterstützt' erscheint, so ist unter Einstellungen der Punkt 'Nur Bestand via HBCI abrufen' zu aktivieren. " +
 	    		  			"In diesem Fall wird versucht, die fehlenden Informationen aus der Differenz zwischen dem aktuellen und dem letzten Bestand zu ermitteln.\n"
 	    		  			, true);
-	      container.addHeadline("Folgende Depots sind aktuell dem Depot-Viewer zugewiesen:");
 	      return container;
 	}
 }

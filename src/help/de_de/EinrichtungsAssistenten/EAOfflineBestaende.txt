@@ -1,0 +1,9 @@
+<form>
+<p>
+<b>Bestände hinzufügen</b><br/>
+<br/>Im Orderbuch haben sie die Möglichkeit Umsätze/Order ihrem Offline-Depot hinzuzufügen.
+<br/>Hierzu betätigen sie die <b>Rechte Maustaste</b> und wählen <b>Hinzufügen</b>.</p> 
+<p></p>
+<!-- Action: de.open4me.depot.gui.action.OrderList -->
+<!-- Next: QuelleWeitereInformationen -->
+</form>

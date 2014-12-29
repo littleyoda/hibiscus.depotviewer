@@ -1,0 +1,6 @@
+<form>
+<p><b>Willkommem beim Einrichtungsassistenten.</b><br/><br/>
+Um ihnen die Einrichtung zu erleichtern, wird automatisch der für jeden Schritt passende Dialog innerhalb von Hibiscus oder Depot-Viewer geöffnet.<br/><br/>
+Hinweis zur Benutzung:<br/>Lassen sie diesen Dialog einfach offen und klicken sie auf weiter. Falls sie ihn schließen, können sie ihn über das Menü "Depot-Viewer" jederzeit wieder öffnen.</p>
+<!-- Next: KontenArten -->
+</form>

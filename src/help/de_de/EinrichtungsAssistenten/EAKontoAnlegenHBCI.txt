@@ -1,0 +1,14 @@
+<form>
+<p><b>HBCI</b><br/>
+<br/>Das Grundgerüst für HBCI-Depot kann in der Regel automatisch von Hibiscus angelegt werden. Hierzu muss in der <a href="de.willuhn.jameica.hbci.gui.action.KontoList">Kontoübersicht</a> die Funktion <b>"Konten aus HBCI-Konfiguration laden..."</b> ausgeführt werden.
+<br/><br/>Für die Nutzung sind folgende <b>Konto-Einstellungen notwendig:</b>
+<br/>Kontoart: <b>Wertpapierdepot</b>
+<br/>Zugangsart: <b>HBCI, nicht(!) "Depot-Viewer"</b>
+<br/><br/>Sollte das Depot-Konto nicht automatisch angelegt werden, so sollte geprüft werden, 
+ob die Bank wirklich HBCI für Depots (Geschäftsvorfälle HKWPD/Wertpapierdepotaufstellung und HKWDU/Depotumsätze) unterstützt. 
+Das Konto muss in diesem Fall manuell <a href="de.willuhn.jameica.hbci.gui.action.KontoNew">angelegt</a> werden.
+<br/>
+</p>
+<!-- Next: KontoDepotuebersichtHBCI -->
+<!-- Action: de.willuhn.jameica.hbci.gui.action.KontoList -->
+</form>

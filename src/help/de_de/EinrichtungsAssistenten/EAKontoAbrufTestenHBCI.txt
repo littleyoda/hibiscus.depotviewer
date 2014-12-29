@@ -1,0 +1,12 @@
+<form><p>
+<b>Abruf starten</b>
+<br/><br/>Als nächstes wählen sie bitte ein HBCI - Depot aus und starten sie den Abruf mit Hilfe des Buttons "Abrufen".
+Sobald sie die Meldung <b>Synchronisierung via HBCI erfolgreich beendet</b> erhalten, wurden die Depot-Daten erfolgreich abgerufen.
+<br/><br/><br/><b>Fehler: Geschäftsvorfall WPDepotUms wird nicht unterstützt</b>
+<br/>Sollten sie diesen Fehler erhalten, unterstützt ihre Bank nicht den Abruf von den Depotumsätzen. Bitte gehen sie in die
+<a href="de.open4me.depot.gui.action.DepotListAction">Depot Übersicht</a>, wählen das entsprechende Depot aus und gehen sie auf <b>"Einstellungen"</b>. Anschließend aktivieren sie die Funktion <b>"Nur Bestand via HBCI holen"</b>.
+
+</p>
+<!-- Action: de.open4me.depot.gui.action.DepotListAction -->
+<!-- Next: AllgemeineHinweise -->
+</form>

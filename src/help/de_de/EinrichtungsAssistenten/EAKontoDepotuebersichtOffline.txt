@@ -1,0 +1,9 @@
+<form>
+<p>
+<b>Depotübersicht</b><br/>
+<br/>Wenn das Konto korrekt angelegt wurde, taucht es in der Depotübersicht auf.</p>
+<p>Falls das Depot nicht erscheint, gehen sie bitte einen Schritt zurück und prüfen sie die Konteneinstellungen.</p>
+<p></p>
+<!-- Action: de.open4me.depot.gui.action.DepotListAction -->
+<!-- Next: OfflineBestaende -->
+</form>

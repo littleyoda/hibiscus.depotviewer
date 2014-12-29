@@ -1,0 +1,8 @@
+<form><p>
+<b>Allgemeine Hinweise</b><br/>
+<br/>Ihre Depot-Daten werden automatisch abgerufen, wenn sie auf der <a href="de.willuhn.jameica.gui.internal.action">Start-Seite</a> die Funktion
+<b>"Synchronisierung starten"</b> auswählen. Ein manueller Abruf mit Hilfe von "Abrufen" ist in der Regel nicht notwendig.<br/>
+</p>
+<!-- Action: de.willuhn.jameica.gui.internal.action.Start -->
+<!-- Next: QuelleWeitereInformationen -->
+</form>

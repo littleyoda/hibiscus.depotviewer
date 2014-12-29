@@ -1,0 +1,21 @@
+<form>
+<p><b>Unterstützte Arten</b><br/>
+Es werden drei verschiedene Arten von Depots unterstützt:<br/><br/>
+<b>Depots via HBCI</b> - <a href="KontoAnlegenHBCI">Weiter mit HBCI</a><br/>
+Diese Depots können via HBCI angesprochen werden.
+<br/><br/>
+
+<hr/>
+<b>Depots via Screen Scraping</b> - <a href="KontoAnlegenScreenScraping">Weiter mit Screen Scraping</a><br/>
+Bei diesem Depots ist für jede Bank ein eigenes Modul zu programmieren, welches die Daten aus Webseite des Online-Bankings extrahiert.<br/>
+Zur Zeit wird nur die Fondsdepot Bank unterstützt.
+<br/><br/>
+
+<b>Offline Depots</b> - <a href="KontoAnlegenOffline">Weiter mit Offline</a><br/>
+Bei diesem Depots geben sie per Hand die Umsätze/Order ein. Nur nötig, wenn ihr Depot 
+weder via HBCI noch Screen Scraping unterstützt wird.
+<br/><br/>
+
+</p>
+<!-- Action: de.open4me.depot.gui.action.DepotListAction -->
+</form>
