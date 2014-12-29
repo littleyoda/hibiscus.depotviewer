@@ -21,6 +21,7 @@ import de.open4me.depot.gui.DatumsSlider;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.tools.Bestandsabfragen;
 import de.willuhn.jameica.gui.AbstractView;
+import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
 public class BestandPieChartControl implements Listener  
@@ -45,7 +46,7 @@ public class BestandPieChartControl implements Listener
 		PiePlot plot = (PiePlot) chart.getPlot();
 		plot.setSectionOutlinesVisible(false);
 		plot.setLabelFont(new Font("SansSerif", Font.PLAIN, 12));
-		plot.setNoDataMessage("No data available");
+		plot.setNoDataMessage("Kein Bestand verfügbar. Wahrscheinlich fehlen die Kursdaten.");
 		plot.setCircular(false);
 		plot.setLabelGap(0.02);
 		plot.setLabelGenerator(new PieSectionLabelGenerator() {
@@ -77,7 +78,12 @@ public class BestandPieChartControl implements Listener
 			try {
 				dataset.clear();
 				for (GenericObjectSQL x : Bestandsabfragen.getBestand(currentdate)) {
-					Object anzahl = x.getAttribute("anzahl");
+					Object anzahl = x.getAttribute("wert");
+					if (anzahl == null) {
+						Logger.warn("Keine Kursdaten für " + (String) x.getAttribute("wertpapiername"));
+						dataset.clear();
+						break;
+					}
 					double wert;
 					if (anzahl instanceof BigDecimal) {
 						wert = ((BigDecimal) anzahl).doubleValue();
