@@ -7,6 +7,7 @@ import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
+import de.willuhn.jameica.gui.parts.ContextMenuItem;
 import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.util.ApplicationException;
 
@@ -39,7 +40,7 @@ public class OrderListMenu extends ContextMenu
 			}
 
 		}));
-		addItem(new CheckedContextMenuItem("Hinzufügen", new UmsatzEditorAction(true)));
+		addItem(new ContextMenuItem("Hinzufügen", new UmsatzEditorAction(true)));
 		addItem(new CheckedContextMenuItem("Bearbeiten", new UmsatzEditorAction(false)));
 	}
 }
