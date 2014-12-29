@@ -25,7 +25,7 @@ public class WertpapierMenu extends ContextMenu
 	
 
 	public WertpapierMenu() {
-		addItem(new CheckedContextMenuItem("Wertpapier hinzufügen...", new AddWertpapierAction()));
+		addItem(new ContextMenuItem("Wertpapier hinzufügen...", new AddWertpapierAction()));
 		addItem(ContextMenuItem.SEPARATOR);
 		addMenu(new OpenInBrowserMenu("Webseiten (allgemein)", allgseiten));
 		addMenu(new OpenInBrowserMenu("Webseiten (Fonds)", fondsseiten));
