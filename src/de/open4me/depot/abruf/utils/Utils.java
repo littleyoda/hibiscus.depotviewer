@@ -138,7 +138,6 @@ public class Utils {
 			e.printStackTrace();
 			throw new ApplicationException(Settings.i18n().tr("error while creating new Umsatz"),e);
 		}
-
 	}
 
 	/**
@@ -163,6 +162,12 @@ public class Utils {
 			Object ret = rs.get(0).getAttribute("value");
 			if (ret == null) {
 				return null;
+			}
+			if (ret.toString().equals("1")) {
+				return true;
+			}
+			if (ret.toString().equals("0")) {
+				return false;
 			}
 			return Boolean.parseBoolean(ret.toString());
 		} catch (RemoteException e) {
