@@ -43,6 +43,8 @@
 		<property name="lang.dir" 					    value="${src.dir}/lang" />
 		<property name="lib.dir" 					      value="lib" />
 		<property name="class.dir" 					    value="${project.tmp}/bin" />
+		<property name="help.dir"		value="${src.dir}/help" />
+		
 
 		<available file="${lib.dir}"     type="dir" property="havelib" />
 
@@ -85,11 +87,16 @@
 			<classpath refid="compilepath" />
 		</javac>
 
-    <copy todir="${class.dir}">
-      <fileset dir="${src.dir}">
-        <include name="META-INF/**" />
-      </fileset>
+		<copy todir="${class.dir}">
+			<fileset dir="${src.dir}">
+        			<include name="META-INF/**" />
+	      		</fileset>
+		</copy>
+		
+		    <copy todir="${class.dir}/help">
+      <fileset dir="${help.dir}" />
     </copy>
+
   </target>
 
 
@@ -118,8 +125,8 @@
 				<attribute name="Implementation-Title" value="${plugin.name}" />
 				<attribute name="Implementation-Version" value="${plugin.version}" />
 				<attribute name="Implementation-Buildnumber" value="${build.number}" />
-        <attribute name="Class-Path" value="lang help lib" />
-      </manifest>
+			        <attribute name="Class-Path" value="lang help lib" />
+		      </manifest>
 			<fileset dir="${class.dir}" />
 		</jar>
 
