@@ -6,6 +6,7 @@ import java.io.File;
 import jsq.fetch.factory.Factory;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.sql.SQLUtils;
+import de.willuhn.jameica.messaging.BootMessage;
 import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.plugin.Version;
 import de.willuhn.jameica.system.Application;
@@ -36,10 +37,11 @@ public class DepotViewerPlugin extends AbstractPlugin
 
 		checkJavaStockQuotesDirectory();
 		SQLUtils.checkforupdates();
-
-		
 	}
 
+	/**
+	 * Nach anderen Datenquellen suchen
+	 */
 	private void checkJavaStockQuotesDirectory() {
 		File dir = new File(getJSDirectory());
 		if (dir.exists()) {
@@ -76,6 +78,8 @@ public class DepotViewerPlugin extends AbstractPlugin
 		// the server
 		if (Application.inClientMode())
 			return;
+		Application.getMessagingFactory().getMessagingQueue("jameica.boot").queueMessage(new BootMessage("Depotviewer\n\nUm ihnen die Einrichtung ihrer Depots zu erleichtern,\n"
+				+ "können sie über dem Menüpunkt \"Depot-Viewer/Einrichtungsassistenten\" einen Assistenten starten,\nder sie durch die Einrichtung begleitet."));
 	}
 
 	/**
