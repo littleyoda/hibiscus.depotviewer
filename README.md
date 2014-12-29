@@ -22,6 +22,8 @@ Installation des Plugins:
 * Die Installation des gewünschten Plugins durch Doppel-Klick beginnen
 * Hibiscus neu starten
 
+Nach der Instllation kann über dem Menüpunkt "Depot-Viewer/Einrichtungsassistenten" ein Assistenten gestartet werden,
+der sie durch die Einrichtung ihrer Depots begleitet.
 
 [Einrichtungen von Depots](banken.md)
 
