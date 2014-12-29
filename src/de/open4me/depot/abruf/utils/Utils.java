@@ -153,6 +153,7 @@ public class Utils {
 	}
 
 	public static void setUmsatzBetsandTest(Boolean value) throws ApplicationException {
+		// TODO true oder false wird Datenbank spezifisch gespeichert 
 		SQLUtils.exec("update depotviewer_cfg set value = " + ((value == null) ? "NULL" : value.toString()) + " where `key`='status_bestand_order'");
 	}
 
