@@ -14,7 +14,6 @@ import de.open4me.depot.gui.action.OrderList;
 import de.open4me.depot.gui.menu.WertpapierMenu;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLQueries;
-import de.open4me.depot.sql.SQLUtils;
 import de.open4me.depot.tools.UpdateStock;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.parts.Button;
@@ -52,7 +51,6 @@ public class WertpapiereTableControl
 				}
 				if (orderList.getSelection() instanceof Object[]) {
 					history.update((GenericObjectSQL[]) orderList.getSelection());
-					System.out.println("Array");
 				} else {
 					GenericObjectSQL d = (GenericObjectSQL) event.data;
 					history.update(d);
