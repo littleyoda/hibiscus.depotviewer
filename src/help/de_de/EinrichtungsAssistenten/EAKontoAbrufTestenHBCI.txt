@@ -1,6 +1,6 @@
 <form><p>
-<b>Abruf starten</b>
-<br/><br/>Als nächstes wählen sie bitte ein HBCI - Depot aus und starten sie den Abruf mit Hilfe des Buttons "Abrufen".
+<b>Abruf testen</b>
+<br/><br/>Als nächstes wählen sie bitte ein HBCI - Depot aus und starten sie den Testabruf mit Hilfe des Buttons "Abrufen".
 Sobald sie die Meldung <b>Synchronisierung via HBCI erfolgreich beendet</b> erhalten, wurden die Depot-Daten erfolgreich abgerufen.
 <br/><br/><br/><b>Fehler: Geschäftsvorfall WPDepotUms wird nicht unterstützt</b>
 <br/>Sollten sie diesen Fehler erhalten, unterstützt ihre Bank nicht den Abruf von den Depotumsätzen. Bitte gehen sie in die

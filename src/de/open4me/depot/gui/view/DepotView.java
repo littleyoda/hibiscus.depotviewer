@@ -2,9 +2,14 @@ package de.open4me.depot.gui.view;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import de.open4me.depot.Settings;
+import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.gui.action.EinrichtungsassistentenAction;
 import de.open4me.depot.gui.control.DepotListControl;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.willuhn.jameica.gui.AbstractView;
@@ -12,6 +17,7 @@ import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.util.Container;
+import de.willuhn.jameica.gui.util.SWTUtil;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.jameica.hbci.gui.action.KontoFetchUmsaetze;
 import de.willuhn.jameica.hbci.rmi.Konto;
@@ -29,13 +35,34 @@ public class DepotView extends AbstractView
 		GUI.getView().setTitle(Settings.i18n().tr("Depots"));
 
 		final DepotListControl control = new DepotListControl(this);
-	      Container container = getText(getParent(), control);
+		if (Utils.getDepotKonten().size() == 0) {
+			Container container = new SimpleContainer(getParent());
+		      container.addHeadline("Einrichtungsassistent:");
+		      container.addText("Sie haben noch keine Konten dem Depotviewer zugewiesen.\n"
+		    		  + "Möchten sie den Einrichtungsassistent starten, der Ihnen bei der Einrichtung hilft?\n"
+		    		  + "Sie können den Einrichtungsassistenten auch später über den Menüpunkt \"Depot-Viewer\" starten.", true);
+
+				ButtonArea baEinrichtung = new ButtonArea();
+				baEinrichtung.addButton("Einrichtungsassistent starten", new Action() {
+
+					@Override
+					public void handleAction(Object context) {
+						(new EinrichtungsassistentenAction()).handleAction(null);
+					}
+
+				}
+
+				,null,true,"dialog-warning-large.png");
+				container.addPart(baEinrichtung);
+			
+		}
+	    getText(getParent(), control);
 
 
 	}
 
 	public Container getText(Composite composite, final DepotListControl control) throws RemoteException, ApplicationException {
-		Container container = new SimpleContainer(composite);
+		Container container = new SimpleContainer(composite, true);
 	      container.addHeadline("Folgende Depots sind aktuell dem Depot-Viewer zugewiesen:");
 			container.addPart(control.getDepotOverview());
 			ButtonArea buttons1 = new ButtonArea();
@@ -87,20 +114,6 @@ public class DepotView extends AbstractView
 	      container.addText("Zugangsarten: \n" +
 	      					"        HBCI, falls die Bank dieses tatsächlich unterstützt\n" +
 	    		  			"        DepotViewer (z.Z. nur für die  Fondsdepot Bank)\n", true);
-//	      FormTextPart text = new FormTextPart();
-//	      text.setText("<form>Mehr Informationen: [" + Links.einrichtung.getHTML() +"]" 
-//	    		  + "</form>");
-//	      container.addPart(text);
-	      
-//	      FormTextPart text = new FormTextPart();
-//	      text.setText("<form>" +
-//	        "<p><b>Hibiscus - HBCI-Onlinebanking für Jameica</b></p>" +
-//	        "<p>Lizenz: GPL [<a href=\"http://www.gnu.org/copyleft/gpl.html\">www.gnu.org/copyleft/gpl.html</a>]<br/>" +
-//	        "Copyright by Olaf Willuhn [<a href=\"mailto:hibiscus@willuhn.de\">hibiscus@willuhn.de</a>]<br/>" +
-//	        "<a href=\"http://www.willuhn.de/products/hibiscus/\">www.willuhn.de/products/hibiscus/</a></p>" +
-//	        "</form>");
-//
-//	      container.addPart(text);
 
 	      container.addHeadline("Geschäftsvorfall WPDepotUms wird nicht unterstützt");
 	      container.addText("Teilweise unterstützen die Banken bei HBCI nur den Bestandsabruf und nicht den Abruf von Umsätzen.\n" +

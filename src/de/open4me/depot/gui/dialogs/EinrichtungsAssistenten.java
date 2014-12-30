@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Stack;
 
 import org.apache.commons.io.IOUtils;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import de.open4me.depot.gui.parts.FormTextPartExt;
@@ -14,6 +15,7 @@ import de.willuhn.jameica.gui.dialogs.AbstractDialog;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.util.Container;
+import de.willuhn.jameica.gui.util.LabelGroup;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.jameica.services.BeanService;
 import de.willuhn.jameica.system.Application;
@@ -27,14 +29,11 @@ public class EinrichtungsAssistenten extends AbstractDialog
 	private String current = "Start";
 	private String next = "";
 	private Stack<String> prev = new Stack<String>();
-	private int schritt;
 	
 
 	public EinrichtungsAssistenten(int position)
 	{
 		super(position);
-		setSize(400, 400);
-		schritt = 1;
 		setTitle("Depot Viewer: Einrichtungsassistenten");
 	}
 
@@ -61,7 +60,14 @@ public class EinrichtungsAssistenten extends AbstractDialog
 	 */
 	protected void paint(final Composite parent) throws Exception
 	{
-		Container group = new SimpleContainer(parent);
+	    Container container = new Container(true) {
+
+			@Override
+			public Composite getComposite() {
+				return parent;
+			}
+	    	
+	    };
 		text = new FormTextPartExt(lade(current)) {
 
 			@Override
@@ -80,9 +86,10 @@ public class EinrichtungsAssistenten extends AbstractDialog
 			}
 			
 		};
-		group.addPart(text);
+		container.addPart(text);
 
-		ButtonArea buttons = new ButtonArea();
+
+	    ButtonArea buttons = new ButtonArea();
 		vorButton = new Button("Schritt zurück", new Action() {
 			public void handleAction(Object context) throws ApplicationException
 			{
@@ -98,7 +105,8 @@ public class EinrichtungsAssistenten extends AbstractDialog
 			}},null ,false, "go-next.png");
 		buttons.addButton(vorButton);
 		buttons.addButton(weiterButton);
-		group.addButtonArea(buttons);
+		container.addButtonArea(buttons);
+	    setSize(380,480); 
 		aktuallisiere();
 	}
 

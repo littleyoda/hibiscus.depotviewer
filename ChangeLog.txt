@@ -1,4 +1,5 @@
-$version
+	Einrichtungsassistent: Sonderfall Consorsbank
+v0.3.7
 	Saldo für Offline-Depots (close #15)
 	Graphische Bestandsanzeige war falsch (Fixes #20)
 	Teilweise keine Aktualisierung der Bestandsübersicht bei Offline-Konten (fixes #24)
