@@ -1,0 +1,18 @@
+$version
+	Saldo für Offline-Depots (close #15)
+	Graphische Bestandsanzeige war falsch (Fixes #20)
+	Teilweise keine Aktualisierung der Bestandsübersicht bei Offline-Konten (fixes #24)
+
+v0.3.6
+	Einrichtungsassistenten (close #14)
+	Umsätze/Order können nun auch in eine leere Liste eingefügt werden
+	Wertpapiere lassen sich nun auch hinzufügen, wenn die Liste noch leer ist
+	Bestand/Graphisch wurde nicht richtig aktualisiert
+	Offline-Depots: Bestand berechnen, wenn Aktienkurse aktualisiert wurden
+
+v0.3.5
+
+v0.3.4
+
+v0.3.3
+
