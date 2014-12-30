@@ -89,6 +89,7 @@ public class Bestandspruefung {
 		Konto k = Utils.getKontoByID(konto.getAttribute("id").toString());
 		HashMap<Integer, BigDecimal> bestand = getBestandLautOrder(konto);
 		Utils.clearBestand(k);
+		BigDecimal saldo = BigDecimal.ZERO;
 		for (Entry<Integer, BigDecimal> position : bestand.entrySet()) {
 			BigDecimal wert = BigDecimal.ZERO;
 			String wertW =  "EUR";
@@ -96,7 +97,6 @@ public class Bestandspruefung {
 			String kursW =  "EUR";
 			Date bewertung = null;
 			String id = position.getKey().toString();
-
 			// Falls Kursdaten vorhanden sind, bitte diese nutzen
 			List<GenericObjectSQL> res = SQLUtils.getResultSet(SQLUtils.addTop(1, "select * from depotviewer_kurse where wpid = " + id +" order by kursdatum desc"), "depotviewer_kurse", id, id);
 			if (res.size() == 1) {
@@ -106,11 +106,14 @@ public class Bestandspruefung {
 				wertW = kursW;
 				wert = kurs.multiply(position.getValue());
 				bewertung = (Date) data.getAttribute("kursdatum");
+				saldo = saldo.add(wert); // Währung beachten!
 			}
 			
 			// Bestand hinzufügen
 			Utils.addBestand(position.getKey().toString(), k, position.getValue().doubleValue(), kurs.doubleValue(), kursW, wert.doubleValue(), wertW, new Date(), bewertung);
 		}
+		k.setSaldo(saldo.doubleValue());
+		k.store();
 		
 	}
 
