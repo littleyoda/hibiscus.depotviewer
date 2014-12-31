@@ -1,3 +1,4 @@
+0.3.8 -- 2014-12-31
 	Verbesserte Wertpapiersuche durch Nutzung der 'Gesamtliste aller auf Xetra handelbaren Wertpapiere' (fixes #21)
 	Einrichtungsassistent: Sonderfall Consorsbank
 v0.3.7
