@@ -13,4 +13,10 @@ public class SQLQueries {
 				"FROM depotviewer_wertpapier", 
 				"depotviewer_wertpapier", "id", "wertpapiername");		
 	}
+
+	public static List<GenericObjectSQL> getWertpapiere() {
+		return SQLUtils.getResultSet("select *, concat(wertpapiername , ' (' , wkn , ' / ' , isin , ')') as nicename from depotviewer_wertpapier order by wertpapiername", 
+			"depotviewer_wertpapier", "id", "nicename");
+	}
+
 }

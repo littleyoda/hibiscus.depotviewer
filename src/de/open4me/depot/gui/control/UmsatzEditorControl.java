@@ -8,6 +8,7 @@ import java.util.List;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.GenericObjectSQL;
+import de.open4me.depot.sql.SQLQueries;
 import de.open4me.depot.sql.SQLUtils;
 import de.open4me.depot.tools.VarDecimalFormat;
 import de.willuhn.jameica.gui.AbstractControl;
@@ -124,8 +125,8 @@ public class UmsatzEditorControl extends AbstractControl
 		  if (wp != null) {
 			  return wp;
 		  }
-			List<GenericObjectSQL> list = SQLUtils.getResultSet("select * from depotviewer_wertpapier", 
-					"depotviewer_wertpapier", "id", "wertpapiername");
+		  
+		  List<GenericObjectSQL> list = SQLQueries.getWertpapiere();
 		  wp = new SelectInput(list, null);
 		  wp.setMandatory(true);
 		  return wp;

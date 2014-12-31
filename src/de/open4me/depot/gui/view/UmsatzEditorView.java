@@ -3,6 +3,7 @@ package de.open4me.depot.gui.view;
 import java.rmi.RemoteException;
 
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.gui.action.AddWertpapierAction;
 import de.open4me.depot.gui.control.UmsatzEditorControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
@@ -31,6 +32,9 @@ public class UmsatzEditorView extends AbstractView {
 		Container left = new SimpleContainer(columns.getComposite());
 
 		left.addLabelPair("Wertpapier", control.getWertpapiere());
+		ButtonArea ba = new ButtonArea();
+		ba.addButton("Neues Wertpapier hinzufügen", new AddWertpapierAction());
+		left.addButtonArea(ba);
 		left.addLabelPair("Datum", control.getDate());
 		left.addLabelPair("Konto", control.getKonto());
 		left.addLabelPair("Aktion", control.getAktionAuswahl());
