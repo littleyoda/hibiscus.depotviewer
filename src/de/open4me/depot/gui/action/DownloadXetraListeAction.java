@@ -16,7 +16,6 @@ import de.willuhn.jameica.messaging.StatusBarMessage;
 import de.willuhn.jameica.services.TransportService;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.BackgroundTask;
-import de.willuhn.jameica.system.ConsoleMonitor;
 import de.willuhn.jameica.transport.Transport;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
