@@ -6,19 +6,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import jsq.tools.HtmlUnitTools;
-
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
-import com.gargoylesoftware.htmlunit.ThreadedRefreshHandler;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlTable;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.action.OrderList;
 import de.open4me.depot.sql.GenericObjectHashMap;
+import de.open4me.depot.tools.WertpapierSuche;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
@@ -32,7 +26,7 @@ import de.willuhn.util.ApplicationException;
 public class AddWertpapierControl  extends AbstractControl {
 
 	private Input suchbox;
-	private TablePart bestandsList;
+	private TablePart trefferListe;
 	
 	public AddWertpapierControl(AbstractView view) {
 		super(view);
@@ -47,15 +41,31 @@ public class AddWertpapierControl  extends AbstractControl {
 	}
 	
 	public TablePart getTab() {
-		if (this.bestandsList != null) {
-			return bestandsList;
+		if (this.trefferListe != null) {
+			return trefferListe;
 		}
-		bestandsList = new TablePart(new ArrayList(),new OrderList());
+		
+		trefferListe = new TablePart(getDummy(),new OrderList());
+		trefferListe.setSummary(false);
+		trefferListe.addColumn(Settings.i18n().tr("Name"), "Name");
+		trefferListe.addColumn(Settings.i18n().tr("Typ"),"Typ");
+		trefferListe.addColumn(Settings.i18n().tr("ISIN"),"Isin");
+		trefferListe.addColumn(Settings.i18n().tr("WKN"),"Wkn");
+		trefferListe.addColumn(Settings.i18n().tr("Quelle"),"Source");
+		return trefferListe;
+	}
+	
+	public List<GenericObjectHashMap> getDummy() {
+		HashMap<String, String> h = new HashMap<String, String>();
+		h.put("Name", "                           ");
+		h.put("Isin", "                           ");
+		h.put("Typ", "                           ");
+		h.put("Wkn", "                           ");
+		h.put("Source", "                           ");
+		List<GenericObjectHashMap> x = new ArrayList<GenericObjectHashMap>();
+		x.add(new GenericObjectHashMap(h));
+		return x;
 
-		bestandsList.addColumn(Settings.i18n().tr("Name"), "Name");
-		bestandsList.addColumn(Settings.i18n().tr("Typ"),"Typ");
-		bestandsList.addColumn(Settings.i18n().tr("ISIN"),"Isin");
-		return bestandsList;
 	}
 	public ButtonArea getSearchButton() {
 		ButtonArea buttons = new ButtonArea();
@@ -65,18 +75,7 @@ public class AddWertpapierControl  extends AbstractControl {
 			public void handleAction(Object context)
 					throws ApplicationException {
 				try {
-					WebClient webClient = new WebClient();
-					webClient.setCssErrorHandler(new SilentCssErrorHandler());
-					webClient.setRefreshHandler(new ThreadedRefreshHandler());
-					webClient.getOptions().setJavaScriptEnabled(false);
-					webClient.getOptions().setThrowExceptionOnScriptError(false);
-					java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(java.util.logging.Level.OFF);
-					HtmlPage page = webClient.getPage("https://de.finance.yahoo.com/lookup/all?s=" + getSuchbox().getValue() +  "&t=A&m=ALL&r=");
-					HtmlTable tab = (HtmlTable) HtmlUnitTools.getElementByPartContent(page, "Ticker", "table");
-					if (tab == null) {
-						return;
-					}
-					List<HashMap<String, String>> x = HtmlUnitTools.analyse(tab);
+					List<HashMap<String, String>> x = WertpapierSuche.search((String) getSuchbox().getValue()); 
 					TablePart ziel = getTab();
 					ziel.removeAll();
 					for (HashMap<String, String> map : x) {
@@ -110,7 +109,7 @@ public class AddWertpapierControl  extends AbstractControl {
 				}
 				GenericObjectHashMap sel = (GenericObjectHashMap) selection;
 				try {
-					Utils.getORcreateWKN("", (String) sel.getAttribute("Isin"), (String) sel.getAttribute("Name"));
+					Utils.getORcreateWKN((String) sel.getAttribute("Wkn"), (String) sel.getAttribute("Isin"), (String) sel.getAttribute("Name"));
 				} catch (RemoteException e) {
 					e.printStackTrace();
 					throw new ApplicationException(e);
@@ -121,6 +120,7 @@ public class AddWertpapierControl  extends AbstractControl {
 		},null ,false,"edit-copy.png");
 		return buttons;
 	}
+
 }
 
 

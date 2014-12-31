@@ -1,3 +1,4 @@
+	Verbesserte Wertpapiersuche durch Nutzung der 'Gesamtliste aller auf Xetra handelbaren Wertpapiere' (fixes #21)
 	Einrichtungsassistent: Sonderfall Consorsbank
 v0.3.7
 	Saldo für Offline-Depots (close #15)
