@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import de.open4me.depot.Settings;
+import de.open4me.depot.gui.action.AddWertpapierAction;
 import de.open4me.depot.gui.action.OrderList;
 import de.open4me.depot.gui.menu.WertpapierMenu;
 import de.open4me.depot.sql.GenericObjectSQL;
@@ -17,6 +18,7 @@ import de.open4me.depot.sql.SQLQueries;
 import de.open4me.depot.tools.UpdateStock;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.parts.Button;
+import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.util.ApplicationException;
 
@@ -75,8 +77,10 @@ public class WertpapiereTableControl
 
 		getTable().paint(rest);
 
+		ButtonArea buttons = new ButtonArea();
 
-		Button updateButton = new Button("Aktualisieren",new Action() {
+		buttons.addButton(new Button("Hinzufügen", new AddWertpapierAction()));
+		buttons.addButton(new Button("Aktualisieren",new Action() {
 
 			@Override
 			public void handleAction(Object context)
@@ -92,8 +96,9 @@ public class WertpapiereTableControl
 
 			}
 
-		});
-		updateButton.paint(rest);
+		}));
+		
+		buttons.paint(rest);
 		return rest;
 	}
 }
