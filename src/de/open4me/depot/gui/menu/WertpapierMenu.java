@@ -1,6 +1,9 @@
 package de.open4me.depot.gui.menu;
 
 import de.open4me.depot.gui.action.AddWertpapierAction;
+import de.open4me.depot.gui.action.WertpapiereAktualisierenAction;
+import de.open4me.depot.gui.control.WertpapiereControl;
+import de.open4me.depot.gui.control.WertpapiereDatenControl;
 import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
 import de.willuhn.jameica.gui.parts.ContextMenuItem;
@@ -24,8 +27,11 @@ public class WertpapierMenu extends ContextMenu
 		};
 	
 
-	public WertpapierMenu() {
+	public WertpapierMenu(WertpapiereControl controller) {
 		addItem(new ContextMenuItem("Wertpapier hinzufügen...", new AddWertpapierAction()));
+		addItem(ContextMenuItem.SEPARATOR);
+		addItem(new ContextMenuItem("Aktualisieren...", new WertpapiereAktualisierenAction(controller, false)));
+		addItem(new ContextMenuItem("Aktualisieren (Einstellungen wählen)...", new WertpapiereAktualisierenAction(controller, true)));
 		addItem(ContextMenuItem.SEPARATOR);
 		addMenu(new OpenInBrowserMenu("Webseiten (allgemein)", allgseiten));
 		addMenu(new OpenInBrowserMenu("Webseiten (Fonds)", fondsseiten));

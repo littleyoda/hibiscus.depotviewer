@@ -34,7 +34,7 @@ import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.jameica.gui.util.TabGroup;
 import de.willuhn.logging.Logger;
 
-public class WertpaperHistoryControl {
+public class WertpapiereDatenControl {
 
 
 	private JFreeChart chart;
@@ -42,8 +42,9 @@ public class WertpaperHistoryControl {
 	private XYItemRenderer renderer;
 	private Connection conn;
 	private TablePart bestandsList;
+	private WertpapiereControl controller;
 
-	public WertpaperHistoryControl() {
+	public WertpapiereDatenControl() {
 		try {
 			conn = SQLUtils.getConnection();
 			data = new JDBCXYDataset(conn);
@@ -167,26 +168,24 @@ public class WertpaperHistoryControl {
 
 	public void update(GenericObjectSQL[] selection) {
 		try {
+			if (selection.length == 1) {
+				update(selection[0]);
+				return;
+			}
 			chart.setTitle("Performancevergleich");
 			String ids = "";
 			String spalten = "datum.kursdatum";
-//			String sql = "SELECT kursdatum, kurs, kursperf from depotviewer_kurse where wpid = " + nummer + " order by 1";
-
 			String sql = "";
 			for (GenericObjectSQL d : selection) {
 				if (!ids.isEmpty()) {
 					ids += ",";
 				}
-				System.out.println(d.toString());
 				String id = d.getAttribute("id").toString(); 
 				ids += id;
 				spalten += ", A" + id + ".kurs as \"" + StringEscapeUtils.escapeSql(d.getAttribute("wertpapiername").toString()) + "\" ";
-				System.out.println(d.getAttribute("id").toString());
-			//	sql +="left join (select kurs, kursdatum from depotviewer_kurse where wpid = " + id  + ") as A" + id + " on A" + id + ".kursdatum = datum.kursdatum\n";
 				sql +="left join depotviewer_kurse as A" + id + " on A" + id + ".wpid = " + id + " and A" + id + ".kursdatum = datum.kursdatum\n";
 			}
 			sql = "select "  + spalten + " from (select distinct kursdatum from depotviewer_kurse where wpid in (" + ids + ") order by 1) as datum\n" + sql;
-			System.out.println(sql);
 			renderer.removeAnnotations();
 			data.executeQuery(sql);
 
@@ -209,6 +208,13 @@ public class WertpaperHistoryControl {
 		bestandsList.addColumn(Settings.i18n().tr("Performance"),"performance");
 		calcKennzahlen("-1");
 		return bestandsList;
+	}
+
+
+
+
+	public void setController(WertpapiereControl controller) {
+		this.controller = controller;
 	}
 
 

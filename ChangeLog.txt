@@ -1,6 +1,11 @@
+	Aktualisierungen: Speicherung der Einstellungen (close #17)
+	Spalte Kursdatum wird aktualisiert (close #25)
+	Mehrere Wertpapiere aktualisieren (close #16)
+
 0.3.8 -- 2014-12-31
 	Verbesserte Wertpapiersuche durch Nutzung der 'Gesamtliste aller auf Xetra handelbaren Wertpapiere' (fixes #21)
 	Einrichtungsassistent: Sonderfall Consorsbank
+
 v0.3.7
 	Saldo für Offline-Depots (close #15)
 	Graphische Bestandsanzeige war falsch (Fixes #20)

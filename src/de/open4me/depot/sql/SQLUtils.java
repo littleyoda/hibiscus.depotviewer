@@ -114,13 +114,23 @@ public class SQLUtils {
 		return version;
 	}
 
+	/**
+	 * Liefert das erste Objekt der ersten Zeile zurück.
+	 * 
+	 * Falls die Query überhaupt kein Ergebnisse zurückliefert hat, wird null zurückgeliefert
+	 * 
+	 * @param statement
+	 * @return
+	 */
 	public static Object getObject(PreparedStatement statement) {
 		Connection conn = null;
 		Object obj = null;
 		try {
 			conn = getConnection();
 			ResultSet ret = statement.executeQuery();
-			ret.next();
+			if (!ret.next()) {
+				return null;
+			}
 			obj = ret.getObject(1);
 			conn.close();
 		} catch (Exception e) {
@@ -135,6 +145,7 @@ public class SQLUtils {
 		return obj;
 	}
 
+	
 	public static void checkforupdates() throws ApplicationException {
 		List<SQLChange> liste = SQLChange.getChangesSinceVersion(getCurrentDBVersion());
 		Connection conn = null;

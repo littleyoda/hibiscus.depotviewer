@@ -26,12 +26,13 @@ public class KursAktualisierenAnbieterAuswahlDialog extends AbstractDialog
 {	  
 	private SelectInput anbieter;
 	protected BaseFetcher bf;
+	private Boolean speich;
 
 
-	public KursAktualisierenAnbieterAuswahlDialog(int position)
+	public KursAktualisierenAnbieterAuswahlDialog(int position, String name)
 	{
 		super(position);
-		setTitle("Daten Anbieter");
+		setTitle(name);
 	}
 
 	/**
@@ -49,6 +50,10 @@ public class KursAktualisierenAnbieterAuswahlDialog extends AbstractDialog
 				+ "Nutzungsbedingungen des Anbieters gelesen haben \n"
 				+ "und sie zu einer Nutzung berechtigt sind!\n\n");
 		
+		final CheckboxInput speichern = new CheckboxInput(false);
+		group.addCheckbox(speichern, 
+				  "Aktualisierungseinstellungen speichern und\nbeim nächsten Abruf automatisch nutzen\n");
+		
 		ButtonArea buttons1 = new ButtonArea();
 		buttons1.addButton(i18n.tr("Weitere Datenquellen installieren"), new Action() {
 
@@ -60,8 +65,6 @@ public class KursAktualisierenAnbieterAuswahlDialog extends AbstractDialog
 			}
 			
 		}
-			
-
 		,null,true,"dialog-information.png");
 
 		buttons1.addButton(i18n.tr("Anbieter Webseite öffnen"), new Action() {
@@ -83,6 +86,7 @@ public class KursAktualisierenAnbieterAuswahlDialog extends AbstractDialog
 				{
 					if ((Boolean) erlaubnis.getValue()) {
 						bf = (BaseFetcher) anbieter.getValue();
+						speich = (Boolean) speichern.getValue();
 						close();
 					}
 				}},null ,false, "ok.png");
@@ -108,6 +112,10 @@ public class KursAktualisierenAnbieterAuswahlDialog extends AbstractDialog
 		return anbieter;
 	}
 
+	public boolean getSpeichernSetting() {
+		return speich;
+	}
+	
 	@Override
 	protected Object getData() throws Exception {
 		return bf;

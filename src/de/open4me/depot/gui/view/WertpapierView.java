@@ -6,7 +6,8 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.layout.FillLayout;
 
 import de.open4me.depot.Settings;
-import de.open4me.depot.gui.control.WertpaperHistoryControl;
+import de.open4me.depot.gui.control.WertpapiereControl;
+import de.open4me.depot.gui.control.WertpapiereDatenControl;
 import de.open4me.depot.gui.control.WertpapiereTableControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
@@ -26,11 +27,13 @@ public class WertpapierView extends AbstractView
 
 		SashForm sashForm = new SashForm(getParent(), SWT.VERTICAL);
 
-		WertpaperHistoryControl history = new WertpaperHistoryControl();
-		WertpapiereTableControl control = new WertpapiereTableControl(history);
-		
-		control.getWepierControl(sashForm);
-		history.getKursChart(sashForm);
+		WertpapiereTableControl oben = new WertpapiereTableControl();
+		WertpapiereDatenControl unten = new WertpapiereDatenControl();
+		WertpapiereControl controller = new WertpapiereControl(unten, oben);
+		oben.setController(controller);
+		unten.setController(controller);
+		oben.getWepierControl(sashForm);
+		unten.getKursChart(sashForm);
 
 	}
 }

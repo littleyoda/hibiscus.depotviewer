@@ -81,7 +81,7 @@ public class SQLChange {
 											"  PRIMARY KEY (id)\n" + 
 											");",
 
-											"insert into depotviewer_cfg (`key`,value) values ('dbversion','1');",
+											"insert into depotviewer_cfg (`key`,value) values ('dbversion','3');",
 											
 											"drop table IF EXISTS depotviewer_wertpapier;",
 
@@ -161,6 +161,17 @@ public class SQLChange {
 			liste.add(new SQLChange(12, 	
 					"create index idxKurseWpid on depotviewer_kurse(wpid);",
 					"create index idxKurseDatum on depotviewer_kurse(kursdatum);"
+					));
+		}
+		if (currentversion < 13) {
+			liste.add(new SQLChange(13,
+					"CREATE TABLE depotviewer_cfgupdatestock (\n" + 
+							"  id int NOT NULL auto_increment,\n" + 
+							"  wpid int,\n" +
+							"  `key` varchar(200),\n" + 
+							"  value varchar(200),\n" + 
+							"  PRIMARY KEY (id)\n" + 
+							");"
 					));
 		}
 		

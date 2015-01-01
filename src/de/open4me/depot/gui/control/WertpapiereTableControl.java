@@ -12,24 +12,21 @@ import org.eclipse.swt.widgets.Listener;
 import de.open4me.depot.Settings;
 import de.open4me.depot.gui.action.AddWertpapierAction;
 import de.open4me.depot.gui.action.OrderList;
+import de.open4me.depot.gui.action.WertpapiereAktualisierenAction;
 import de.open4me.depot.gui.menu.WertpapierMenu;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLQueries;
-import de.open4me.depot.tools.UpdateStock;
-import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.parts.TablePart;
-import de.willuhn.util.ApplicationException;
 
 public class WertpapiereTableControl 
 {
 
 	private TablePart orderList;
-	private WertpaperHistoryControl history;
+	private WertpapiereControl controller;
 
-	public WertpapiereTableControl(WertpaperHistoryControl history) {
-		this.history = history;
+	public WertpapiereTableControl() {
 	}
 
 	private TablePart getTable() {
@@ -52,17 +49,17 @@ public class WertpapiereTableControl
 					return; 
 				}
 				if (orderList.getSelection() instanceof Object[]) {
-					history.update((GenericObjectSQL[]) orderList.getSelection());
+					controller.aktualisieren((GenericObjectSQL[]) orderList.getSelection());
 				} else {
 					GenericObjectSQL d = (GenericObjectSQL) event.data;
-					history.update(d);
+					controller.aktualisieren(d);
 				}
 
 			}
 
 		});
 		orderList.setMulti(true);
-		orderList.setContextMenu(new WertpapierMenu());
+		orderList.setContextMenu(new WertpapierMenu(controller));
 		return orderList;
 	}
 
@@ -80,25 +77,21 @@ public class WertpapiereTableControl
 		ButtonArea buttons = new ButtonArea();
 
 		buttons.addButton(new Button("Hinzufügen", new AddWertpapierAction()));
-		buttons.addButton(new Button("Aktualisieren",new Action() {
-
-			@Override
-			public void handleAction(Object context)
-					throws ApplicationException {
-				Object obj = getTable().getSelection();
-				if (obj == null || !(obj instanceof GenericObjectSQL)) {
-					return;
-				}
-				GenericObjectSQL d = (GenericObjectSQL) obj;
-
-					UpdateStock.update(d);
-					history.update(d);
-
-			}
-
-		}));
+		buttons.addButton(new Button("Aktualisieren",new WertpapiereAktualisierenAction(controller, getTable())));
 		
 		buttons.paint(rest);
 		return rest;
+	}
+
+	public void setController(WertpapiereControl controller) {
+		this.controller = controller;
+		
+	}
+
+	public void aktualisiere() throws RemoteException {
+		getTable().removeAll();
+		for (GenericObjectSQL x : SQLQueries.getWertpapiereMitKursdatum()) {
+			getTable().addItem(x);
+		}
 	}
 }
