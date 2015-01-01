@@ -15,7 +15,6 @@
     <import plugin="hibiscus.scripting.htmlunit" version="2.13+" />
   </requires>
 
-  <!-- Define regex wildcards for the classes and jars the classfinder should load -->
   <classfinder>
     <include>hibiscus\.depotviewer\.jar</include>
     <include>.*\.class</include>

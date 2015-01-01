@@ -1,3 +1,4 @@
+0.3.9 -- 2015-01-01
 	Aktualisierungen: Speicherung der Einstellungen (close #17)
 	Spalte Kursdatum wird aktualisiert (close #25)
 	Mehrere Wertpapiere aktualisieren (close #16)
