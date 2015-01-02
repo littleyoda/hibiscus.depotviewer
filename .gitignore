@@ -12,3 +12,6 @@ bin/*
 .project
 build/BUILD
 /bin
+credential.txt
+/docs
+/examples
