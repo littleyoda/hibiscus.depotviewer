@@ -3,8 +3,6 @@ package de.open4me.depot.gui.menu;
 import de.open4me.depot.gui.action.AddWertpapierAction;
 import de.open4me.depot.gui.action.WertpapiereAktualisierenAction;
 import de.open4me.depot.gui.control.WertpapiereControl;
-import de.open4me.depot.gui.control.WertpapiereDatenControl;
-import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
 import de.willuhn.jameica.gui.parts.ContextMenuItem;
 
