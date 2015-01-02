@@ -1,6 +1,7 @@
 package database;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.junit.Test;
 
@@ -26,8 +28,27 @@ public class DataBaseCreation {
 
 	@Test
 	public void runMYSQL() throws ClassNotFoundException, SQLException, IOException {
-		clearMysql("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/hibiscus?useUnicode=Yes&characterEncoding=ISO8859_1", "hibiscus", "hibiscus");
-//		test("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/hibiscus?useUnicode=Yes&characterEncoding=ISO8859_1", "hibiscus", "hibiscus");
+			FileReader reader = new FileReader( "credential.txt" );
+
+		  Properties credentail = new Properties();
+		  credentail.load( reader );
+			reader.close();
+
+		String dbname = createTempDB("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/", credentail.getProperty("user"), credentail.getProperty("pwd"));
+		test("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/" + dbname + "?useUnicode=Yes&characterEncoding=ISO8859_1", "hibiscus", "hibiscus");
+	}
+
+	private String createTempDB(String classname, String jdbc, String user, String pwd) throws ClassNotFoundException, SQLException {
+		Class.forName(classname);
+		String dbname = "hibiscus_test_" + System.currentTimeMillis();
+		Connection conn = DriverManager.getConnection(jdbc, user, pwd);
+		conn.setAutoCommit(false);
+		Statement statement = conn.createStatement();
+		statement.execute("create database " + dbname + ";");
+		// CREATE USER 'hibiscus'@'localhost' IDENTIFIED BY 'hibiscus';
+		statement.execute("GRANT ALL PRIVILEGES ON " + dbname + ".* TO 'hibiscus'@'localhost';");
+		return dbname;
+	
 	}
 
 	/**
