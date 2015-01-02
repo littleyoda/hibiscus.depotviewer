@@ -76,7 +76,7 @@ public class UmsatzImportAction implements Action {
 			}
 			String aktion = record.get("aktion").toUpperCase();
 			if (!(aktion.equals("KAUF") || aktion.equals("VERKAUF"))) {
-				throw new ApplicationException("In der Spalte 'aktion' nur nur die Werte 'KAUF' oder 'VERKAUF' zulässig. \"" + aktion + "\"");
+				throw new ApplicationException("In der Spalte 'aktion' sind nur die Werte 'KAUF' oder 'VERKAUF' zulässig. \"" + aktion + "\"");
 			}
 			Date date = null;
 			try {
@@ -95,7 +95,7 @@ public class UmsatzImportAction implements Action {
 						((aktion.toUpperCase().equals("VERKAUF")) ? 1 : -1) * kurs * stueck,
 						waehrung,
 						date,
-						"" + record.toString().hashCode(), ""
+						"" + record.toString().hashCode(), "",0.0d, "EUR", 0.0d, "EUR"
 						);
 			}
 		}

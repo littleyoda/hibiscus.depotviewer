@@ -153,7 +153,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 						Math.rint(Utils.getDoubleFromZahl(kurs[0]) * Utils.getDoubleFromZahl(infos.get("stück/nominale")) * 100) / 100,
 						kurs[1],
 						d,
-						infos.get("ordernummer"), ""
+						infos.get("ordernummer"), "",0.0d, "EUR", 0.0d, "EUR"
 						);
 			}
 

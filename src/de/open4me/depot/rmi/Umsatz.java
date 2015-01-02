@@ -1,5 +1,6 @@
 package de.open4me.depot.rmi;
 
+import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.Date;
 
@@ -27,19 +28,18 @@ public interface Umsatz extends DBObject
 	public void setBuchungsinformationen(String name) throws RemoteException;
 	
 	
-	public Double getAnzahl() throws RemoteException;
-	
-	public void setAnzahl(Double name) throws RemoteException;
+	public BigDecimal getAnzahl() throws RemoteException;
 	
 	
-	public Double getKurz() throws RemoteException;
 	
-	public void setKurz(Double name) throws RemoteException;
+	public BigDecimal getKurs() throws RemoteException;
+	
+	public void setKurs(BigDecimal name) throws RemoteException;
 
 	
 	public void setKurzW(String kursW) throws RemoteException;
 
-	public void setKosten(Double kosten) throws RemoteException;
+	public void setKosten(BigDecimal kosten) throws RemoteException;
 
 	public void setKostenW(String kostenW) throws RemoteException;
 
@@ -54,5 +54,15 @@ public interface Umsatz extends DBObject
 	public String getKommentar() throws RemoteException;
 	
 	public void setKommentar(String name) throws RemoteException;
+	BigDecimal getSteuern() throws RemoteException;
+	void setSteuern(BigDecimal name) throws RemoteException;
+	void setSteuernW(String kursW) throws RemoteException;
+	String getSteuernW() throws RemoteException;
+	String getTransaktionsgebuehrenW() throws RemoteException;
+	void setTransaktionsgebuehrenW(String kursW) throws RemoteException;
+	void setTransaktionsgebuehren(BigDecimal name) throws RemoteException;
+	BigDecimal getTransaktionsgebuehren() throws RemoteException;
+	BigDecimal getKosten() throws RemoteException;
+	void setAnzahl(BigDecimal name) throws RemoteException;
 
 }

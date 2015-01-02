@@ -1,5 +1,6 @@
 package de.open4me.depot.server;
 
+import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.Date;
 
@@ -38,24 +39,31 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 		setAttribute("wpid",Integer.parseInt(name));
 	}
 
-	public Double getAnzahl() throws RemoteException
+	@Override
+
+	public BigDecimal getAnzahl() throws RemoteException
 	{
-		return (Double) getAttribute("anzahl");
+		return (BigDecimal) getAttribute("anzahl");
 	}
 
-	public void setAnzahl(Double name) throws RemoteException
+	@Override
+	public void setAnzahl(BigDecimal name) throws RemoteException
 	{
 		setAttribute("anzahl", name);
 	}
-	public Double getKurz() throws RemoteException
+	
+	@Override
+	public BigDecimal getKurs() throws RemoteException
 	{
-		return (Double) getAttribute("kurs");
+		return (BigDecimal) getAttribute("kurs");
 	}
 
-	public void setKurz(Double name) throws RemoteException
+	@Override
+	public void setKurs(BigDecimal name) throws RemoteException
 	{
 		setAttribute("kurs", name);
 	}
+	
 	public String getAktion() throws RemoteException
 	{
 		return (String) getAttribute("aktion");
@@ -105,7 +113,7 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 	}
 
 	@Override
-	public void setKosten(Double kosten) throws RemoteException {
+	public void setKosten(BigDecimal kosten) throws RemoteException {
 		setAttribute("kosten", kosten);
 	}
 
@@ -114,6 +122,13 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 		setAttribute("kostenw", kostenW);
 	}
 
+	@Override
+	public BigDecimal getKosten() throws RemoteException
+	{
+		return (BigDecimal) getAttribute("kosten");
+	}
+	
+	
 	@Override
 	public void setBuchungsdatum(Date date) throws RemoteException {
 		setAttribute("buchungsdatum", date);
@@ -155,5 +170,54 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 		setAttribute("kommentar",name);
 		
 	}
+	
+	@Override
+	public BigDecimal getSteuern() throws RemoteException
+	{
+		return (BigDecimal) getAttribute("steuern");
+	}
+
+	@Override
+	public void setSteuern(BigDecimal name) throws RemoteException
+	{
+		setAttribute("steuern", name);
+	}
+	
+	@Override
+	public void setSteuernW(String kursW) throws RemoteException {
+		setAttribute("stuernw", kursW);
+	}
+
+	@Override
+	public String getSteuernW() throws RemoteException
+	{
+		return (String) getAttribute("steuernw");
+	}
+	
+	
+	@Override
+	public BigDecimal getTransaktionsgebuehren() throws RemoteException
+	{
+		return (BigDecimal) getAttribute("transaktionskosten");
+	}
+
+	@Override
+	public void setTransaktionsgebuehren(BigDecimal name) throws RemoteException
+	{
+		setAttribute("transaktionskosten", name);
+	}
+	
+	@Override
+	public void setTransaktionsgebuehrenW(String kursW) throws RemoteException {
+		setAttribute("stuernw", kursW);
+	}
+
+	@Override
+	public String getTransaktionsgebuehrenW() throws RemoteException
+	{
+		return (String) getAttribute("transaktionskostenw");
+	}
+
+
 }
 

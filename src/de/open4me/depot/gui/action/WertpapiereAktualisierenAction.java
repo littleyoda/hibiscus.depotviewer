@@ -3,7 +3,6 @@ package de.open4me.depot.gui.action;
 import java.rmi.RemoteException;
 
 import de.open4me.depot.gui.control.WertpapiereControl;
-import de.open4me.depot.gui.control.WertpapiereDatenControl;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.tools.UpdateStock;
 import de.willuhn.jameica.gui.Action;

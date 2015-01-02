@@ -182,7 +182,7 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 					-1 * Utils.getDoubleFromZahl(infos.get("umsatz")), // Kosten 
 					infos.get("umsatz2"),
 					d,
-					String.valueOf(orderid.hashCode()), ""
+					String.valueOf(orderid.hashCode()), "",0.0d, "EUR", 0.0d, "EUR"
 					);
 
 

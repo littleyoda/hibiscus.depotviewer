@@ -174,17 +174,22 @@ public class SQLChange {
 							");"
 					));
 		}
-		
-		
-		//		// Clean up
-////		currentversion = 10;
-//	liste.add(new SQLChange(11,
-//		"truncate table depotviewer_umsaetze;",
-//		"truncate table depotviewer_bestand;",
-//		"truncate table depotviewer_wertpapier;",
-//		"truncate table depotviewer_kurse;"
-//		));	
-//
+		if (currentversion < 14) {
+			liste.add(new SQLChange(14, 
+					"ALTER TABLE depotviewer_umsaetze ADD transaktionskosten decimal(20,2);",
+					"ALTER TABLE depotviewer_umsaetze ADD transaktionskostenw varchar(3);",
+					"ALTER TABLE depotviewer_umsaetze ADD steuern decimal(20,2);",
+					"ALTER TABLE depotviewer_umsaetze ADD steuernw varchar(3);"
+					));
+		}
+		if (currentversion < 15) {
+			liste.add(new SQLChange(15, 
+					"update depotviewer_umsaetze set transaktionskosten  =0 where transaktionskosten is null;",
+					"update depotviewer_umsaetze set transaktionskostenw ='EUR' where transaktionskostenw is null;",
+					"update depotviewer_umsaetze set steuern =0 where steuern is null;",
+					"update depotviewer_umsaetze set steuernw='EUR' where steuernw is null;"
+					));
+		}
 		return liste;
 	}
 

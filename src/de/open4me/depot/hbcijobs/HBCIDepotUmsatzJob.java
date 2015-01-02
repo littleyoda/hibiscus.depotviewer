@@ -157,7 +157,7 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 							gesamtbetrag, waehrung,
 							t.datum,
 							String.valueOf(orderid.hashCode()),
-							""
+							"",0.0d, "EUR", 0.0d, "EUR"
 							);
 				} catch (RemoteException e) {
 					e.printStackTrace();

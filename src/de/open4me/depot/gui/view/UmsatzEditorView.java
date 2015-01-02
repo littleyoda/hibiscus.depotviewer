@@ -2,17 +2,16 @@ package de.open4me.depot.gui.view;
 
 import java.rmi.RemoteException;
 
-import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.action.AddWertpapierAction;
 import de.open4me.depot.gui.control.UmsatzEditorControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.parts.ButtonArea;
+import de.willuhn.jameica.gui.parts.ExpandPart;
 import de.willuhn.jameica.gui.util.ColumnLayout;
 import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.SimpleContainer;
-import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.messaging.StatusBarMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.util.ApplicationException;
@@ -20,7 +19,7 @@ import de.willuhn.util.ApplicationException;
 public class UmsatzEditorView extends AbstractView {
 
 	private UmsatzEditorControl control;
-
+	
 	@Override
 	public void bind() throws Exception {
 		this.control = new UmsatzEditorControl(this);
@@ -43,7 +42,11 @@ public class UmsatzEditorView extends AbstractView {
 
 		right.addLabelPair("Anzahl", control.getAnzahl());
 		right.addLabelPair("Einzelkurs", control.getEinzelkurs());
-
+		right.addLabelPair("Kurswert", control.getKurswert());
+		right.addCheckbox(control.getCBKurswertBerechnen(), "Kurswert automtaisch berechnen?");
+		right.addLabelPair("Transaktionskosten", control.getTransaktionskosten());
+		right.addLabelPair("Steuern", control.getSteuern());
+		right.addLabelPair("Gesamt Kosten/Erlöse", control.getGesamtSumme());
 		ButtonArea buttonArea = new ButtonArea();
 		buttonArea.addButton("Speichern",new Action()
 		{
@@ -62,6 +65,11 @@ public class UmsatzEditorView extends AbstractView {
 			}
 		},null,false,"document-save.png");
 		buttonArea.paint(getParent());
+//		ExpandPart ep = new ExpandPart();
+//		ep.add("Nicht zugeordnete Konto-Umsätze", control.getBuchungen());
+//		ep.paint(getParent());
+		
 	}
+
 
 }

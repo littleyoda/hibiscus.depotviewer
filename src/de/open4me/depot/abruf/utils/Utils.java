@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -87,8 +88,27 @@ public class Utils {
 		return Double.parseDouble(s.replace(".", "").replace(",","."));
 	}
 
+	/**
+	 * 
+	 * TODO Umsatzbuilder implementieren
+	 * 
+	 * @param kontoid
+	 * @param wpid
+	 * @param aktion
+	 * @param info
+	 * @param anzahl
+	 * @param kurs
+	 * @param kursW
+	 * @param kosten
+	 * @param kostenW
+	 * @param date
+	 * @param orderid
+	 * @param kommentar
+	 * @throws ApplicationException
+	 */
 	public static void addUmsatz(String kontoid, String wpid, String aktion, String info, Double anzahl, 
-			Double kurs, String kursW, Double kosten, String kostenW, Date date, String orderid, String kommentar) throws ApplicationException {
+			Double kurs, String kursW, Double kosten, String kostenW, Date date, String orderid, String kommentar,
+			Double gebuehren, String gebuehrenW, Double steuern, String steuernW) throws ApplicationException {
 		try {
 			DBIterator liste = Settings.getDBService().createList(Umsatz.class);
 			liste.addFilter("orderid=?", orderid);
@@ -121,14 +141,18 @@ public class Utils {
 			p.setAktion(aktion.toUpperCase());
 			p.setBuchungsinformationen(info);
 			p.setWPid(wpid);
-			p.setAnzahl(anzahl);
-			p.setKurz(kurs);
+			p.setAnzahl(new BigDecimal(anzahl));
+			p.setKurs(new BigDecimal(kurs));
 			p.setKurzW(kursW);
-			p.setKosten(kosten);
+			p.setKosten(new BigDecimal(kosten));
 			p.setKostenW(kostenW);
 			p.setBuchungsdatum(date);
 			p.setOrderid(orderid);
 			p.setKommentar(kommentar);
+			p.setSteuern(new BigDecimal(steuern));
+			p.setSteuernW(steuernW);
+			p.setTransaktionsgebuehren(new BigDecimal(gebuehren));
+			p.setTransaktionsgebuehrenW(gebuehrenW);
 			p.store();
 			// Liste der Objekte aus der Datenbank laden
 		}
@@ -139,6 +163,16 @@ public class Utils {
 			throw new ApplicationException(Settings.i18n().tr("error while creating new Umsatz"),e);
 		}
 	}
+	
+	public static Umsatz getUmsatzByID(String id) throws RemoteException {
+		DBIterator liste = Settings.getDBService().createList(Umsatz.class);
+		liste.addFilter("id=?", id);
+		if (!liste.hasNext()) {
+			return null; // Unbekanntes Wertpapier
+		}
+		return ((Umsatz) liste.next());
+	}
+
 
 	/**
 	 * Wird aufgerufen, wenn sich im Bestand oder bei den Umästzen etwas geändert hat
