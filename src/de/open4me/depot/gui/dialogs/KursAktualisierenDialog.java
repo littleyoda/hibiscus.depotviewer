@@ -39,7 +39,7 @@ public class KursAktualisierenDialog extends AbstractDialog
 		Container group = new SimpleContainer(parent);
 		group.addText("Notwendige Einstellungen:", false);
 		for (Config cfg : list) {
-			group.addInput(getFileEncoding(cfg));
+			group.addInput(getSelectInput(cfg));
 		}
 
 
@@ -62,7 +62,7 @@ public class KursAktualisierenDialog extends AbstractDialog
 		group.addButtonArea(buttons);
 	}
 
-	private SelectInput getFileEncoding(Config cfg)
+	private SelectInput getSelectInput(Config cfg)
 	{
 		SelectInput encoding = new SelectInput(cfg.getOptions(), null);
 		encoding.setName(cfg.getBeschreibung());

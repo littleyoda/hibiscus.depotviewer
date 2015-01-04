@@ -6,6 +6,7 @@ import java.io.File;
 import jsq.fetch.factory.Factory;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.sql.SQLUtils;
+import de.open4me.depot.tools.io.KurseViaCSV;
 import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.plugin.Version;
 import de.willuhn.jameica.system.Application;
@@ -36,6 +37,7 @@ public class DepotViewerPlugin extends AbstractPlugin
 
 		checkJavaStockQuotesDirectory();
 		SQLUtils.checkforupdates();
+		Factory.addJavaFetcher(new KurseViaCSV());
 	}
 
 	/**

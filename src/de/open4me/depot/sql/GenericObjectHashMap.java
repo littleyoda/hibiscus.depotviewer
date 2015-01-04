@@ -2,14 +2,15 @@ package de.open4me.depot.sql;
 
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.Map;
 
 import de.willuhn.datasource.GenericObject;
 
 public class GenericObjectHashMap implements GenericObject {
 
-	protected HashMap<?, ?> map;
+	protected Map<?, ?> map;
 
-	public HashMap<?, ?> getMap() {
+	public Map<?, ?> getMap() {
 		return map;
 	}
 	
@@ -17,7 +18,7 @@ public class GenericObjectHashMap implements GenericObject {
 		map = new HashMap<Object, Object>();
 	}
 
-	public GenericObjectHashMap(HashMap<?, ?> map) {
+	public GenericObjectHashMap(Map<?, ?> map) {
 		this.map = map;
 	}
 	@Override
@@ -27,7 +28,7 @@ public class GenericObjectHashMap implements GenericObject {
 
 	@SuppressWarnings("unchecked")
 	public void setAttribute(String key, Object value)  {
-		((HashMap<Object, Object>) getMap()).put(key, value);
+		((Map<Object, Object>) getMap()).put(key, value);
 	}
 
 	@Override
