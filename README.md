@@ -16,8 +16,10 @@ Kontakt via depotviewer@open4me.de
 
 
 
-#Installation des Plugins
-Stand 01. Jan 2015: Das Plugin funktioniert nur mit einer Nightly-Build Version von Hibiscus und nicht mit der 2.6.11. Voraussichtlich wird es mit der 2.6.12 funktionieren.
+#Installation
+Stand 01. Jan 2015: Das Plugin funktioniert nur mit einer Nightly-Build Version von Hibiscus (27. Dez. 2014 oder neuer) und nicht mit der 2.6.11. 
+Voraussichtlich wird es mit der 2.6.12 funktionieren.
+
 ## Plugin installieren
 * Menü Datei/Einstellungen
 * Reiter "Updates"
