@@ -1,4 +1,5 @@
-	 Steuern und Transaktionskosten können bei den Umsätzen verwaltet werden (closes #29)
+	Import von Kursdaten via CSV-Datei möglich
+	Steuern und Transaktionskosten können bei den Umsätzen verwaltet werden (closes #29)
 	
 0.3.9 -- 2015-01-01
 	Aktualisierungen: Speicherung der Einstellungen (close #17)
