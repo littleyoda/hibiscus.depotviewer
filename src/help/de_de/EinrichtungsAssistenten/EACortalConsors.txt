@@ -2,6 +2,6 @@
 <p><b>Consors Bank</b><br/>
 <br/>Diese Bank übermittelt per HBCI nur den Bestand, aber keine Umsätze.
 <br/>Für den Abruf der Umsätze wurde eine Erweiterung programmiert, die die Umsätze aus der Webseite extrahiert.
-<br/>Für jedes Konto sind deshalb unter dem Punkt "Synchronisierungsoptionen" die Zugangsdaten zu hinterlegen.
+<br/>Für jedes Konto sind deshalb unter dem Punkt "Synchronisierungsoptionen" die Zugangsdaten zu hinterlegen, die für den Login auf der Webseite genutzt werden.
  </p></form>
  <!-- Next: KontoDepotuebersichtHBCI -->
