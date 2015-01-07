@@ -48,12 +48,13 @@ public class WertpapiereTableControl
 				if (orderList.getSelection() == null) {
 					return; 
 				}
+				GenericObjectSQL[] d;
 				if (orderList.getSelection() instanceof Object[]) {
-					controller.aktualisieren((GenericObjectSQL[]) orderList.getSelection());
+					d = ((GenericObjectSQL[]) orderList.getSelection());
 				} else {
-					GenericObjectSQL d = (GenericObjectSQL) event.data;
-					controller.aktualisieren(d);
+					d = new GenericObjectSQL[] {(GenericObjectSQL) event.data};
 				}
+				controller.aktualisieren(d);
 
 			}
 

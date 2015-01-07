@@ -23,8 +23,5 @@ public class WertpapiereControl {
 		
 	}
 
-	public void aktualisieren(GenericObjectSQL d) {
-		unten.update(d);
-	}
 
 }

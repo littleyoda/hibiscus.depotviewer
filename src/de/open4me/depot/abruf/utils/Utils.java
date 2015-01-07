@@ -465,4 +465,12 @@ public class Utils {
 		return list;
 	}
 
+	public static java.sql.Date getSQLDate(Date d) {
+		return new java.sql.Date(d.getTime());
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static Date getDatum(int year, int month, int day) {
+		return new Date(year - 1900, month - 1, day);
+	}
 }
