@@ -23,7 +23,7 @@ public abstract class BasisDepotAbruf {
 
 	public List<String> getPROP() {
 		List<String> result = new ArrayList<String>();
-		result.add(getName());
+//		result.add(getName());
 		result.addAll(PropHelper.getPROP());
 		return result;
 
