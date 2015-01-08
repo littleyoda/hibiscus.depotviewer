@@ -237,8 +237,8 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 	}
 
 	@Override
-	public List<String> getPROP() {
-		List<String> result = super.getPROP();
+	public List<String> getPROP(Konto konto) {
+		List<String> result = super.getPROP(konto);
 		result.add(0, PROP_PASSWORD);
 		return result;
 	}

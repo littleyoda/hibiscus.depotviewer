@@ -38,29 +38,6 @@ public class DVHBCISynchronizeJobDepotKontoauszug extends SynchronizeJobKontoaus
 
     if (o.getSyncKontoauszuege() || (forceUmsatz != null && forceUmsatz.booleanValue())) 
     {
-//    	Passport passport = null;
-//		try {
-//			passport = PassportRegistry.findByClass(k.getPassportClass());
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		if (passport == null) {
-//			throw new ApplicationException("Kein HBCI-Sicherheitsmedium für das Konto gefunden");
-//		}
-//		PassportHandle handle = passport.getHandle();
-//		if (handle == null)
-//			throw new ApplicationException("Fehler beim Erzeugen der HBCI-Verbindung");
-//
-//		HBCIHandler handler = handle.open();
-//
-//		if (handler == null)
-//			throw new ApplicationException("Fehler beim Öffnen der HBCI-Verbindung");
-//
-//		boolean supportDepotList = handler.isSupported("WPDepotList");
-//		boolean supportDepotUmsatz = handler.isSupported("WPDepotUms");
-//		handler.close();
-//		handle.close();
-    	//k.getMeta(name, defaultValue)
 		boolean supportDepotList = true;
 		boolean supportDepotUmsatz = !Boolean.valueOf(k.getMeta(PropHelper.NURBESTAND, "false"));
 		
@@ -72,9 +49,10 @@ public class DVHBCISynchronizeJobDepotKontoauszug extends SynchronizeJobKontoaus
 		BasisDepotAbruf x = DepotAbrufFabrik.getDepotAbrufHBCI(k);
 		
 		// ggf. kann der Abruf über Screenscraping deaktiviert sein.
-		if (!supportDepotUmsatz) {
-			x = null;
-		}
+		// TODO Möglichkeit einbauen, dass Screenscraping auf vernünftige Weise zu deaktivieren
+		//		if (!supportDepotUmsatz) {
+		//				x = null;
+		//		}
 		
 		// Bestimmen, ob die Erzeugung der Umsätze aus den Bestandsveränderungen aktiviert werden soll
 		boolean simulateOrders =  (x == null) && !supportDepotUmsatz;
@@ -103,6 +81,6 @@ public class DVHBCISynchronizeJobDepotKontoauszug extends SynchronizeJobKontoaus
 			List<String> liste = Arrays.asList(new String[]{PropHelper.NURBESTANDINKLFORMAT});
 			return liste;
 		}
-		return x.getPROP();
+		return x.getPROP(k);
   }
 }

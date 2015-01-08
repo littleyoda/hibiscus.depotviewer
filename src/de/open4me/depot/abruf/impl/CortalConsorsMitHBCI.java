@@ -41,8 +41,8 @@ import de.willuhn.util.I18N;
 public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 
 	private final static I18N i18n = Application.getPluginLoader().getPlugin(DepotViewerPlugin.class).getResources().getI18N();
-	final static String PROP_KUNDENNUMMER = "Kundennummer (Webseite)";
-	final static String PROP_PASSWORD = "Passwort (Webseite)";
+	final static String PROP_KUNDENNUMMER = "Kontonummer / UserID (Webseite)";
+	final static String PROP_PASSWORD = "PIN / Passwort (Webseite)";
 
 	@Override
 	public String getName() {
@@ -186,14 +186,27 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 	}
 
 	@Override
-	public List<String> getPROP() {
-		List<String> result = super.getPROP();
+	public List<String> getPROP(Konto konto) {
+		List<String> result = super.getPROP(konto);
 		result.add(0, PROP_PASSWORD);
 		result.add(0, PROP_KUNDENNUMMER);
-		result.add(PropHelper.NURBESTANDINKLFORMAT);
 		return result;
 	}
 
+	@Override 
+	public List<String[]> getPropertiesChanges(int version) {
+		List<String[]> liste = new ArrayList<String[]>();
+		if (version < 1) {
+			liste.add(new String[]{ "Kundennummer (Webseite)", "Kontonummer / UserID (Webseite)", "1"});
+		}
+		if (version < 2) {
+			liste.add(new String[]{ "Passwort (Webseite)", "PIN / Passwort (Webseite)", "2"});
+		}
+		if (version < 4) {
+			liste.add(new String[] { "Nur Bestand via HBCI abholen?", "", "4" });
+		}
+		return liste;
+	}
 	@Override
 	public boolean isSupported(Konto konto) throws ApplicationException,
 	RemoteException {

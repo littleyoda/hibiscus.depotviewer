@@ -56,7 +56,7 @@ public class DVSynchronizeBackend extends AbstractSynchronizeBackend<DVSynchroni
 			if (konto == null || konto.hasFlag(Konto.FLAG_DISABLED)) {
 				return null;
 			}
-			return DepotAbrufFabrik.getDepotAbruf(konto).getPROP();
+			return DepotAbrufFabrik.getDepotAbruf(konto).getPROP(konto);
 		} catch (RemoteException re) {
 			Logger.error("unable to determine property-names",re);
 			return null;
