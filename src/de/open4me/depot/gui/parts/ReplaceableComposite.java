@@ -31,4 +31,16 @@ public class ReplaceableComposite extends Composite {
 		layout(true);
 	}
 
+	public void replace(Composite comp) {
+//		SWTUtil.disposeChildren(this);
+//		setLayoutData(new GridData(GridData.FILL_BOTH));
+//		setLayout(new GridLayout());
+//		try {
+//			comp.paint(this);
+//		} catch (RemoteException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		layout(true);
+	}
 }

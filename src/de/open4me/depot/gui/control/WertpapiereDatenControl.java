@@ -7,18 +7,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TabFolder;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYAnnotation;
@@ -30,7 +28,8 @@ import org.jfree.ui.Layer;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
-import de.open4me.depot.gui.parts.ReplaceableComposite;
+import de.open4me.depot.gui.parts.TabFolderExt;
+import de.open4me.depot.gui.parts.TabGroupExt;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
@@ -45,11 +44,10 @@ public class WertpapiereDatenControl {
 
 	private JFreeChart chart;
 	private JDBCXYDataset data = null;
-	private XYItemRenderer renderer;
 	private Connection conn;
 	private WertpapiereControl controller;
-	private ReplaceableComposite kennzahlenTab;
-	private ReplaceableComposite kursTab;
+	private TabFolderExt folder;
+	private GenericObjectSQL[] currentSelection;
 
 	public WertpapiereDatenControl() {
 		try {
@@ -60,10 +58,41 @@ public class WertpapiereDatenControl {
 		}	
 	}
 
+	/**
+	 * Wird aufgerufen, wenn ein neues Wertpapier ausgesucht wurde.
+	 * Anschließend muss das Diagramm aktualisiert werden
+	 */
+	public void update(GenericObjectSQL[] selection) {
+		currentSelection = selection;
+		folder.doNotify();
+	}
 
 
 
-	private void readData(GenericObjectSQL d) {
+	private void readData(XYItemRenderer renderer, GenericObjectSQL[] selection) {
+		try {
+			String ids = "";
+			String spalten = "datum.kursdatum";
+			String sql = "";
+			for (GenericObjectSQL d : selection) {
+				if (!ids.isEmpty()) {
+					ids += ",";
+				}
+				String id = d.getAttribute("id").toString(); 
+				ids += id;
+				spalten += ", A" + id + ".kurs as \"" + StringEscapeUtils.escapeSql(d.getAttribute("wertpapiername").toString()) + "\" ";
+				sql +="left join depotviewer_kurse as A" + id + " on A" + id + ".wpid = " + id + " and A" + id + ".kursdatum = datum.kursdatum\n";
+			}
+			sql = "select "  + spalten + " from (select distinct kursdatum from depotviewer_kurse where wpid in (" + ids + ") order by 1) as datum\n" + sql;
+			renderer.removeAnnotations();
+			data.executeQuery(sql);
+		} catch (RemoteException | SQLException e) {
+			e.printStackTrace();
+			Logger.error("Fehler beim aktualisieren des Wertpapierdiagrammes", e);
+		}
+	}
+
+	private void readData(XYItemRenderer renderer, GenericObjectSQL d) {
 
 		try {
 			String wpid = d.getAttribute("id").toString();
@@ -94,129 +123,147 @@ public class WertpapiereDatenControl {
 
 	public void getKursChart(Composite comp) throws Exception
 	{
-		final TabFolder folder = new TabFolder(comp, SWT.CENTER);
-		folder.addSelectionListener(new SelectionListener() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				System.out.println("Normal: " + folder.getSelectionIndex());
-				
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				System.out.println("Default: " + folder.getSelectionIndex());
-				
-			}
-			
-		});
+		folder = new TabFolderExt(comp, SWT.CENTER);
 		folder.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		final TabGroup tabellenTab = new TabGroup(folder, "Kennzahlen");
-		kennzahlenTab  = new ReplaceableComposite(tabellenTab.getComposite(),SWT.NONE);
-		kennzahlenTab.replace(getKennzahlenTabelle(null));
+		final TabGroup tabellenTab = new TabGroupExt(folder, "Performance") {
 
-		final TabGroup kursTabGroup = new TabGroup(folder, "Kurse");
-		kursTab  = new ReplaceableComposite(kursTabGroup.getComposite(),SWT.NONE);
-		kursTab.replace(getKursTabelle(null));
+			String lastSelection = "";
+			@Override
+			public void active() {
+				String newSelection = Arrays.toString(currentSelection);
+				if (currentSelection == null || newSelection.equals(lastSelection)) {
+					return;
+				}
+				lastSelection = newSelection;
+				List<GenericObjectHashMap> liste = calcKennzahlen(currentSelection);
 
-		final TabGroup piechartTab = new TabGroup(folder, "Graphisch");
-		piechartTab.getComposite().setLayout(new FillLayout());
+				TablePart kennzahlenTabelle = new TablePart(liste, null);
+				kennzahlenTabelle.addColumn(Settings.i18n().tr("Zeitraum"), "zeitraum");
+				for (GenericObjectSQL wp : currentSelection) {
+					try {
+						kennzahlenTabelle.addColumn(wp.getAttribute("wertpapiername").toString(), wp.getAttribute("id").toString());
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					}
+				}
+				getReplaceableComposite().replace(kennzahlenTabelle);
 
-		chart = ChartFactory.createTimeSeriesChart(
-				"",  "Datum",
-				"Kurs", data, true, true, false);
-		renderer = chart.getXYPlot().getRenderer();
-		new ChartComposite(piechartTab.getComposite(), SWT.NONE, chart, true);
-	}
+			}
 
+		};
 
+		new TabGroupExt(folder, "Performance/Jahr") {
 
+			String lastSelection = "";
+			@Override
+			public void active() {
+				String newSelection = Arrays.toString(currentSelection);
+				if (currentSelection == null || newSelection.equals(lastSelection)) {
+					return;
+				}
+				lastSelection = newSelection;
+				List<GenericObjectHashMap> liste = calcKennzahlen2(currentSelection);
 
-	/**
-	 * Wird aufgerufen, wenn ein neues Wertpapier ausgesucht wurde.
-	 * Anschließend muss das Diagramm aktualisiert werden
-	 */
-	public void update(GenericObjectSQL[] selection) {
-		try {
-			calcKennzahlen(selection);
-			calcKurs(selection);
-			if (selection.length == 1) {
+				TablePart kennzahlenTabelle = new TablePart(liste, null);
+				kennzahlenTabelle.addColumn(Settings.i18n().tr("Zeitraum"), "zeitraum");
+				for (GenericObjectSQL wp : currentSelection) {
+					try {
+						kennzahlenTabelle.addColumn(wp.getAttribute("wertpapiername").toString(), wp.getAttribute("id").toString());
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					}
+				}
+				getReplaceableComposite().replace(kennzahlenTabelle);
+
+			}
+
+		};
+
+		final TabGroup kursTabGroup = new TabGroupExt(folder, "Kurse") {
+			String lastSelection = "";
+			@Override
+			public void active() {
+				String newSelection = Arrays.toString(currentSelection);
+				if (currentSelection == null || newSelection.equals(lastSelection)) {
+					return;
+				}
+				lastSelection = newSelection;
 				try {
-					chart.setTitle((String) selection[0].getAttribute("wertpapiername"));
-					readData(selection[0]);
-				} catch (RemoteException e) {
+					String sql = "";
+					String ids = "";
+					String spalten = "datum.kursdatum as zeitraum";
+					for (GenericObjectSQL d : currentSelection) {
+						if (!ids.isEmpty()) {
+							ids += ",";
+						}
+						String id = d.getAttribute("id").toString();
+						ids += id;
+						spalten += ", concat(a" + id + ".kurs, ' ', a" + id + ".kursw) as A" + id + "k"; 
+						spalten += ", concat(a" + id + ".kursperf, ' ', a" + id + ".kursw)  as A" + id + "kp";
+						sql +="left join depotviewer_kurse as A" + id + " on A" + id + ".wpid = " + id + " and A" + id + ".kursdatum = datum.kursdatum\n";
+					}
+					sql = "select "  + spalten + " from (select distinct kursdatum from depotviewer_kurse where wpid in (" + ids + ") order by 1 desc) as datum\n" + sql;
+
+					List<GenericObjectSQL> liste = SQLUtils.getResultSet(sql, "depotview_kurse", "", "");
+					TablePart tab = new TablePart(liste, null);
+					tab.addColumn(Settings.i18n().tr("Zeitraum"), "zeitraum");
+					for (GenericObjectSQL d : currentSelection) {
+						String id = d.getAttribute("id").toString();
+						tab.addColumn(d.getAttribute("wertpapiername").toString(), "a" +id + "k");
+						tab.addColumn(d.getAttribute("wertpapiername").toString() + " (P)", "a" +id + "kp");
+					}
+					getReplaceableComposite().replace(tab);
+				} catch (Exception e) {
 					e.printStackTrace();
-					Logger.error("Fehler beim aktualisieren des Wertpapierdiagrammes", e);
+					Logger.error("Fehler bei der Kursdarstellung", e);
+				} 
+			}
+		};
+
+		final TabGroup graphischTab = new TabGroupExt(folder, "Graphisch", false) {
+			
+			{
+				getComposite().setLayout(new FillLayout());
+
+				chart = ChartFactory.createTimeSeriesChart(
+						"",  "Datum",
+						"Kurs", data, true, true, false);
+				renderer = chart.getXYPlot().getRenderer();
+				new ChartComposite(getComposite(), SWT.NONE, chart, true);
+			}
+			
+			String lastSelection = "";
+			private XYItemRenderer renderer;
+			@Override
+			public void active() {
+				String newSelection = Arrays.toString(currentSelection);
+				if (currentSelection == null || newSelection.equals(lastSelection)) {
+					return;
 				}
-				return;
-			}
-			chart.setTitle("Performancevergleich");
-			String ids = "";
-			String spalten = "datum.kursdatum";
-			String sql = "";
-			for (GenericObjectSQL d : selection) {
-				if (!ids.isEmpty()) {
-					ids += ",";
+				if (currentSelection.length == 1) {
+					chart.setTitle("Kursverlauf");
+					readData(renderer, currentSelection[0]);
+				} else {
+					chart.setTitle("Performancevergleich");
+					readData(renderer, currentSelection);
 				}
-				String id = d.getAttribute("id").toString(); 
-				ids += id;
-				spalten += ", A" + id + ".kurs as \"" + StringEscapeUtils.escapeSql(d.getAttribute("wertpapiername").toString()) + "\" ";
-				sql +="left join depotviewer_kurse as A" + id + " on A" + id + ".wpid = " + id + " and A" + id + ".kursdatum = datum.kursdatum\n";
 			}
-			sql = "select "  + spalten + " from (select distinct kursdatum from depotviewer_kurse where wpid in (" + ids + ") order by 1) as datum\n" + sql;
-			renderer.removeAnnotations();
-			data.executeQuery(sql);
-		} catch (RemoteException | SQLException e) {
-			e.printStackTrace();
-			Logger.error("Fehler beim aktualisieren des Wertpapierdiagrammes", e);
-		}
-	}
-
-
-
-	private void calcKurs(GenericObjectSQL[] selection) {
-
-		try {
-			String sql = "";
-			String ids = "";
-			String spalten = "datum.kursdatum as zeitraum";
-			for (GenericObjectSQL d : selection) {
-				if (!ids.isEmpty()) {
-					ids += ",";
-				}
-				String id = d.getAttribute("id").toString();
-				ids += id;
-				spalten += ", concat(a" + id + ".kurs, ' ', a" + id + ".kursw) as A" + id + "k"; 
-				spalten += ", concat(a" + id + ".kursperf, ' ', a" + id + ".kursw)  as A" + id + "kp";
-				sql +="left join depotviewer_kurse as A" + id + " on A" + id + ".wpid = " + id + " and A" + id + ".kursdatum = datum.kursdatum\n";
-			}
-			sql = "select "  + spalten + " from (select distinct kursdatum from depotviewer_kurse where wpid in (" + ids + ") order by 1) as datum\n" + sql;
-
-			List<GenericObjectSQL> liste = SQLUtils.getResultSet(sql, "depotview_kurse", "", "");
-			TablePart tab = getKennzahlenTabelle(liste);
-			for (GenericObjectSQL d : selection) {
-				String id = d.getAttribute("id").toString();
-				tab.addColumn(d.getAttribute("wertpapiername").toString(), "a" +id + "k");
-				tab.addColumn(d.getAttribute("wertpapiername").toString() + " (P)", "a" +id + "kp");
-			}
-			kursTab.replace(tab);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+		};
+		
 	}
 
 
 
 
-	private void calcKennzahlen(GenericObjectSQL[] selection) {
-		Date now = new Date();
-		TablePart tab;
+
+
+
+	private List<GenericObjectHashMap> calcKennzahlen(GenericObjectSQL[] selection) {
+		List<GenericObjectHashMap> zeilen = new ArrayList<GenericObjectHashMap>();
 		try {
 			// Legende hinzufügen
-			List<GenericObjectHashMap> zeilen = new ArrayList<GenericObjectHashMap>();
-			for (int i = 0; i < 16; i++) {
+			for (int i = 0; i < 6; i++) {
 				GenericObjectHashMap zeile = new GenericObjectHashMap();
 				String zeitraum = "";
 				switch (i) {
@@ -226,10 +273,6 @@ public class WertpapiereDatenControl {
 				case 3: zeitraum = "Letzten 3 Jahre"; break;
 				case 4: zeitraum = "Letzten 4 Jahre"; break;
 				case 5: zeitraum = "Letzten 5 Jahre";  break;
-				}
-				if (i > 5) {
-					int jahr = now.getYear() + 1900 - (i -6);
-					zeitraum = "Jahr " + jahr;
 				}
 				zeile.setAttribute("zeitraum", zeitraum);
 				zeilen.add(zeile);
@@ -241,46 +284,59 @@ public class WertpapiereDatenControl {
 
 				BigDecimal refKurs = getReferenzKurs(wpid, 10);
 
-				for (int i = 0; i < 16; i++) {
-					if (i <= 5) {
+				for (int i = 0; i < 6; i++) {
 						if (refKurs == null) {
 							zeilen.get(i).setAttribute(wpid,  "Keine (aktuellen) Kursdaten");
 							continue;
 						}
 						String out = getPerforamnceZahl(i, refKurs, wpid);
 						zeilen.get(i).setAttribute(wpid,  out);
-					} else {
-						String out = getPerformanceFuerJahr(now.getYear() + 1900 - (i -6), wpid);
-						zeilen.get(i).setAttribute(wpid,  out);
-					}
 				} // For Zeitraum
 			} // For WP
 
 
-			// Tabelle erzeugen
-			tab = getKennzahlenTabelle(zeilen);
-			for (GenericObjectSQL wp : selection) {
-				tab.addColumn(wp.getAttribute("wertpapiername").toString(), wp.getAttribute("id").toString());
-			}
-			kennzahlenTab.replace(tab);
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Logger.error("Fehler bei der Berechnung der Kennzahlen", e);
 		}
+		return zeilen;
 
 	}
 
+	private List<GenericObjectHashMap> calcKennzahlen2(GenericObjectSQL[] selection) {
+		List<GenericObjectHashMap> zeilen = new ArrayList<GenericObjectHashMap>();
+		Date now = new Date();
+		try {
+			// Legende hinzufügen
+			for (int i = 0; i < 10; i++) {
+				GenericObjectHashMap zeile = new GenericObjectHashMap();
+				int jahr = now.getYear() + 1900 - (i);
+				zeile.setAttribute("zeitraum", "Jahr " + jahr);
+				zeilen.add(zeile);
+			}
+
+			// Über alle ausgewählten Wertpapiere iterieren
+			for (GenericObjectSQL wp : selection) {
+				String wpid = wp.getAttribute("id").toString();
+
+				BigDecimal refKurs = getReferenzKurs(wpid, 10);
+
+				for (int i = 0; i < 10; i++) {
+						String out = getPerformanceFuerJahr(now.getYear() + 1900 - (i), wpid);
+						zeilen.get(i).setAttribute(wpid,  out);
+				} // For Zeitraum
+			} // For WP
 
 
 
-	private TablePart getKursTabelle(List<GenericObjectHashMap> list) {
-		TablePart kursTabelle = new TablePart(list, null);
-		return kursTabelle;
+		} catch (Exception e) {
+			e.printStackTrace();
+			Logger.error("Fehler bei der Berechnung der Kennzahlen", e);
+		}
+		return zeilen;
+
 	}
-
-
-
 
 	private String getPerformanceFuerJahr(int jahr, String wpid) throws ApplicationException, Exception {
 		// letzter 
@@ -363,14 +419,6 @@ public class WertpapiereDatenControl {
 		//					(refkurs - kurs)/(kurs/100)
 		return performance.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "%";
 	}
-
-
-	public TablePart getKennzahlenTabelle(List list) throws Exception {
-		TablePart kennzahlenTabelle = new TablePart(list, null);
-		kennzahlenTabelle.addColumn(Settings.i18n().tr("Zeitraum"), "zeitraum");
-		return kennzahlenTabelle;
-	}
-
 
 
 
