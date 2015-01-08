@@ -8,6 +8,7 @@ import java.util.List;
 import de.open4me.depot.abruf.impl.BasisDepotAbruf;
 import de.open4me.depot.abruf.impl.DepotAbrufFabrik;
 import de.open4me.depot.abruf.utils.PropHelper;
+import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.hbcijobs.HBCIDepotBestandJob;
 import de.open4me.depot.hbcijobs.HBCIDepotUmsatzJob;
 import de.willuhn.jameica.hbci.SynchronizeOptions;
@@ -94,6 +95,9 @@ public class DVHBCISynchronizeJobDepotKontoauszug extends SynchronizeJobKontoaus
   }
 
   public static List<String> getProf(Konto k) throws RemoteException, ApplicationException {
+	  	if (!Utils.hasRightKontoType(k)) {
+	  		return null;
+	  	}
 		BasisDepotAbruf x = DepotAbrufFabrik.getDepotAbrufHBCI(k);
 		if (x == null) {
 			List<String> liste = Arrays.asList(new String[]{PropHelper.NURBESTANDINKLFORMAT});
