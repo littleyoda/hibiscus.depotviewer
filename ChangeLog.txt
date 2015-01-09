@@ -1,3 +1,4 @@
+0.3.10 -- 2015-01-09
 	Properties für Consors anpassen (closes #35)
 	Kennzahlen von Wertpapieren vergleichen (closes #12)
 	Performance von Wertpapieren auf Jahresbasis (close #32)
