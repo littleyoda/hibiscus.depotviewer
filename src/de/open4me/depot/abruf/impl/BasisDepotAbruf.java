@@ -16,7 +16,9 @@ public abstract class BasisDepotAbruf {
 
 	public abstract String getName();
 
-	public abstract void run(Konto konto) throws ApplicationException;
+	public void run(Konto konto) throws ApplicationException {
+		handlePropertiesChanges(konto);
+	}
 	
 	public boolean isSupported(Konto konto) throws ApplicationException, RemoteException {
 		return Utils.hasRightKontoType(konto);

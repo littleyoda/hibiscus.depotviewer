@@ -12,7 +12,7 @@ public class BasisHBCIDepotAbruf extends BasisDepotAbruf {
 
 	@Override
 	public void run(Konto konto) throws ApplicationException {
-		handlePropertiesChanges(konto);
+		super.run(konto);
 	}
 
 	

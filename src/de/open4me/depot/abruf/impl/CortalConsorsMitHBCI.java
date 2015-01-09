@@ -1,7 +1,6 @@
 package de.open4me.depot.abruf.impl;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
@@ -30,7 +29,6 @@ import com.gargoylesoftware.htmlunit.util.NameValuePair;
 
 import de.open4me.depot.DepotViewerPlugin;
 import de.open4me.depot.abruf.utils.HtmlUtils;
-import de.open4me.depot.abruf.utils.PropHelper;
 import de.open4me.depot.abruf.utils.Utils;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.system.Application;
