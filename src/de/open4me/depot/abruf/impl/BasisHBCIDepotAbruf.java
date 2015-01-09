@@ -12,8 +12,7 @@ public class BasisHBCIDepotAbruf extends BasisDepotAbruf {
 
 	@Override
 	public void run(Konto konto) throws ApplicationException {
-		// TODO Auto-generated method stub
-		
+		handlePropertiesChanges(konto);
 	}
 
 	

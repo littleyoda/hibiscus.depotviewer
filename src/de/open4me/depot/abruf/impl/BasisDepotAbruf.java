@@ -33,7 +33,7 @@ public abstract class BasisDepotAbruf {
 	 * Korrigiert die im Laufe der Zeit umbenannten bzw. gelöschten Properties-Einträge
 	 * @param konto
 	 */
-	private void handlePropertiesChanges(Konto konto) {
+	protected void handlePropertiesChanges(Konto konto) {
 		try {
 			// Änderungsliste anfordern
 			int version = Integer.parseInt(konto.getMeta("depotviewerversion", "0"));
