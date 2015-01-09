@@ -15,6 +15,7 @@ import de.open4me.depot.sql.GenericObjectHashMap;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.SWTUtil;
@@ -22,6 +23,8 @@ import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.jameica.hbci.gui.action.KontoFetchUmsaetze;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.rmi.KontoType;
+import de.willuhn.jameica.messaging.StatusBarMessage;
+import de.willuhn.jameica.system.Application;
 import de.willuhn.util.ApplicationException;
 
 public class DepotView extends AbstractView
@@ -65,8 +68,7 @@ public class DepotView extends AbstractView
 		Container container = new SimpleContainer(composite, true);
 	      container.addHeadline("Folgende Depots sind aktuell dem Depot-Viewer zugewiesen:");
 			container.addPart(control.getDepotOverview());
-			ButtonArea buttons1 = new ButtonArea();
-			buttons1.addButton("Abrufen", new Action() {
+			Button abrufen = new Button("Abrufen", new Action() {
 
 				@Override
 				public void handleAction(Object context)
@@ -74,6 +76,7 @@ public class DepotView extends AbstractView
 					try {
 						Object obj = control.getSelectedItem();
 						if (obj == null || !(obj instanceof GenericObjectHashMap)) {
+							Application.getMessagingFactory().sendMessage(new StatusBarMessage(Application.getI18n().tr("Bitte ein Depot auswählen!"),StatusBarMessage.TYPE_INFO));							
 							return;
 						}
 							GenericObjectHashMap o = (GenericObjectHashMap) obj;
@@ -88,13 +91,14 @@ public class DepotView extends AbstractView
 			}
 
 			,null,true,"dialog-information.png");
-			buttons1.addButton("Einstellungen", new Action() {
+			Button einstellungen = new Button("Einstellungen", new Action() {
 
 				@Override
 				public void handleAction(Object context)
 						throws ApplicationException {
 					Object obj = control.getSelectedItem();
 					if (obj == null || !(obj instanceof GenericObjectHashMap)) {
+						Application.getMessagingFactory().sendMessage(new StatusBarMessage(Application.getI18n().tr("Bitte ein Depot auswählen!"),StatusBarMessage.TYPE_INFO));							
 						return;
 					}
 					control.exec(obj);
@@ -104,6 +108,10 @@ public class DepotView extends AbstractView
 
 
 			,null,true,"dialog-information.png");
+			ButtonArea buttons1 = new ButtonArea();
+			buttons1.addButton(abrufen);
+			buttons1.addButton(einstellungen);
+
 			container.addPart(buttons1);
 
 	      container.addHeadline("Unterstütze Banken:");
