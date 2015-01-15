@@ -50,6 +50,8 @@ public class UmsatzEditorControl extends AbstractControl
 	public UmsatzEditorControl(AbstractView view) throws Exception {
 		super(view);
 		if (view.getCurrentObject() == null) {
+			getCBKurswertBerechnen().setValue(true);
+			calc();
 			return;
 		}
 		umsatz = Utils.getUmsatzByID(((GenericObjectSQL) view.getCurrentObject()).getID());
@@ -119,10 +121,13 @@ public class UmsatzEditorControl extends AbstractControl
 	protected void calc()  {
 		try {
 			if ((Boolean) getCBKurswertBerechnen().getValue()) {
-				
+				getKurswert().setValue(null);
+				getKurswert().setEnabled(false);
+			} else {
+				getKurswert().setEnabled(true);
 			}
 			getGesamtSumme().setValue(Double.NaN);
-			if (getEinzelkurs().getValue() == null || getAnzahl().getValue() == null || getDate().getValue() ==null) {
+			if (getEinzelkurs().getValue() == null || getAnzahl().getValue() == null) {
 				return;
 			}
 			if ((Double) getAnzahl().getValue() <=0 || ((Double) getEinzelkurs().getValue() < 0)) {
@@ -131,10 +136,7 @@ public class UmsatzEditorControl extends AbstractControl
 			if ((Boolean) getCBKurswertBerechnen().getValue()) {
 				Double d = (Double) getAnzahl().getValue() * (Double) getEinzelkurs().getValue();
 				getKurswert().setValue(d);
-    			//getGesamtSumme().setValue(d);
-				getKurswert().setEnabled(false);
 			} else {
-				getKurswert().setEnabled(true);
 			}
 			
 			int faktor = -1;
