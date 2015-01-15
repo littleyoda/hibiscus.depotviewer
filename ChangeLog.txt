@@ -1,3 +1,6 @@
+0.3.12 -- 2015-01-15
+	Bugfixes in Verbindung mit dem Hinzufügen von Umsätzen
+
 0.3.11 -- 2015-01-09
 	Properties für Consors anpassen (closes #35)
 	
