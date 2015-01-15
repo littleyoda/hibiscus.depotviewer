@@ -2,9 +2,6 @@ package de.open4me.depot.gui.view;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import de.open4me.depot.Settings;
@@ -18,7 +15,6 @@ import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.util.Container;
-import de.willuhn.jameica.gui.util.SWTUtil;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.jameica.hbci.gui.action.KontoFetchUmsaetze;
 import de.willuhn.jameica.hbci.rmi.Konto;
