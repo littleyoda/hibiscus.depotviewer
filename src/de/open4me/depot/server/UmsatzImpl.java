@@ -185,7 +185,7 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 	
 	@Override
 	public void setSteuernW(String kursW) throws RemoteException {
-		setAttribute("stuernw", kursW);
+		setAttribute("steuernw", kursW);
 	}
 
 	@Override
@@ -209,7 +209,7 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 	
 	@Override
 	public void setTransaktionsgebuehrenW(String kursW) throws RemoteException {
-		setAttribute("stuernw", kursW);
+		setAttribute("transaktionskostenw", kursW);
 	}
 
 	@Override
