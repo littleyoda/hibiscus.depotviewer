@@ -190,6 +190,27 @@ public class SQLChange {
 					"update depotviewer_umsaetze set steuernw='EUR' where steuernw is null;"
 					));
 		}
+		if (currentversion < 16) {
+			liste.add(new SQLChange(16, 
+					"ALTER TABLE depotviewer_bestand MODIFY  COLUMN  `id` int;",
+					"ALTER TABLE depotviewer_kurse MODIFY  COLUMN  `id` int;",
+					"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `id` int;",
+					"ALTER TABLE depotviewer_wertpapier MODIFY  COLUMN  `id` int;",
+					"ALTER TABLE depotviewer_kursevent MODIFY  COLUMN  `id` int;",
+					
+					"ALTER TABLE depotviewer_bestand MODIFY  COLUMN  `wert` decimal(20,6);",
+					"ALTER TABLE depotviewer_bestand MODIFY  COLUMN  `kurs` decimal(20,6);",
+					
+					"ALTER TABLE depotviewer_kurse MODIFY  COLUMN  `kurs` decimal(20,6);",
+					"ALTER TABLE depotviewer_kurse MODIFY  COLUMN  `kursperf` decimal(20,6);",
+					
+					"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `kurs` decimal(20,6);",
+					"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `kosten` decimal(20,6);",
+					"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `transaktionskosten` decimal(20,6);",
+					"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `steuern` decimal(20,6);"
+										
+					));
+		}
 		return liste;
 	}
 

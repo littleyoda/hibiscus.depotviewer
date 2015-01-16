@@ -152,6 +152,9 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 
 	public Integer getKontoid() throws RemoteException
 	{
+		if (getAttribute("kontoid") instanceof BigDecimal) {
+			return ((BigDecimal) getAttribute("kontoid")).intValueExact(); 
+		}
 		return (Integer) getAttribute("kontoid");
 	}
 
