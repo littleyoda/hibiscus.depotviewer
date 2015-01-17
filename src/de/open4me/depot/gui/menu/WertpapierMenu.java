@@ -1,8 +1,10 @@
 package de.open4me.depot.gui.menu;
 
 import de.open4me.depot.gui.action.AddWertpapierAction;
+import de.open4me.depot.gui.action.ModifyWertpapierAction;
 import de.open4me.depot.gui.action.WertpapiereAktualisierenAction;
 import de.open4me.depot.gui.control.WertpapiereControl;
+import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
 import de.willuhn.jameica.gui.parts.ContextMenuItem;
 
@@ -27,6 +29,7 @@ public class WertpapierMenu extends ContextMenu
 
 	public WertpapierMenu(WertpapiereControl controller) {
 		addItem(new ContextMenuItem("Wertpapier hinzufügen...", new AddWertpapierAction()));
+		addItem(new CheckedContextMenuItem("Wertpapier bearbeiten...", new ModifyWertpapierAction()));
 		addItem(ContextMenuItem.SEPARATOR);
 		addItem(new ContextMenuItem("Aktualisieren...", new WertpapiereAktualisierenAction(controller, false)));
 		addItem(new ContextMenuItem("Aktualisieren (Einstellungen wählen)...", new WertpapiereAktualisierenAction(controller, true)));

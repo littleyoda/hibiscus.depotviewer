@@ -168,7 +168,7 @@ public class Utils {
 		DBIterator liste = Settings.getDBService().createList(Umsatz.class);
 		liste.addFilter("id=?", id);
 		if (!liste.hasNext()) {
-			return null; // Unbekanntes Wertpapier
+			return null; // Unbekannter Umsatz
 		}
 		return ((Umsatz) liste.next());
 	}
@@ -323,6 +323,15 @@ public class Utils {
 			return null; // Unbekanntes Wertpapier
 		}
 		return ((Wertpapier) liste.next()).getWpid();
+	}
+
+	public static Wertpapier getWertPapierByID(String id) throws RemoteException {
+		DBIterator liste = Settings.getDBService().createList(Wertpapier.class);
+		liste.addFilter("id=?", id);
+		if (!liste.hasNext()) {
+			return null; // Unbekanntes Wertpapier
+		}
+		return ((Wertpapier) liste.next());
 	}
 
 	public static void addWertPapier(String wkn, String isin,
