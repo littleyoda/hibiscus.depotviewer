@@ -192,11 +192,11 @@ public class SQLChange {
 		}
 		if (currentversion < 16) {
 			liste.add(new SQLChange(16, 
-					"ALTER TABLE depotviewer_bestand MODIFY  COLUMN  `id` int;",
-					"ALTER TABLE depotviewer_kurse MODIFY  COLUMN  `id` int;",
-					"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `id` int;",
-					"ALTER TABLE depotviewer_wertpapier MODIFY  COLUMN  `id` int;",
-					"ALTER TABLE depotviewer_kursevent MODIFY  COLUMN  `id` int;",
+					"ALTER TABLE depotviewer_bestand MODIFY  COLUMN  `id` int NOT NULL auto_increment;",
+					"ALTER TABLE depotviewer_kurse MODIFY  COLUMN  `id` int NOT NULL auto_increment;",
+					"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `id` int NOT NULL auto_increment;",
+					"ALTER TABLE depotviewer_wertpapier MODIFY  COLUMN  `id` int NOT NULL auto_increment;",
+					"ALTER TABLE depotviewer_kursevent MODIFY  COLUMN  `id` int NOT NULL auto_increment;",
 					
 					"ALTER TABLE depotviewer_bestand MODIFY  COLUMN  `wert` decimal(20,6);",
 					"ALTER TABLE depotviewer_bestand MODIFY  COLUMN  `kurs` decimal(20,6);",
