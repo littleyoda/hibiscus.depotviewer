@@ -48,7 +48,6 @@ public class CSVImportConfigDialog extends AbstractDialog
 	private File file;
 
 
-
 	public CSVImportConfigDialog(File file)
 	{
 		super(POSITION_CENTER);
@@ -62,6 +61,7 @@ public class CSVImportConfigDialog extends AbstractDialog
 	protected void paint(Composite parent) throws Exception
 	{
 		Container group = new SimpleContainer(parent);
+		group.addText("Bitte nehmen sie die notwendigen Einstellungen so vor, dass alle Daten der CSV-Datei inkl. korrekter Spaltennamen in der Tabelle unten angezeigt werden.", true);
 		group.addText("Notwendige Einstellungen:", false);
 
 		group.addInput(getCharset());
@@ -133,21 +133,27 @@ public class CSVImportConfigDialog extends AbstractDialog
 			InputStreamReader isr = new InputStreamReader(is, Charset.forName((String) getCharset().getValue()) );
 			CSVFormat format = CSVFormat.RFC4180
 					.withHeader()
+					.withAllowMissingColumnNames()
 					.withDelimiter(((String) getTrennzeichen().getValue()).charAt(0))
 					.withSkipLines((Integer) getSkipLines().getValue());
 			CSVParser parser = new CSVParser(isr, format);
 			list.clear();
+			boolean iserror = false;
 			for(CSVRecord record : parser) {
-				if (record.size() == 0 || (record.get(0) == null || record.get(1).isEmpty())) {
-					getError().setValue("Ungültige Zeilen am Ende ignoriert.");
-					break;
-				}
 				GenericObjectHashMap g = new GenericObjectHashMap(record.toMap());
+				g.setAttribute("_DEPOTVIEWER_IGNORE", "");
+				if (record.size() == 0 || (record.get(0) == null || record.get(0).isEmpty())) {
+					g.setAttribute("_DEPOTVIEWER_IGNORE", "X");
+					iserror = true;
+				}
 				list.add(g);
 			}
 			header.clear();
 			for (Entry<String, Integer> x: parser.getHeaderMap().entrySet()) {
 				header.add(x.getKey());
+			}
+			if (iserror) {
+				getError().setValue("Die mit X markierten Zeilen wurden ignoiert.");
 			}
 			parser.close();
 
@@ -159,6 +165,7 @@ public class CSVImportConfigDialog extends AbstractDialog
 			enable = false;
 		}
 		TablePart tab = new TablePart(list, null);
+		tab.addColumn("", "_DEPOTVIEWER_IGNORE");
 		for (String h : header) {
 			tab.addColumn(h, h);
 		}
