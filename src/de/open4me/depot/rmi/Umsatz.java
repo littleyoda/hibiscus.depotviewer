@@ -64,5 +64,6 @@ public interface Umsatz extends DBObject
 	BigDecimal getTransaktionsgebuehren() throws RemoteException;
 	BigDecimal getKosten() throws RemoteException;
 	void setAnzahl(BigDecimal name) throws RemoteException;
+	String generateOrderId() throws RemoteException;
 
 }

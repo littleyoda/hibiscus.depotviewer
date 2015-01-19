@@ -34,7 +34,8 @@ public class KurseViaCSV extends BaseFetcher {
 			fd.add(new FeldDefinitionen("Datum", java.util.Date.class, "date", true));
 			fd.add(new FeldDefinitionen("Kurs", BigDecimal.class, "last", true));
 
-			List<GenericObjectHashMap> daten = CSVImportHelper.run(fd);
+			CSVImportHelper csv = new CSVImportHelper("kurse." + search);
+			List<GenericObjectHashMap> daten = csv.run(fd);
 			if (daten == null) {
 				return;
 			}

@@ -2,6 +2,7 @@ package de.open4me.depot.gui.menu;
 
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.action.UmsatzEditorAction;
+import de.open4me.depot.gui.action.UmsatzImportAction;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.gui.Action;
@@ -42,6 +43,7 @@ public class OrderListMenu extends ContextMenu
 		}));
 		addItem(new ContextMenuItem("Hinzufügen", new UmsatzEditorAction(true)));
 		addItem(new CheckedContextMenuItem("Bearbeiten", new UmsatzEditorAction(false)));
+		addItem(new ContextMenuItem("Importieren", new UmsatzImportAction()));
 	}
 }
 

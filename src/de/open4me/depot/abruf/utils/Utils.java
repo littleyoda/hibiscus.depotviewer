@@ -87,6 +87,10 @@ public class Utils {
 	public static Double getDoubleFromZahl(String s) {
 		return Double.parseDouble(s.replace(".", "").replace(",","."));
 	}
+	
+	public static boolean checkTransaktionsBezeichnung(String aktion) {
+		return aktion.equals("KAUF") || aktion.equals("VERKAUF") || aktion.equals("EINLAGE");
+	}
 
 	/**
 	 * 
@@ -116,7 +120,7 @@ public class Utils {
 				Logger.info("Skipping Buchung");
 				return;
 			}
-			if (!(aktion.toUpperCase().equals("KAUF") || aktion.toUpperCase().equals("VERKAUF") || aktion.toUpperCase().equals("EINLAGE"))) {
+			if (!checkTransaktionsBezeichnung(aktion.toUpperCase())) {
 				Logger.error("Unbekannte Buchungsart" + aktion);
 				return;
 			}
@@ -128,7 +132,7 @@ public class Utils {
 			if (anzahl < 0.0f) {
 				throw new ApplicationException("Anzahl muss immer positiv sein.");
 			}
-			if (kurs <=  0.0f) {
+			if (kurs <  0.0f) {
 				throw new ApplicationException("Der Kurs muss immer positiv sein.");
 			}
 			if (orderid == null) {
@@ -158,7 +162,7 @@ public class Utils {
 		}
 		catch (RemoteException e)
 		{
-			System.out.println(e.toString());
+			Logger.error("error while creating new Umsatz", e);
 			e.printStackTrace();
 			throw new ApplicationException(Settings.i18n().tr("error while creating new Umsatz"),e);
 		}
@@ -230,9 +234,9 @@ public class Utils {
 		}
 		catch (RemoteException e)
 		{
-			System.out.println(e.toString());
+			Logger.error("Error while creating new Bestand", e);
 			e.printStackTrace();
-			throw new ApplicationException(Settings.i18n().tr("error while creating new Umsatz"),e);
+			throw new ApplicationException(Settings.i18n().tr("error while creating new Bestand"),e);
 		}
 
 	}
@@ -453,6 +457,7 @@ public class Utils {
 			for (String attr : k.getAttributeNames()) {
 				m.setAttribute(attr, k.getAttribute(attr));
 			}
+			m.setAttribute("id", k.getID());
 			m.setAttribute("zugangsart", "keine Unterstützung");
 			m.setAttribute("kontoobj", k);
 			if (offline) {

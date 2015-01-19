@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.Date;
 
+import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.rmi.Umsatz;
 import de.willuhn.datasource.db.AbstractDBObject;
+import de.willuhn.util.ApplicationException;
 
 
 public class UmsatzImpl extends AbstractDBObject implements Umsatz
@@ -145,9 +147,12 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 	}
 
 	@Override
-
 	public void setOrderid(String orderid) throws RemoteException {
 		setAttribute("orderid", orderid);
+	}
+
+	public String getOrderid() throws RemoteException {
+		return (String) getAttribute("orderid");
 	}
 
 	public Integer getKontoid() throws RemoteException
@@ -221,6 +226,36 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 		return (String) getAttribute("transaktionskostenw");
 	}
 
+	@Override
+	public void store() throws RemoteException, ApplicationException {
+		if (!Utils.checkTransaktionsBezeichnung(getAktion())) {
+			throw new ApplicationException("Unbekannte Transaktionsart/Buchungsart: " + getAktion());
+		}
+//		if ((aktion.toUpperCase().equals("KAUF") && (kosten >= 0.0f))
+//				|| (aktion.toUpperCase().equals("VERKAUF") && (kosten <= 0.0f))) {
+//			throw new ApplicationException("Bei Käufen muss der Gesamtbetrag negativ sein, beim Verkauf positiv. ("
+//					+ aktion.toUpperCase() + " " + kosten + ")");
+//		}
+//		if (anzahl < 0.0f) {
+//			throw new ApplicationException("Anzahl muss immer positiv sein.");
+//		}
+//		if (kurs <  0.0f) {
+//			throw new ApplicationException("Der Kurs muss immer positiv sein.");
+//		}
+		
+		if (getOrderid() == null) {
+			throw new ApplicationException("Keine OrderID vergeben.");
+		}
+
+		// TODO Auto-generated method stub
+		super.store();
+	}
+
+	@Override
+	public String generateOrderId() throws RemoteException {
+		Integer hash = ("" + getKontoid() + getWPid() + getAktion() + getBuchungsdatum() +  getAnzahl() + getKurs() + getKurzW()).hashCode();
+		return hash.toString();
+	}
 
 }
 

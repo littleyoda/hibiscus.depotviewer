@@ -16,8 +16,43 @@ import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.util.ApplicationException;
 
 public class CSVImportHelper {
+	
+	private String savename;
 
-	public static List<GenericObjectHashMap> run(ArrayList<FeldDefinitionen> fd) throws Exception {
+	public CSVImportHelper(String savename) {
+		this.savename = savename;
+	}
+
+
+	public List<GenericObjectHashMap> run(ArrayList<FeldDefinitionen> fd) throws Exception {
+		File file = getFilename();
+		if (file == null) {
+			return null;
+		}
+		
+		// CSV Daten in ein passendes Format bringen
+		CSVImportConfigDialog dialog = new CSVImportConfigDialog(file);
+		try {
+			dialog.open();
+		} catch (OperationCanceledException e) {
+			return null;
+		}
+		List<GenericObjectHashMap> csvdata = dialog.getCSVData();
+		
+
+		// Und nun die Daten der CSV Datei den gewünschten Feldern zu weisen
+		List<String> header = dialog.getCSVHeader();
+		CSVImportFeldDefinitionenDialog fdDialog = new CSVImportFeldDefinitionenDialog(fd, csvdata, header, savename);
+		try {
+			fdDialog.open();
+		} catch (OperationCanceledException e) {
+			return null;
+		}
+		return fdDialog.getCSVData();
+
+	}
+
+	public File getFilename() throws ApplicationException {
 		FileDialog fileopen = new FileDialog(GUI.getShell(),SWT.OPEN);
 		fileopen.setText("Bitte wählen Sie die CSV Datei aus:");
 		String filename;
@@ -33,22 +68,6 @@ public class CSVImportHelper {
 		if (!file.exists() || !file.isFile()) {
 			throw new ApplicationException("Datei existiert nicht oder ist nicht lesbar");
 		}
-
-		// CSV Daten in ein passendes Format bringen
-		CSVImportConfigDialog dialog = new CSVImportConfigDialog(file);
-		try {
-			dialog.open();
-		} catch (OperationCanceledException e) {
-			return null;
-		}
-
-		List<GenericObjectHashMap> csvdata = dialog.getCSVData();
-		List<String> header = dialog.getCSVHeader();
-
-		CSVImportFeldDefinitionenDialog fdDialog = new CSVImportFeldDefinitionenDialog(fd, csvdata, header);
-		fdDialog.open();
-		return fdDialog.getCSVData();
-
+		return file;
 	}
-
 }

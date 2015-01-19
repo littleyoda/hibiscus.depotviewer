@@ -2,10 +2,14 @@ package de.open4me.depot.gui.dialogs;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
+import java.sql.PreparedStatement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Currency;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,13 +17,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import de.open4me.depot.Settings;
+import de.open4me.depot.gui.parts.ReplaceableComposite;
+import de.open4me.depot.server.BigDecimalWithCurrency;
 import de.open4me.depot.sql.GenericObjectHashMap;
+import de.open4me.depot.sql.SQLUtils;
 import de.open4me.depot.tools.io.FeldDefinitionen;
 import de.open4me.depot.tools.io.feldConverter.BigDecimalDezimaltrennzeichenKomma;
 import de.open4me.depot.tools.io.feldConverter.BigDecimalDezimaltrennzeichenPunkt;
@@ -35,15 +41,15 @@ import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.jameica.gui.util.Color;
-import de.willuhn.jameica.gui.util.Container;
-import de.willuhn.jameica.gui.util.SWTUtil;
+import de.willuhn.jameica.gui.util.ScrolledContainer;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.util.ApplicationException;
 
+
+// TODO: Trennung in View und Controller
 public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 {	  
-	private Composite comp;
 	private LabelInput error;
 	private Button weiterbutton;
 	List<GenericObjectHashMap> tablist = new ArrayList<GenericObjectHashMap>();
@@ -56,14 +62,20 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 	private FeldConverter[] fcBigDecimal = new FeldConverter[]{ new BigDecimalDezimaltrennzeichenKomma(), new BigDecimalDezimaltrennzeichenPunkt()}; 
 
 	private List<String> header;
+	private ReplaceableComposite rc;
+	private String savename;
+	private SelectInput zahlenFormat;
+	private TextInput datumsFormat;
+	private SelectInput waehrung;
 
 
 
-	public CSVImportFeldDefinitionenDialog(ArrayList<FeldDefinitionen> fd, List<GenericObjectHashMap> liste, List<String> header)
+	public CSVImportFeldDefinitionenDialog(ArrayList<FeldDefinitionen> fd, List<GenericObjectHashMap> liste, List<String> header, String savename)
 	{
 		super(POSITION_CENTER);
 		setTitle("CSV Felddefinitionen");
 		this.feldDefinitionen = fd;
+		this.savename = "csvimport." + savename + ".";
 		this.quellDaten = liste;
 		this.header = new ArrayList<String>();
 		this.header.add("");
@@ -77,28 +89,47 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 	{
 		controls = new HashMap<FeldDefinitionen, AbstractInput>();
 		extendedControls = new HashMap<FeldDefinitionen, AbstractInput>();
-		Container group = new SimpleContainer(parent);
-		group.addText("Bitte ordnen sie die einzelnen Spalten zu:", false);
+
+		
+
+		SimpleContainer columns = new SimpleContainer(parent, true, 2);
+		ScrolledContainer left = new ScrolledContainer(columns.getComposite());
+		SimpleContainer right = new SimpleContainer(columns.getComposite());
+		
+		left.addText("Bitte ordnen sie die einzelnen Spalten zu:", false);
+		zahlenFormat = new SelectInput(Arrays.asList(fcBigDecimal), null);
+		left.addLabelPair("Format für Zahlen", zahlenFormat);
+		
+		datumsFormat = new TextInput("dd.MM.yyyy");
+		left.addLabelPair("Format für Datum (yyyy-MM-dd)", datumsFormat);
+
+		Locale locale = Locale.getDefault();
+		ArrayList<Currency> currencies = new ArrayList<Currency>(Currency.getAvailableCurrencies());
+		Collections.sort(currencies, new Comparator<Currency>() {
+
+			@Override
+			public int compare(Currency o1, Currency o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+			
+		});
+		waehrung = new SelectInput(currencies, Currency.getInstance(locale));
+		left.addLabelPair("Standard Währung", waehrung);
+
+		left.addSeparator();
 		for (FeldDefinitionen x : feldDefinitionen) {
-			AbstractInput control = new SelectInput(header, null);
+			String saved = SQLUtils.getCfg(getSaveKey(x, "ext"));
+			if (saved == null) {
+				saved = "";
+			}
+			AbstractInput control = new SelectInput(header, SQLUtils.getCfg(getSaveKey(x, "")));
 			String desc = x.getBeschreibung();
 			if (x.isRequired()) {
 				desc = desc + " (*)";
 			}
-			group.addLabelPair(desc, control);
+			left.addLabelPair(desc, control);
 			controls.put(x, control);
-			if (x.getFeldtype().equals(Date.class)) {
-				control = new TextInput("yyyy-MM-dd");
-				extendedControls.put(x, control);
-				group.addLabelPair("Datumsformat (yyyy-MM-dd)", control);
-			} else if (x.getFeldtype().equals(BigDecimal.class)) {
-				control = new SelectInput(Arrays.asList(fcBigDecimal), null);
-				extendedControls.put(x, control);
-				group.addLabelPair("Zahlenformat", control);
-			}
-
 		}
-
 		ButtonArea buttons = new ButtonArea();
 		buttons.addButton("Testen", new Action() {
 			public void handleAction(Object context) throws ApplicationException {
@@ -127,24 +158,48 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 			}
 
 		},null,false,"process-stop.png");
-		group.addButtonArea(buttons);
+		buttons.addButton("Einstellungen speichern", new Action() {
+			public void handleAction(Object context) throws ApplicationException
+			{
+				try {
+				PreparedStatement pre = SQLUtils.getPreparedSQL("delete from depotviewer_cfg where key like concat(?,'%')");
+				pre.setString(1, savename);
+				pre.execute();
+				for (Entry<FeldDefinitionen, AbstractInput> x : controls.entrySet()) {
+					Object value = x.getValue().getValue();
+					if (value != null) {
+							SQLUtils.saveCfg(getSaveKey(x.getKey(), ""), value.toString());
+					}
+				}
+				for (Entry<FeldDefinitionen, AbstractInput> x : extendedControls.entrySet()) {
+					Object value = x.getValue().getValue();
+					if (value != null) {
+							SQLUtils.saveCfg(getSaveKey(x.getKey(), "ext"), value.toString());
+					}
+				}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}					
+			}
 
-		comp  = new Composite(parent,SWT.NONE);
-		comp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		comp.setLayout(new GridLayout());
+		},null,false,"process-stop.png");
+		right.addButtonArea(buttons);
+		rc = new ReplaceableComposite(right.getComposite(), SWT.None);
 		reload();
-		SimpleContainer sc = new SimpleContainer(parent);
-		sc.addInput(this.getError());
+		right.addInput(getError());
 
 	}
 
+	private String getSaveKey(FeldDefinitionen x, String erweitert) {
+		if (erweitert.isEmpty()) {
+			return savename + x.getAttr();
+		}
+		return savename + erweitert + "." + x.getAttr(); 
+	}
+	
 	private void reload() throws RemoteException {
 		this.getError().setValue("");
-		tablist.clear();
-		SWTUtil.disposeChildren(this.comp);
-		comp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		this.comp.setLayout(new GridLayout());
-
 		transformiereDaten(tablist);
 		TablePart tab = new TablePart(tablist, null);
 		for (FeldDefinitionen h : feldDefinitionen) {
@@ -154,22 +209,31 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 				tab.addColumn(h.getAttr(), h.getAttr());
 			}
 		}
-		tab.paint(comp);
-		comp.layout(true);
+		rc.replace(tab);
 	}
+	
 
 	private void transformiereDaten(List<GenericObjectHashMap> tablist) throws RemoteException {
+		tablist.clear();
 		int fehler = 0;
 		for (GenericObjectHashMap source: quellDaten) {
+			if (!source.getAttribute("_DEPOTVIEWER_IGNORE").toString().isEmpty()) {
+				continue;
+			}
 			GenericObjectHashMap g = new GenericObjectHashMap();
 			for (Entry<FeldDefinitionen, AbstractInput> entry : controls.entrySet()) {
+				boolean required = entry.getValue().isMandatory();
 				String sourceattr = (String) entry.getValue().getValue();
 				String destattr = entry.getKey().getAttr();
 				
 				// Prüfen, ob überhaupt eine Spalte zugewiesen wurde
-				if (sourceattr.isEmpty()) {
-					g.setAttribute(destattr, "N/A");
-					fehler++;
+				if (sourceattr.isEmpty() ) {
+					if (required) {
+						g.setAttribute(destattr, "N/A");
+						fehler++;
+					} else {
+						g.setAttribute(destattr, "");
+					}
 					continue;
 				}
 				
@@ -177,16 +241,34 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 				Object sourcedata = source.getAttribute(sourceattr);
 				Class<?> feldtype = entry.getKey().getFeldtype();
 				try {
-					AbstractInput ec = extendedControls.get(entry.getKey());
+//					AbstractInput ec = extendedControls.get(entry.getKey());
 					if (feldtype.equals(BigDecimal.class)) {
 						// Converter nutzen
-						FeldConverter fc = (FeldConverter) ec.getValue();
+						FeldConverter fc = (FeldConverter) zahlenFormat.getValue();
 						sourcedata = fc.convert(sourcedata.toString());
+					} else if (feldtype.equals(BigDecimalWithCurrency.class)) {
+							FeldConverter fc = (FeldConverter) zahlenFormat.getValue();
+							String data = sourcedata.toString().trim();
+							int spaceCount = StringUtils.countMatches(data, " ");
+							if (spaceCount == 0) {
+								// Vermutlich nur eine Zahl
+								sourcedata = fc.convert(data);
+							} else if (spaceCount == 1) {
+								// Zahl mit Währung
+								String[] splitted = data.split(" ");
+								BigDecimalWithCurrency bdwc = new BigDecimalWithCurrency((BigDecimal) fc.convert(splitted[0]), splitted[1]);
+								sourcedata = bdwc;
+							} else {
+								// Augen zu und durch. Ich habe keine Ahnung, was es sein kann.
+								sourcedata = fc.convert(data);
+							}
 					} else if (feldtype.equals(Date.class)) {
 						// Date-Format ermitteln
-						SimpleDateFormat dp = getDateParser(ec.getValue().toString());
+						SimpleDateFormat dp = getDateParser(datumsFormat.getValue().toString());
 						// Sourcedaten entsprechend parsen
 						sourcedata = dp.parse(sourcedata.toString());
+					} else if (feldtype.equals(String.class)) {
+						//sourcedata = sourcedata.toString();
 					} else {
 						sourcedata = "FELDTYPE UNBEKANNT!";
 					}
@@ -196,6 +278,7 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 				}
 				g.setAttribute(destattr, sourcedata);
 			}
+			g.setAttribute("_depotviewer_default_curr", waehrung.getValue().toString());
 			tablist.add(g);
 		}
 		if (fehler == 0) {
@@ -219,14 +302,6 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 		}
 		return df;
 	}
-
-	private SelectInput getSelectInput(String beschreibung, List list) {
-		SelectInput selectInput = new SelectInput(list, null);
-		selectInput.setName(beschreibung);
-		selectInput.setMandatory(true);
-		return selectInput;
-	}
-
 
 
 	@Override

@@ -135,7 +135,7 @@ public class CSVImportConfigDialog extends AbstractDialog
 					.withHeader()
 					.withAllowMissingColumnNames()
 					.withDelimiter(((String) getTrennzeichen().getValue()).charAt(0))
-					.withSkipLines((Integer) getSkipLines().getValue());
+					.withSkipLines(((Integer) getSkipLines().getValue()) - 1);
 			CSVParser parser = new CSVParser(isr, format);
 			list.clear();
 			boolean iserror = false;
@@ -153,7 +153,7 @@ public class CSVImportConfigDialog extends AbstractDialog
 				header.add(x.getKey());
 			}
 			if (iserror) {
-				getError().setValue("Die mit X markierten Zeilen wurden ignoiert.");
+				getError().setValue("Die mit X markierten Zeilen werden ignoriert.");
 			}
 			parser.close();
 
@@ -196,8 +196,8 @@ public class CSVImportConfigDialog extends AbstractDialog
 
 	private SelectInput getSkipLines() {
 		if (skiplines == null) {
-			skiplines = getSelectInput("Zeilen überspringen", Arrays.asList( 
-					new Integer[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10 }));
+			skiplines = getSelectInput("Zeile mit den Spaltennamen", Arrays.asList( 
+					new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9,10 }));
 		}
 		return skiplines;
 	}

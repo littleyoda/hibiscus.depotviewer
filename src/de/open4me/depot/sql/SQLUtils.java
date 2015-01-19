@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jfree.util.Log;
+
 import de.open4me.depot.abruf.utils.Utils;
 import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.server.AbstractDBSupportImpl;
@@ -92,6 +94,29 @@ public class SQLUtils {
 		return list;
 	}
 
+	
+	public static void saveCfg(String key, String value) throws Exception {
+		PreparedStatement pre = getPreparedSQL("insert into depotviewer_cfg (key, value) values (?,?)");
+		pre.setString(1, key);
+		pre.setString(2, value);
+		pre.executeUpdate();
+	}
+	
+	public static String getCfg(String key) {
+		try {
+			PreparedStatement pre = SQLUtils.getPreparedSQL("select value from depotviewer_cfg where `key`=?");
+			pre.setString(1, key);
+			ResultSet ret =  pre.executeQuery();
+			if (!ret.next()) {
+				return null;
+			}
+			return ret.getString(1);
+		} catch (Exception e) {
+			Logger.error("Fehler beim Zugriff auf cfg", e);
+			e.printStackTrace();
+			return null;
+		}
+	}
 	private static int getCurrentDBVersion() {
 		int version = -1;
 		Connection conn = null;
