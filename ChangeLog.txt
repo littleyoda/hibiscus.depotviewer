@@ -1,3 +1,6 @@
+0.3.14 -- 2015-01-19
+	Umsatz-Import: Vorläufig werden nur Käufe und Verkäufe übernommen
+
 0.3.13 -- 2015-01-19
 	Verbesserter CSV Import
 	Editieren von Wertpapieren (closes #23)
