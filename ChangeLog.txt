@@ -1,3 +1,7 @@
+0.3.13 -- 2015-01-19
+	Verbesserter CSV Import
+	Editieren von Wertpapieren (closes #23)
+
 0.3.12 -- 2015-01-15
 	Bugfixes in Verbindung mit dem Hinzufügen von Umsätzen
 
