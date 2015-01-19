@@ -124,6 +124,18 @@ public class UmsatzImportAction implements Action {
 					BigDecimal d = ((BigDecimal) x.getAttribute("kurs")).multiply((BigDecimal) x.getAttribute("anzahl"));
 					x.setAttribute("kosten", d); 
 				}
+				String aktion = x.getAttribute("aktion").toString();
+				if (!Utils.checkTransaktionsBezeichnung(aktion.toUpperCase())) {
+					continue;
+//					Logger.error("Fehler beim CSV-Import. Umbekannte Transaktionsart: " + aktion);
+	//				throw new ApplicationException("Fehler beim CSV-Import. Umbekannte Transaktionsart: " + aktion);
+				}
+				if (aktion.toUpperCase().equals("KAUF")) {
+					x.setAttribute("kosten", ((BigDecimal) x.getAttribute("kosten")).abs().negate());
+				}
+				if (aktion.toUpperCase().equals("VERKAUF")) {
+					x.setAttribute("kosten", ((BigDecimal) x.getAttribute("kosten")).abs());
+				}
 				
 				// Nochmal prüfen. Evtl. haben wir ja etwas übersehen
 				for (FeldDefinitionen f : fd) {
@@ -152,7 +164,9 @@ public class UmsatzImportAction implements Action {
 					Log.warn("Überspringe Buchung, da sie bereits existiert");
 					continue;
 				}
-				// TODO Betrag gemäß An und Verkauf normieren
+				if (!Utils.checkTransaktionsBezeichnung(x.getAttribute("aktion").toString().toUpperCase())) {
+					continue;
+				}
 				Umsatz p = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
 				p.setKontoid(Integer.parseInt(kontoid));
 				p.setAktion(x.getAttribute("aktion").toString().toUpperCase());

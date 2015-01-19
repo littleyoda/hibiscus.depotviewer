@@ -236,12 +236,12 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 //			throw new ApplicationException("Bei Käufen muss der Gesamtbetrag negativ sein, beim Verkauf positiv. ("
 //					+ aktion.toUpperCase() + " " + kosten + ")");
 //		}
-//		if (anzahl < 0.0f) {
-//			throw new ApplicationException("Anzahl muss immer positiv sein.");
-//		}
-//		if (kurs <  0.0f) {
-//			throw new ApplicationException("Der Kurs muss immer positiv sein.");
-//		}
+		if (getAnzahl().signum() == -1) {
+			throw new ApplicationException("Anzahl muss immer positiv sein.");
+		}
+		if (getKurs().signum() == -1) {
+			throw new ApplicationException("Der Kurs muss immer positiv sein.");
+		}
 		
 		if (getOrderid() == null) {
 			throw new ApplicationException("Keine OrderID vergeben.");
