@@ -1,6 +1,7 @@
 package de.open4me.depot.datenobj;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.jfree.util.Log;
@@ -11,10 +12,13 @@ public class DepotAktion {
 
 	private String name;
 	
-	public DepotAktion(String name, String internal) {
+	public DepotAktion(String name, String internal, String... alternativeSchreibweisen) {
 		aktionsName = internal;
 		this.name = name;
-		all.add(this);
+		all.put(internal, this);
+		for (String s : alternativeSchreibweisen) {
+			all.put(s, this);
+		}
 	}
 	
 	public String toString() {
@@ -25,20 +29,19 @@ public class DepotAktion {
 		return aktionsName;
 	}
 
-	static private List<DepotAktion> all = new ArrayList<DepotAktion>();
+	static private HashMap<String, DepotAktion> all = new HashMap<String, DepotAktion>();
 	
-	static public final DepotAktion EINLAGE = new DepotAktion("Einlage", "EINLAGE");
+	static public final DepotAktion EINLAGE = new DepotAktion("Einbuchung", "EINBUCHUNG", "EINLIEFERUNG", "EINLAGE");
+	static public final DepotAktion AUSBUCHUNG = new DepotAktion("Ausbuchung", "AUSBUCHUNG");
 	static public final DepotAktion VERKAUF = new DepotAktion("Verkauf", "VERKAUF");
 	static public final DepotAktion KAUF = new DepotAktion("Kauf", "KAUF");
 	
 	public static DepotAktion getByString(String s) {
-		for (DepotAktion a : all) {
-			if (a.internal().equals(s)) {
-				return a;
-			}
+		DepotAktion x = all.get(s.toUpperCase());
+		if (x == null) {
+			Log.warn("Aktion '" + s + "' nicht gefunden!");
 		}
-		Log.warn("Aktion '" + s + "' nicht gefunden!");
-		return null;
+		return x;
 		
 	}
 
