@@ -90,7 +90,7 @@ public class UmsatzEditorControl extends AbstractControl
 			throw new ApplicationException("Keine Änderungen möglich.\nZugehöriges Konto nicht gefunden!");
 		}
 
-		getAktionAuswahl().setValue(DepotAktion.getByString(umsatz.getAktion()));
+		getAktionAuswahl().setValue(umsatz.getAktion());
 		calc();
 
 	}
@@ -252,7 +252,7 @@ public class UmsatzEditorControl extends AbstractControl
 		Konto k = (Konto) ((GenericObjectHashMap) getKonto().getValue()).getAttribute("kontoobj");
 		umsatz.setKontoid(Integer.parseInt(k.getID()));
 		umsatz.setWPid(((GenericObjectSQL) getWertpapiere().getValue()).getID());
-		umsatz.setAktion(((DepotAktion) getAktionAuswahl().getValue()).internal());
+		umsatz.setAktion((DepotAktion) getAktionAuswahl().getValue());
 		umsatz.setAnzahl(new BigDecimal((Double) getAnzahl().getValue()));
 		umsatz.setKurs(new BigDecimal((Double) getEinzelkurs().getValue()));
 		umsatz.setKosten(new BigDecimal(faktor * (Double) getKurswert().getValue()));

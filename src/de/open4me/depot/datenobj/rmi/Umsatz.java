@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.Date;
 
+import de.open4me.depot.datenobj.DepotAktion;
 import de.willuhn.datasource.rmi.DBObject;
 
 
@@ -18,9 +19,9 @@ public interface Umsatz extends DBObject
 	public void setWPid(String name) throws RemoteException;
 	
 
-	public String getAktion() throws RemoteException;
+	public DepotAktion getAktion() throws RemoteException;
 	
-	public void setAktion(String name) throws RemoteException;
+	public void setAktion(DepotAktion aktion) throws RemoteException;
 
 	
 	public String getBuchungsinformationen() throws RemoteException;

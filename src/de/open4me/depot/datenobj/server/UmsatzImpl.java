@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.Date;
 
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.datenobj.DepotAktion;
 import de.open4me.depot.datenobj.rmi.Umsatz;
 import de.willuhn.datasource.db.AbstractDBObject;
 import de.willuhn.util.ApplicationException;
@@ -66,14 +67,16 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 		setAttribute("kurs", name);
 	}
 	
-	public String getAktion() throws RemoteException
+	@Override
+	public DepotAktion getAktion() throws RemoteException
 	{
-		return (String) getAttribute("aktion");
+		return DepotAktion.getByString((String) getAttribute("aktion"));
 	}
 
-	public void setAktion(String name) throws RemoteException
+	@Override
+	public void setAktion(DepotAktion aktion) throws RemoteException
 	{
-		setAttribute("aktion",name);
+		setAttribute("aktion", aktion.internal());
 	}
 
 	public String getBuchungsinformationen() throws RemoteException
@@ -228,7 +231,7 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 
 	@Override
 	public void store() throws RemoteException, ApplicationException {
-		if (Utils.checkTransaktionsBezeichnung(getAktion()) == null) {
+		if (getAktion() == null) {
 			throw new ApplicationException("Unbekannte Transaktionsart/Buchungsart: " + getAktion());
 		}
 		if (getAnzahl().signum() == -1) {

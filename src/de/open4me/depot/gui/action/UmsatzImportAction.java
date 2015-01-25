@@ -165,13 +165,15 @@ public class UmsatzImportAction implements Action {
 					Log.warn("Überspringe Buchung, da sie bereits existiert");
 					continue;
 				}
-				if (Utils.checkTransaktionsBezeichnung(x.getAttribute("aktion").toString().toUpperCase()) != null) {
+				DepotAktion aktion = Utils.checkTransaktionsBezeichnung(x.getAttribute("aktion").toString().toUpperCase()); 
+				if (aktion != null) {
+					Log.error("Aktion " + x.getAttribute("aktion").toString().toUpperCase() + " unbekannt!");
 					// TODO
 					continue;
 				}
 				Umsatz p = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
 				p.setKontoid(Integer.parseInt(kontoid));
-				p.setAktion(x.getAttribute("aktion").toString().toUpperCase());
+				p.setAktion(aktion);
 				p.setBuchungsinformationen("CSV Import");
 				p.setWPid(Utils.getORcreateWKN(x.getAttribute("wkn").toString(), x.getAttribute("isin").toString(), x.getAttribute("name").toString()));
 				p.setAnzahl((BigDecimal) x.getAttribute("anzahl"));

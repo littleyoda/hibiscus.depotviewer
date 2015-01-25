@@ -144,7 +144,7 @@ public class Utils {
 			// create new project
 			Umsatz p = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
 			p.setKontoid(Integer.parseInt(kontoid));
-			p.setAktion(a.internal());
+			p.setAktion(a);
 			p.setBuchungsinformationen(info);
 			p.setWPid(wpid);
 			p.setAnzahl(new BigDecimal(anzahl));
