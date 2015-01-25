@@ -31,8 +31,8 @@ public class DepotAktion {
 
 	static private HashMap<String, DepotAktion> all = new HashMap<String, DepotAktion>();
 	
-	static public final DepotAktion EINLAGE = new DepotAktion("Einbuchung", "EINBUCHUNG", "EINLIEFERUNG", "EINLAGE");
-	static public final DepotAktion AUSBUCHUNG = new DepotAktion("Ausbuchung", "AUSBUCHUNG");
+	static public final DepotAktion EINLAGE = new DepotAktion("Einlieferung", "EINLIEFERUNG","EINBUCHUNG",  "EINLAGE");
+	static public final DepotAktion AUSBUCHUNG = new DepotAktion("Auslieferungen", "AUSLIEFERUNGEN", "AUSBUCHUNG");
 	static public final DepotAktion VERKAUF = new DepotAktion("Verkauf", "VERKAUF");
 	static public final DepotAktion KAUF = new DepotAktion("Kauf", "KAUF");
 	
