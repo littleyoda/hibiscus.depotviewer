@@ -1,9 +1,9 @@
-package de.open4me.depot.server;
+package de.open4me.depot.datenobj.server;
 
 import java.rmi.RemoteException;
 import java.util.Date;
 
-import de.open4me.depot.rmi.Kursevents;
+import de.open4me.depot.datenobj.rmi.Kursevents;
 import de.willuhn.datasource.db.AbstractDBObject;
 
 public class KurseventsImpl extends AbstractDBObject implements Kursevents

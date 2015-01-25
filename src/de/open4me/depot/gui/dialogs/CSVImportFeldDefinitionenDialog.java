@@ -22,8 +22,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import de.open4me.depot.Settings;
+import de.open4me.depot.datenobj.rmi.BigDecimalWithCurrency;
 import de.open4me.depot.gui.parts.ReplaceableComposite;
-import de.open4me.depot.server.BigDecimalWithCurrency;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.SQLUtils;
 import de.open4me.depot.tools.io.FeldDefinitionen;

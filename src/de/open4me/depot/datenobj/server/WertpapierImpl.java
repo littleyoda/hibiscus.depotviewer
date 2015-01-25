@@ -1,8 +1,8 @@
-package de.open4me.depot.server;
+package de.open4me.depot.datenobj.server;
 
 import java.rmi.RemoteException;
 
-import de.open4me.depot.rmi.Wertpapier;
+import de.open4me.depot.datenobj.rmi.Wertpapier;
 import de.willuhn.datasource.db.AbstractDBObject;
 
 public class WertpapierImpl extends AbstractDBObject implements Wertpapier

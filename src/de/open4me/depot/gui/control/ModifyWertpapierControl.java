@@ -4,8 +4,8 @@ import java.rmi.RemoteException;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.datenobj.rmi.Wertpapier;
 import de.open4me.depot.gui.view.WertpapierView;
-import de.open4me.depot.rmi.Wertpapier;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.gui.AbstractControl;

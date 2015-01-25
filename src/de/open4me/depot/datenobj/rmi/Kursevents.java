@@ -1,4 +1,4 @@
-package de.open4me.depot.rmi;
+package de.open4me.depot.datenobj.rmi;
 
 import java.rmi.RemoteException;
 import java.util.Date;

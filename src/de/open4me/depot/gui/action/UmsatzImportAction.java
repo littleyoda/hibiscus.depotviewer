@@ -13,9 +13,9 @@ import org.jfree.util.Log;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.datenobj.rmi.BigDecimalWithCurrency;
+import de.open4me.depot.datenobj.rmi.Umsatz;
 import de.open4me.depot.gui.dialogs.KursAktualisierenDialog;
-import de.open4me.depot.rmi.Umsatz;
-import de.open4me.depot.server.BigDecimalWithCurrency;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.tools.CSVImportHelper;
 import de.open4me.depot.tools.UmsatzHelper;

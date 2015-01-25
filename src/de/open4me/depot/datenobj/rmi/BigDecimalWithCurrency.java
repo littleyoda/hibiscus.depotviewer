@@ -1,4 +1,4 @@
-package de.open4me.depot.server;
+package de.open4me.depot.datenobj.rmi;
 
 import java.math.BigDecimal;
 

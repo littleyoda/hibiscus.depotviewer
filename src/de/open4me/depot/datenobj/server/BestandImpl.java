@@ -1,10 +1,10 @@
-package de.open4me.depot.server;
+package de.open4me.depot.datenobj.server;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.Date;
 
-import de.open4me.depot.rmi.Bestand;
+import de.open4me.depot.datenobj.rmi.Bestand;
 import de.willuhn.datasource.db.AbstractDBObject;
 
 public class BestandImpl extends AbstractDBObject implements Bestand

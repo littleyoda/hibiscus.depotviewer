@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import de.open4me.depot.rmi.Umsatz;
+import de.open4me.depot.datenobj.rmi.Umsatz;
 import de.willuhn.datasource.db.AbstractDBObject;
 import de.willuhn.datasource.rmi.DBObject;
 

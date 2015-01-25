@@ -26,6 +26,8 @@ public class BewertungsControl extends AbstractControl {
 
 
 		wertList = new TablePart(WertBerechnung.getWertBerechnung(), new OrderList());
+		wertList.setRememberColWidths(true);
+		wertList.setRememberOrder(true);
 		wertList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
 		wertList.addColumn(Settings.i18n().tr("Name"),"wertpapiername"); 
 		wertList.addColumn(Settings.i18n().tr("ISIN"),"isin");

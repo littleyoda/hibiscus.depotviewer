@@ -3,7 +3,7 @@ package de.open4me.depot.tools;
 import java.rmi.RemoteException;
 
 import de.open4me.depot.Settings;
-import de.open4me.depot.rmi.Umsatz;
+import de.open4me.depot.datenobj.rmi.Umsatz;
 import de.willuhn.datasource.rmi.DBIterator;
 
 public class UmsatzHelper {

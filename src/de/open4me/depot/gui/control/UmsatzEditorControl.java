@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Listener;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
-import de.open4me.depot.rmi.Umsatz;
+import de.open4me.depot.datenobj.rmi.Umsatz;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLQueries;
