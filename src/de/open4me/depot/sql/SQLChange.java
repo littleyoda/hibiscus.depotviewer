@@ -205,12 +205,12 @@ public class SQLChange {
 										
 					));
 		}
-		liste.add(new SQLChange(16,
-		"truncate table depotviewer_umsaetze;",
-		"truncate table depotviewer_bestand;",
-		"truncate table depotviewer_wertpapier;",
-		"truncate table depotviewer_kurse;"
-		));	
+//		liste.add(new SQLChange(currentversion,
+//		"truncate table depotviewer_umsaetze;",
+//		"truncate table depotviewer_bestand;",
+//		"truncate table depotviewer_wertpapier;",
+//		"truncate table depotviewer_kurse;"
+//		));	
 		return liste;
 	}
 
