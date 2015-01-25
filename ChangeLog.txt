@@ -1,3 +1,4 @@
+0.3.15 -- 2015-01-25
 	Umsatz-Import um Ein- und Ausbuchungen ergänzt
 
 0.3.14 -- 2015-01-19
