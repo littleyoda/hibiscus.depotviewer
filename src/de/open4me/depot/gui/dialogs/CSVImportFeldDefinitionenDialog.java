@@ -22,6 +22,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import de.open4me.depot.Settings;
+import de.open4me.depot.datenobj.DepotAktion;
 import de.open4me.depot.datenobj.rmi.BigDecimalWithCurrency;
 import de.open4me.depot.gui.parts.ReplaceableComposite;
 import de.open4me.depot.sql.GenericObjectHashMap;
@@ -267,6 +268,8 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 						SimpleDateFormat dp = getDateParser(datumsFormat.getValue().toString());
 						// Sourcedaten entsprechend parsen
 						sourcedata = dp.parse(sourcedata.toString());
+					} else if (feldtype.equals(DepotAktion.class)) {
+						sourcedata = DepotAktion.getByString(sourcedata.toString());
 					} else if (feldtype.equals(String.class)) {
 						//sourcedata = sourcedata.toString();
 					} else {
