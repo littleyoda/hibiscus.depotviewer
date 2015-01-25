@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import de.open4me.depot.sql.GenericObjectHashMap;
+import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.dialogs.AbstractDialog;
 import de.willuhn.jameica.gui.input.LabelInput;
@@ -46,12 +48,14 @@ public class CSVImportConfigDialog extends AbstractDialog
 	private List<GenericObjectHashMap> list = new ArrayList<GenericObjectHashMap>();
 	private List<String> header = new ArrayList<String>();
 	private File file;
+	private String savename;
 
 
-	public CSVImportConfigDialog(File file)
+	public CSVImportConfigDialog(File file, String savename)
 	{
 		super(POSITION_CENTER);
 		this.file = file;
+		this.savename = "csvimportfile." + savename + ".";
 		setTitle("CSV Einstellungen");
 	}
 
@@ -104,6 +108,24 @@ public class CSVImportConfigDialog extends AbstractDialog
 			}
 
 		},null,false,"process-stop.png");
+		buttons.addButton("Einstellungen speichern", new Action() {
+			public void handleAction(Object context) throws ApplicationException
+			{
+				try {
+					PreparedStatement pre = SQLUtils.getPreparedSQL("delete from depotviewer_cfg where key like concat(?,'%')");
+					pre.setString(1, savename);
+					pre.execute();
+
+					for (SelectInput x : new SelectInput[] { charset, trennzeichen, skiplines }) {
+						SQLUtils.saveCfg(getSaveKey(x), x.getValue().toString());
+					}
+				} catch (Exception e) {
+					Logger.error("Fehler beim Löschen der Pref", e);
+				}
+
+			}
+
+		},null,false,"document-save.png");
 		group.addButtonArea(buttons);
 	}
 
@@ -206,6 +228,12 @@ public class CSVImportConfigDialog extends AbstractDialog
 		SelectInput selectInput = new SelectInput(list, null);
 		selectInput.setName(beschreibung);
 		selectInput.setMandatory(true);
+		Object auswahl = SQLUtils.getCfg(getSaveKey(selectInput));
+		for (Object o : list) {
+			if (o.toString().equals(auswahl)) {
+				selectInput.setValue(o);
+			}
+		}
 		return selectInput;
 	}
 
@@ -239,4 +267,8 @@ public class CSVImportConfigDialog extends AbstractDialog
 		return this.error;
 	}
 
+	private String getSaveKey(SelectInput x) {
+			return savename + x.getName().toLowerCase().trim().replace(" ", "");
+	}
+	
 }

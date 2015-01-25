@@ -119,10 +119,10 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 
 		left.addSeparator();
 		for (FeldDefinitionen x : feldDefinitionen) {
-			String saved = SQLUtils.getCfg(getSaveKey(x, "ext"));
-			if (saved == null) {
-				saved = "";
-			}
+//			String saved = SQLUtils.getCfg(getSaveKey(x, "ext"));
+//			if (saved == null) {
+//				saved = "";
+//			}
 			AbstractInput control = new SelectInput(header, SQLUtils.getCfg(getSaveKey(x, "")));
 			String desc = x.getBeschreibung();
 			if (x.isRequired()) {
@@ -184,7 +184,7 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 				}					
 			}
 
-		},null,false,"process-stop.png");
+		},null,false,"document-save.png");
 		right.addButtonArea(buttons);
 		rc = new ReplaceableComposite(right.getComposite(), SWT.None);
 		reload();

@@ -31,7 +31,7 @@ public class CSVImportHelper {
 		}
 		
 		// CSV Daten in ein passendes Format bringen
-		CSVImportConfigDialog dialog = new CSVImportConfigDialog(file);
+		CSVImportConfigDialog dialog = new CSVImportConfigDialog(file, savename);
 		try {
 			dialog.open();
 		} catch (OperationCanceledException e) {
