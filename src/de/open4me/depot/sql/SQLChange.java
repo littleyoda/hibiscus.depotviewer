@@ -205,6 +205,11 @@ public class SQLChange {
 										
 					));
 		}
+		if (currentversion < 17) {
+			liste.add(new SQLChange(17, 
+					"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `aktion` varchar(30) NOT NULL;"));
+		}
+
 //		liste.add(new SQLChange(currentversion,
 //		"truncate table depotviewer_umsaetze;",
 //		"truncate table depotviewer_bestand;",

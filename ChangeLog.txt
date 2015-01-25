@@ -1,3 +1,5 @@
+	Umsatz-Import um Ein- und Ausbuchungen ergänzt
+
 0.3.14 -- 2015-01-19
 	Umsatz-Import: Vorläufig werden nur Käufe und Verkäufe übernommen
 
