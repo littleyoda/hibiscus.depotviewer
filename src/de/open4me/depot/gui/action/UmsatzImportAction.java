@@ -46,7 +46,7 @@ public class UmsatzImportAction implements Action {
 		fd.add(new FeldDefinitionen("Wertpapiername", String.class, "name", true));
 		fd.add(new FeldDefinitionen("ISIN", String.class, "isin", false));
 		fd.add(new FeldDefinitionen("WKN", String.class, "wkn", false));
-		fd.add(new FeldDefinitionen("Transaktionsart", String.class, "aktion", true));
+		fd.add(new FeldDefinitionen("Transaktionsart", DepotAktion.class, "aktion", true));
 		fd.add(new FeldDefinitionen("Anzahl", BigDecimal.class, "anzahl", true));
 		fd.add(new FeldDefinitionen("Einzelkosten", BigDecimalWithCurrency.class, "kurs", false));
 		fd.add(new FeldDefinitionen("Einzelkosten (Währung)", BigDecimal.class, "kursW", false));
@@ -114,9 +114,9 @@ public class UmsatzImportAction implements Action {
 				if (x.getAttribute("kostenW").toString().isEmpty()) {
 					x.setAttribute("kostenW", x.getAttribute("_depotviewer_default_curr")); 
 				}
-				if (x.getAttribute("aktion").toString().equals("Einlieferung")) {
-					x.setAttribute("aktion", "einlage");
-				}
+//				if (x.getAttribute("aktion").toString().equals("Einlieferung")) {
+//					x.setAttribute("aktion", "einlage");
+//				}
 				if (x.getAttribute("kurs").toString().isEmpty()  && !x.getAttribute("kosten").toString().isEmpty()) {
 					BigDecimal d = ((BigDecimal) x.getAttribute("kosten")).divide((BigDecimal) x.getAttribute("anzahl"),5, RoundingMode.HALF_UP);
 					x.setAttribute("kurs", d); 
@@ -165,15 +165,12 @@ public class UmsatzImportAction implements Action {
 					Log.warn("Überspringe Buchung, da sie bereits existiert");
 					continue;
 				}
-				DepotAktion aktion = Utils.checkTransaktionsBezeichnung(x.getAttribute("aktion").toString().toUpperCase()); 
-				if (aktion != null) {
-					Log.error("Aktion " + x.getAttribute("aktion").toString().toUpperCase() + " unbekannt!");
-					// TODO
-					continue;
+				if (x.getAttribute("aktion") == null) {
+					Log.error("Aktion fehlt");
 				}
 				Umsatz p = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
 				p.setKontoid(Integer.parseInt(kontoid));
-				p.setAktion(aktion);
+				p.setAktion((DepotAktion) x.getAttribute("aktion"));
 				p.setBuchungsinformationen("CSV Import");
 				p.setWPid(Utils.getORcreateWKN(x.getAttribute("wkn").toString(), x.getAttribute("isin").toString(), x.getAttribute("name").toString()));
 				p.setAnzahl((BigDecimal) x.getAttribute("anzahl"));
