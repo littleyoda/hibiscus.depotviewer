@@ -10,6 +10,7 @@ import org.kapott.hbci.GV_Result.GVRWPDepotUms.Entry.FinancialInstrument.Transac
 import org.kapott.hbci.structures.TypedValue;
 
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.datenobj.DepotAktion;
 import de.willuhn.jameica.hbci.HBCIProperties;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.rmi.Protokoll;
@@ -127,13 +128,13 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 				String aktion = "";
 				if (t.transaction_indicator == Transaction.INDICATOR_CORPORATE_ACTION 
 						&& t.richtung == Transaction.RICHTUNG_ERHALT) {
-					aktion = "EINLAGE";
+					aktion = DepotAktion.EINLAGE.internal();
 				} else if (t.transaction_indicator == Transaction.INDICATOR_SETTLEMENT_CLEARING 
 						&& t.richtung == Transaction.RICHTUNG_ERHALT) {
-					aktion = "KAUF";
+					aktion = DepotAktion.KAUF.internal();
 				}  else if (t.transaction_indicator == Transaction.INDICATOR_SETTLEMENT_CLEARING 
 						&& t.richtung == Transaction.RICHTUNG_LIEFERUNG) {
-					aktion = "VERKAUF";
+					aktion = DepotAktion.VERKAUF.internal();
 				} else {
 					de.willuhn.logging.Logger.error("Unbekannte Transaktion. Bitte nehmen sie Kontakt zum Author auf.\n"
 							+ t.toString());

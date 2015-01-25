@@ -13,6 +13,7 @@ import org.jfree.util.Log;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.datenobj.DepotAktion;
 import de.open4me.depot.datenobj.rmi.BigDecimalWithCurrency;
 import de.open4me.depot.datenobj.rmi.Umsatz;
 import de.open4me.depot.gui.dialogs.KursAktualisierenDialog;
@@ -124,16 +125,16 @@ public class UmsatzImportAction implements Action {
 					BigDecimal d = ((BigDecimal) x.getAttribute("kurs")).multiply((BigDecimal) x.getAttribute("anzahl"));
 					x.setAttribute("kosten", d); 
 				}
-				String aktion = x.getAttribute("aktion").toString();
-				if (!Utils.checkTransaktionsBezeichnung(aktion.toUpperCase())) {
+				DepotAktion aktion = Utils.checkTransaktionsBezeichnung(x.getAttribute("aktion").toString().toUpperCase());
+				if (aktion == null) {
 					continue;
 //					Logger.error("Fehler beim CSV-Import. Umbekannte Transaktionsart: " + aktion);
 	//				throw new ApplicationException("Fehler beim CSV-Import. Umbekannte Transaktionsart: " + aktion);
 				}
-				if (aktion.toUpperCase().equals("KAUF")) {
+				if (aktion.equals(DepotAktion.KAUF)) {
 					x.setAttribute("kosten", ((BigDecimal) x.getAttribute("kosten")).abs().negate());
 				}
-				if (aktion.toUpperCase().equals("VERKAUF")) {
+				if (aktion.equals(DepotAktion.VERKAUF)) {
 					x.setAttribute("kosten", ((BigDecimal) x.getAttribute("kosten")).abs());
 				}
 				
@@ -164,7 +165,8 @@ public class UmsatzImportAction implements Action {
 					Log.warn("Überspringe Buchung, da sie bereits existiert");
 					continue;
 				}
-				if (!Utils.checkTransaktionsBezeichnung(x.getAttribute("aktion").toString().toUpperCase())) {
+				if (Utils.checkTransaktionsBezeichnung(x.getAttribute("aktion").toString().toUpperCase()) != null) {
+					// TODO
 					continue;
 				}
 				Umsatz p = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);

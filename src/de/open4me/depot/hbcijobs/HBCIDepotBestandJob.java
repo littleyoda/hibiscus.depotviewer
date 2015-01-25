@@ -12,6 +12,7 @@ import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry.Gattung;
 
 import de.open4me.depot.abruf.impl.BasisDepotAbruf;
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.datenobj.DepotAktion;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.hbci.HBCIProperties;
@@ -206,7 +207,7 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 				// Umsatz hinzufügen
 				Utils.addUmsatz(konto.getID(), 
 						"" + wpid,
-						(isKauf) ? "KAUF" : "VERKAUF",
+						(isKauf) ? DepotAktion.KAUF.internal() : DepotAktion.VERKAUF.internal(),
 								"",
 								diff.abs().doubleValue(),
 								((BigDecimal) ref.getAttribute("kurs")).doubleValue(),

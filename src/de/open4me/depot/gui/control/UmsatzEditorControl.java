@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Listener;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.datenobj.DepotAktion;
 import de.open4me.depot.datenobj.rmi.Umsatz;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.GenericObjectSQL;
@@ -89,7 +90,7 @@ public class UmsatzEditorControl extends AbstractControl
 			throw new ApplicationException("Keine Änderungen möglich.\nZugehöriges Konto nicht gefunden!");
 		}
 
-		getAktionAuswahl().setValue(umsatz.getAktion());
+		getAktionAuswahl().setValue(DepotAktion.getByString(umsatz.getAktion()));
 		calc();
 
 	}
@@ -140,7 +141,7 @@ public class UmsatzEditorControl extends AbstractControl
 			}
 			
 			int faktor = -1;
-			if (getAktionAuswahl().getValue().toString().equals("VERKAUF")) {
+			if (getAktionAuswahl().getValue().equals(DepotAktion.VERKAUF)) {
 				faktor = 1;
 			}
 			Double d = faktor * (Double) getKurswert().getValue();
@@ -195,9 +196,9 @@ public class UmsatzEditorControl extends AbstractControl
 		if (aktion != null) {
 			return aktion;
 		}
-		List<String> liste = new ArrayList<String>();
-		liste.add("VERKAUF");
-		liste.add("KAUF");
+		List<DepotAktion> liste = new ArrayList<DepotAktion>();
+		liste.add(DepotAktion.KAUF);
+		liste.add(DepotAktion.VERKAUF);
 		aktion = new SelectInput(liste, null);
 		aktion.setMandatory(true);
 		return aktion;
@@ -227,7 +228,7 @@ public class UmsatzEditorControl extends AbstractControl
 
 	public void handleStore() throws RemoteException, ApplicationException {
 		int faktor = -1;
-		if (getAktionAuswahl().getValue().toString().equals("VERKAUF")) {
+		if (getAktionAuswahl().getValue().equals(DepotAktion.VERKAUF)) {
 			faktor = 1;
 		}
 		if (getEinzelkurs().getValue() == null || getAnzahl().getValue() == null || getDate().getValue() ==null) {
@@ -251,7 +252,7 @@ public class UmsatzEditorControl extends AbstractControl
 		Konto k = (Konto) ((GenericObjectHashMap) getKonto().getValue()).getAttribute("kontoobj");
 		umsatz.setKontoid(Integer.parseInt(k.getID()));
 		umsatz.setWPid(((GenericObjectSQL) getWertpapiere().getValue()).getID());
-		umsatz.setAktion(getAktionAuswahl().getValue().toString());
+		umsatz.setAktion(((DepotAktion) getAktionAuswahl().getValue()).internal());
 		umsatz.setAnzahl(new BigDecimal((Double) getAnzahl().getValue()));
 		umsatz.setKurs(new BigDecimal((Double) getEinzelkurs().getValue()));
 		umsatz.setKosten(new BigDecimal(faktor * (Double) getKurswert().getValue()));

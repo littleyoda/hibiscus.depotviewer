@@ -26,12 +26,6 @@ public class SQLChange {
 	public static List<SQLChange> getChangesSinceVersion(int currentversion) {
 		ArrayList<SQLChange> liste = new ArrayList<SQLChange>();
 
-//			liste.add(new SQLChange(9,
-//				"truncate table depotviewer_umsaetze;",
-//				"truncate table depotviewer_bestand;",
-//				"truncate table depotviewer_wertpapier;",
-//				"truncate table depotviewer_kurse;"
-//				));	
 		if (currentversion < 3) {
 
 			liste.add(new SQLChange(3, 		
@@ -211,6 +205,12 @@ public class SQLChange {
 										
 					));
 		}
+		liste.add(new SQLChange(16,
+		"truncate table depotviewer_umsaetze;",
+		"truncate table depotviewer_bestand;",
+		"truncate table depotviewer_wertpapier;",
+		"truncate table depotviewer_kurse;"
+		));	
 		return liste;
 	}
 

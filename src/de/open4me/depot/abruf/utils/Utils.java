@@ -24,6 +24,7 @@ import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.hbci.DVHBCISynchronizeJobProviderDepotKontoauszug;
 import de.open4me.depot.abruf.impl.DepotAbrufFabrik;
 import de.open4me.depot.abruf.www.DVSynchronizeBackend;
+import de.open4me.depot.datenobj.DepotAktion;
 import de.open4me.depot.datenobj.rmi.Bestand;
 import de.open4me.depot.datenobj.rmi.Umsatz;
 import de.open4me.depot.datenobj.rmi.Wertpapier;
@@ -88,8 +89,8 @@ public class Utils {
 		return Double.parseDouble(s.replace(".", "").replace(",","."));
 	}
 	
-	public static boolean checkTransaktionsBezeichnung(String aktion) {
-		return aktion.equals("KAUF") || aktion.equals("VERKAUF") || aktion.equals("EINLAGE");
+	public static DepotAktion checkTransaktionsBezeichnung(String aktion) {
+		return DepotAktion.getByString(aktion);
 	}
 
 	/**
@@ -120,12 +121,13 @@ public class Utils {
 				Logger.info("Skipping Buchung");
 				return;
 			}
-			if (!checkTransaktionsBezeichnung(aktion.toUpperCase())) {
+			DepotAktion a = checkTransaktionsBezeichnung(aktion.toUpperCase());
+			if (a == null) {
 				Logger.error("Unbekannte Buchungsart" + aktion);
 				return;
 			}
-			if ((aktion.toUpperCase().equals("KAUF") && (kosten >= 0.0f))
-					|| (aktion.toUpperCase().equals("VERKAUF") && (kosten <= 0.0f))) {
+			if ((a.equals(DepotAktion.KAUF) && (kosten >= 0.0f))
+					|| (a.equals(DepotAktion.VERKAUF) && (kosten <= 0.0f))) {
 				throw new ApplicationException("Bei Käufen muss der Gesamtbetrag negativ sein, beim Verkauf positiv. ("
 						+ aktion.toUpperCase() + " " + kosten + ")");
 			}
@@ -142,7 +144,7 @@ public class Utils {
 			// create new project
 			Umsatz p = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
 			p.setKontoid(Integer.parseInt(kontoid));
-			p.setAktion(aktion.toUpperCase());
+			p.setAktion(a.internal());
 			p.setBuchungsinformationen(info);
 			p.setWPid(wpid);
 			p.setAnzahl(new BigDecimal(anzahl));

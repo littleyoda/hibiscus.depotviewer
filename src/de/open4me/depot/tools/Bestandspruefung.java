@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.datenobj.DepotAktion;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.hbci.rmi.Konto;
@@ -152,14 +153,14 @@ public class Bestandspruefung {
 		List<GenericObjectSQL> buchungen = SQLUtils.getResultSet("select * from depotviewer_umsaetze where kontoid = " + konto.getID() + " order by buchungsdatum asc", null, null);
 		for (GenericObjectSQL x : buchungen) {
 			Integer wpid = (Integer) x.getAttribute("wpid");
-			String aktion = (String) x.getAttribute("aktion");
 			BigDecimal transactionanzahl = (BigDecimal) x.getAttribute("anzahl");
 
 			BigDecimal aktuellerBestand = (bestandLautOrder.containsKey(wpid)) ? bestandLautOrder.get(wpid) : new BigDecimal(0);
 
-			if (aktion.equals("KAUF") || aktion.equals("EINLAGE")) {
+			DepotAktion  aktion = DepotAktion.getByString((String) x.getAttribute("aktion"));
+			if (aktion.equals(DepotAktion.KAUF) || aktion.equals(DepotAktion.EINLAGE)) {
 				aktuellerBestand = aktuellerBestand.add(transactionanzahl);
-			} else if (aktion.equals("VERKAUF")) {
+			} else if (aktion.equals(DepotAktion.VERKAUF)) {
 				aktuellerBestand = aktuellerBestand.subtract(transactionanzahl);
 			}
 			bestandLautOrder.put(wpid, aktuellerBestand);

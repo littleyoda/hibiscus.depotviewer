@@ -228,14 +228,9 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 
 	@Override
 	public void store() throws RemoteException, ApplicationException {
-		if (!Utils.checkTransaktionsBezeichnung(getAktion())) {
+		if (Utils.checkTransaktionsBezeichnung(getAktion()) == null) {
 			throw new ApplicationException("Unbekannte Transaktionsart/Buchungsart: " + getAktion());
 		}
-//		if ((aktion.toUpperCase().equals("KAUF") && (kosten >= 0.0f))
-//				|| (aktion.toUpperCase().equals("VERKAUF") && (kosten <= 0.0f))) {
-//			throw new ApplicationException("Bei Käufen muss der Gesamtbetrag negativ sein, beim Verkauf positiv. ("
-//					+ aktion.toUpperCase() + " " + kosten + ")");
-//		}
 		if (getAnzahl().signum() == -1) {
 			throw new ApplicationException("Anzahl muss immer positiv sein.");
 		}
@@ -246,8 +241,6 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 		if (getOrderid() == null) {
 			throw new ApplicationException("Keine OrderID vergeben.");
 		}
-
-		// TODO Auto-generated method stub
 		super.store();
 	}
 

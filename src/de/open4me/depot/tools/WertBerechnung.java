@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.open4me.depot.datenobj.DepotAktion;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
@@ -159,7 +160,7 @@ public class WertBerechnung {
 		int idx;
 		idx = -1;
 		for (int i = 0; i < orders.size(); i++) {
-			if ("VERKAUF".equals(orders.get(i).getAttribute("aktion"))) {
+			if (DepotAktion.VERKAUF.equals(DepotAktion.getByString(orders.get(i).getAttribute("aktion").toString()))) {
 				idx = i;
 				break;
 			}

@@ -22,7 +22,6 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYAnnotation;
 import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.jdbc.JDBCXYDataset;
 import org.jfree.experimental.chart.swt.ChartComposite;
 import org.jfree.ui.Layer;
 
@@ -43,7 +42,7 @@ public class WertpapiereDatenControl {
 
 
 	private JFreeChart chart;
-	private JDBCXYDataset data = null;
+	private de.open4me.depot.jfreechart.SQLXYDataset data = null;
 	private Connection conn;
 	private WertpapiereControl controller;
 	private TabFolderExt folder;
@@ -52,7 +51,50 @@ public class WertpapiereDatenControl {
 	public WertpapiereDatenControl() {
 		try {
 			conn = SQLUtils.getConnection();
-			data = new JDBCXYDataset(conn);
+			data = new de.open4me.depot.jfreechart.SQLXYDataset(conn) {
+
+				@Override
+			    public void executeQuery(String query) throws SQLException, ApplicationException {
+			        super.executeQuery(query);
+			        System.out.println("ItemCount: " + getItemCount());
+			        System.out.println("Seriescount" + getSeriesCount());
+			        for (int i = 0; i < getItemCount(); i++) {
+			        //	ArrayList row = (ArrayList) rows.get(i);
+			        }
+			        	
+	//		        return (Number) row.get(seriesIndex + 1);
+
+			    }
+				
+				@Override
+				public Number getX(int seriesIndex, int itemIndex) {
+					// TODO Auto-generated method stub
+					return super.getX(seriesIndex, itemIndex);
+				}
+
+				@Override
+				public double getXValue(int series, int item) {
+					double x = super.getXValue(series, item);
+					//System.out.println(series + " "  + item + " " + x);
+					// TODO Auto-generated method stub
+					return x;
+				}
+
+				@Override
+				public Number getY(int seriesIndex, int itemIndex) {
+					// TODO Auto-generated method stub
+					return super.getY(seriesIndex, itemIndex);
+				}
+
+				@Override
+				public double getYValue(int series, int item) {
+					double x = super.getYValue(series, item);
+//					System.out.println(series + " "  + item + " " + x);
+					// TODO Auto-generated method stub
+					return x;
+				}
+				
+			};
 		} catch (Exception e) {
 			e.printStackTrace();
 		}	
@@ -86,7 +128,7 @@ public class WertpapiereDatenControl {
 			sql = "select "  + spalten + " from (select distinct kursdatum from depotviewer_kurse where wpid in (" + ids + ") order by 1) as datum\n" + sql;
 			renderer.removeAnnotations();
 			data.executeQuery(sql);
-		} catch (RemoteException | SQLException e) {
+		} catch (RemoteException | SQLException | ApplicationException e) {
 			e.printStackTrace();
 			Logger.error("Fehler beim aktualisieren des Wertpapierdiagrammes", e);
 		}
