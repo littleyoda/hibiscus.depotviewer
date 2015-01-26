@@ -1,3 +1,7 @@
+0.3.16 -- 2015-01-26
+	Bestands-Import für Offline-Deports
+	Verbesserter CSV-Import
+	
 0.3.15 -- 2015-01-25
 	Umsatz-Import um Ein- und Ausbuchungen ergänzt
 
