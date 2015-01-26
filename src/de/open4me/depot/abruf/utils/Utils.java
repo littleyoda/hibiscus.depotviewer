@@ -438,8 +438,12 @@ public class Utils {
 		}
 		return null;
 	}
-	
+
 	public static List<GenericObjectHashMap> getDepotKonten() throws RemoteException, ApplicationException {
+		return getDepotKonten(false);
+	}
+
+	public static List<GenericObjectHashMap> getDepotKonten(boolean onlyoffline) throws RemoteException, ApplicationException {
 		DVHBCISynchronizeJobProviderDepotKontoauszug hbciBackend = new DVHBCISynchronizeJobProviderDepotKontoauszug();
 		DVSynchronizeBackend screenScrapingBackend = new DVSynchronizeBackend();
 		List<GenericObjectHashMap> list = new ArrayList<GenericObjectHashMap>();
@@ -451,6 +455,9 @@ public class Utils {
 				continue;
 			}
 			boolean offline = k.hasFlag(Konto.FLAG_OFFLINE);
+			if (onlyoffline && !offline) {
+				continue;
+			}
 			boolean hbci = (k.getBackendClass() == null || k.getBackendClass().equals(HBCISynchronizeBackend.class.getName())) && hbciBackend.supports(null, k);
 			boolean www = (k.getBackendClass() != null && k.getBackendClass().equals(DVSynchronizeBackend.class.getName())) && screenScrapingBackend.supports(SynchronizeJobKontoauszug.class, k);
 
