@@ -134,6 +134,7 @@ public class CSVImportConfigDialog extends AbstractDialog
 		boolean enable = true;
 		list.clear();
 		header.clear();
+		Integer headerline = ((Integer) getSkipLines().getValue());
 		try
 		{
 			SWTUtil.disposeChildren(this.comp);
@@ -142,10 +143,11 @@ public class CSVImportConfigDialog extends AbstractDialog
 			 BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), Charset.forName((String) getCharset().getValue())));
 			 String line = null;
 			 int counter = 0;
-			 while ((line = br.readLine()) != null && counter < 10) {
+			 while ((line = br.readLine()) != null && counter < 30) {
 				 GenericObjectHashMap g = new GenericObjectHashMap();
 				 g.setAttribute("Dateiinhalt", line);
 						list.add(g);
+				counter++;
 			 }
 			 header.add("Dateiinhalt");
 			 br.close();
@@ -154,26 +156,53 @@ public class CSVImportConfigDialog extends AbstractDialog
 			FileInputStream is = new FileInputStream(file);
 			InputStreamReader isr = new InputStreamReader(is, Charset.forName((String) getCharset().getValue()) );
 			CSVFormat format = CSVFormat.RFC4180
-					.withHeader()
-					.withAllowMissingColumnNames()
 					.withDelimiter(((String) getTrennzeichen().getValue()).charAt(0))
-					.withSkipLines(((Integer) getSkipLines().getValue()) - 1);
+					.withSkipLines(headerline - 1);
 			CSVParser parser = new CSVParser(isr, format);
 			list.clear();
 			boolean iserror = false;
+			boolean isheader = true;
+			header.clear();
 			for(CSVRecord record : parser) {
-				GenericObjectHashMap g = new GenericObjectHashMap(record.toMap());
-				g.setAttribute("_DEPOTVIEWER_IGNORE", "");
-				if (record.size() == 0 || (record.get(0) == null || record.get(0).isEmpty())) {
-					g.setAttribute("_DEPOTVIEWER_IGNORE", "X");
-					iserror = true;
+				if (isheader) {
+					for (int i = 0; i < record.size(); i++) {
+						String name = record.get(i);
+						if (name.isEmpty()) {
+							name = "Namenlos";
+						}
+						String neuername = name;
+						counter = 1;
+						while (header.contains(neuername)) { 
+							neuername = name + " (" + counter + ")";
+							counter++;
+						}
+						header.add(neuername);
+					}
+					isheader = false;
+					continue;
 				}
+				System.out.println(header);
+				GenericObjectHashMap g = new GenericObjectHashMap();
+				g.setAttribute("_DEPOTVIEWER_IGNORE", "");
+				g.setAttribute("_DEPOTVIEWER_IDX", "" + (record.getRecordNumber() + headerline));
+				for (int i = 0; i < header.size(); i++) {
+					if (i >= record.size()) {
+						g.setAttribute("_DEPOTVIEWER_IGNORE", "X");
+						iserror = true;
+						continue;
+					}
+					g.setAttribute(header.get(i), record.get(i));
+					
+				}
+//				if (record.size() == 0 || (record.get(0) == null || record.get(0).isEmpty())) {
+//					g.setAttribute("_DEPOTVIEWER_IGNORE", "X");
+//					iserror = true;
+//				}
 				list.add(g);
 			}
-			header.clear();
-			for (Entry<String, Integer> x: parser.getHeaderMap().entrySet()) {
-				header.add(x.getKey());
-			}
+//			for (Entry<String, Integer> x: parser.getHeaderMap().entrySet()) {
+//				header.add(x.getKey());
+//			}
 			if (iserror) {
 				getError().setValue("Die mit X markierten Zeilen werden ignoriert.");
 			}
@@ -187,6 +216,7 @@ public class CSVImportConfigDialog extends AbstractDialog
 			enable = false;
 		}
 		TablePart tab = new TablePart(list, null);
+		tab.addColumn("" + headerline, "_DEPOTVIEWER_IDX");
 		tab.addColumn("", "_DEPOTVIEWER_IGNORE");
 		for (String h : header) {
 			tab.addColumn(h, h);

@@ -242,7 +242,7 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 				Object sourcedata = source.getAttribute(sourceattr);
 				Class<?> feldtype = entry.getKey().getFeldtype();
 				try {
-//					AbstractInput ec = extendedControls.get(entry.getKey());
+					// TODO Alle Converter auslagern
 					if (feldtype.equals(BigDecimal.class)) {
 						// Converter nutzen
 						FeldConverter fc = (FeldConverter) zahlenFormat.getValue();
@@ -270,12 +270,14 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 						sourcedata = dp.parse(sourcedata.toString());
 					} else if (feldtype.equals(DepotAktion.class)) {
 						sourcedata = DepotAktion.getByString(sourcedata.toString());
+					} else if (feldtype.equals(Currency.class)) {
+							sourcedata = Currency.getInstance(sourcedata.toString());
 					} else if (feldtype.equals(String.class)) {
 						//sourcedata = sourcedata.toString();
 					} else {
 						sourcedata = "FELDTYPE UNBEKANNT!";
 					}
-				} catch (NumberFormatException | ParseException e) {
+				} catch (ParseException | IllegalArgumentException e) {
 					fehler++;
 					sourcedata = "ERROR: " + sourcedata.toString();
 				}

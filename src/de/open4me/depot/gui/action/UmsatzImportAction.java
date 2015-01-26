@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.Date;
 import java.util.List;
 
@@ -49,16 +50,16 @@ public class UmsatzImportAction implements Action {
 		fd.add(new FeldDefinitionen("Transaktionsart", DepotAktion.class, "aktion", true));
 		fd.add(new FeldDefinitionen("Anzahl", BigDecimal.class, "anzahl", true));
 		fd.add(new FeldDefinitionen("Einzelkosten", BigDecimalWithCurrency.class, "kurs", false));
-		fd.add(new FeldDefinitionen("Einzelkosten (Währung)", BigDecimal.class, "kursW", false));
+		fd.add(new FeldDefinitionen("Einzelkosten (Währung)", Currency.class, "kursW", false));
 		
 		fd.add(new FeldDefinitionen("Gesamtkosten (Anzahl x E.kosten)", BigDecimalWithCurrency.class, "kosten", false));
-		fd.add(new FeldDefinitionen("Gesamtkosten (Währung)", BigDecimal.class, "kostenW", false));
+		fd.add(new FeldDefinitionen("Gesamtkosten (Währung)", Currency.class, "kostenW", false));
 		
 		fd.add(new FeldDefinitionen("Steuern", BigDecimalWithCurrency.class, "steuern", false));
-		fd.add(new FeldDefinitionen("Steuern (Währung)", String.class, "steuernW", false));
+		fd.add(new FeldDefinitionen("Steuern (Währung)", Currency.class, "steuernW", false));
 		
 		fd.add(new FeldDefinitionen("Gebühren", BigDecimalWithCurrency.class, "gebuehren", false));
-		fd.add(new FeldDefinitionen("Gebühren (Währung)", String.class, "gebuehrenW", false));
+		fd.add(new FeldDefinitionen("Gebühren (Währung)", Currency.class, "gebuehrenW", false));
 		fd.add(new FeldDefinitionen("Ordernummer", String.class, "orderid", false));
 
 		List<GenericObjectHashMap> daten;
