@@ -45,14 +45,9 @@ public class WertpapiereTableControl
 
 			@Override
 			public void handleEvent(Event event) {
-				if (orderList.getSelection() == null) {
-					return; 
-				}
-				GenericObjectSQL[] d;
-				if (orderList.getSelection() instanceof Object[]) {
-					d = ((GenericObjectSQL[]) orderList.getSelection());
-				} else {
-					d = new GenericObjectSQL[] {(GenericObjectSQL) event.data};
+				GenericObjectSQL[] d = getSelection();
+				if (d == null) {
+					return;
 				}
 				controller.aktualisieren(d);
 
@@ -64,6 +59,19 @@ public class WertpapiereTableControl
 		return orderList;
 	}
 
+	public GenericObjectSQL[] getSelection() {
+		if (orderList.getSelection() == null) {
+			return null; 
+		}
+		GenericObjectSQL[] d;
+		if (orderList.getSelection() instanceof Object[]) {
+			d = ((GenericObjectSQL[]) orderList.getSelection());
+		} else {
+			d = new GenericObjectSQL[] {(GenericObjectSQL) orderList.getSelection()};
+		}
+		return d;
+	}
+	
 	public Composite getWepierControl(Composite comp) throws RemoteException
 	{
 
@@ -78,7 +86,7 @@ public class WertpapiereTableControl
 		ButtonArea buttons = new ButtonArea();
 
 		buttons.addButton(new Button("Hinzufügen", new AddWertpapierAction()));
-		buttons.addButton(new Button("Aktualisieren",new WertpapiereAktualisierenAction(controller, getTable())));
+		buttons.addButton(new Button("Aktualisieren", new WertpapiereAktualisierenAction(getTable())));
 		
 		buttons.paint(rest);
 		return rest;

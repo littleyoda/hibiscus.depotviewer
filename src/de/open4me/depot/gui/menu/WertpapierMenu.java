@@ -31,8 +31,8 @@ public class WertpapierMenu extends ContextMenu
 		addItem(new ContextMenuItem("Wertpapier hinzufügen...", new AddWertpapierAction()));
 		addItem(new CheckedContextMenuItem("Wertpapier bearbeiten...", new ModifyWertpapierAction()));
 		addItem(ContextMenuItem.SEPARATOR);
-		addItem(new ContextMenuItem("Aktualisieren...", new WertpapiereAktualisierenAction(controller, false)));
-		addItem(new ContextMenuItem("Aktualisieren (Einstellungen wählen)...", new WertpapiereAktualisierenAction(controller, true)));
+		addItem(new ContextMenuItem("Aktualisieren...", new WertpapiereAktualisierenAction(false)));
+		addItem(new ContextMenuItem("Aktualisieren (Einstellungen wählen)...", new WertpapiereAktualisierenAction(true)));
 		addItem(ContextMenuItem.SEPARATOR);
 		addMenu(new OpenInBrowserMenu("Webseiten (allgemein)", allgseiten));
 		addMenu(new OpenInBrowserMenu("Webseiten (Fonds)", fondsseiten));
