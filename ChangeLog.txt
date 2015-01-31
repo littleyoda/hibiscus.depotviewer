@@ -1,4 +1,4 @@
-0.3.16 -- 2015-01-31
+0.3.17 -- 2015-01-31
 	Wertpapieraktualisierungen erfolgen im Hintergrund
 	Diverse Bugfixes
 
