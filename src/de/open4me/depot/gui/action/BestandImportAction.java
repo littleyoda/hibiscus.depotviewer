@@ -8,7 +8,6 @@ import java.util.Currency;
 import java.util.Date;
 import java.util.List;
 
-
 import jsq.config.Config;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.datenobj.rmi.BigDecimalWithCurrency;
@@ -132,14 +131,17 @@ public class BestandImportAction implements Action {
 			Utils.clearBestand(konto);
 			for (GenericObjectHashMap x : daten) {
 				// Alle Einträge sind vorläufig und werden bei der Neuberechnung des Offline-Kontos gelöscht
+				Object kursW = x.getAttribute("kursW");
+				Object wertW = x.getAttribute("wertW");
+
 				Utils.addBestand(
 						Utils.getORcreateWKN((String) x.getAttribute("wkn"), (String) x.getAttribute("isin"), (String) x.getAttribute("name")),
 						konto,
 						((BigDecimal) x.getAttribute("anzahl")).doubleValue(),
 						((BigDecimal) x.getAttribute("kurs")).doubleValue(),
-						((Currency) x.getAttribute("kursW")).getCurrencyCode(),
+						handleCurrency(kursW),
 						((BigDecimal) x.getAttribute("wert")).doubleValue(),
-						((Currency) x.getAttribute("wertW")).getCurrencyCode(),
+						handleCurrency(wertW),
 						(Date) x.getAttribute("date"),
 						(Date) x.getAttribute("date"));
 			}
@@ -149,6 +151,13 @@ public class BestandImportAction implements Action {
 		}
 		Application.getMessagingFactory().sendMessage(new StatusBarMessage(Application.getI18n().tr("Import beendet!"),StatusBarMessage.TYPE_INFO));
 
+	}
+
+	private String handleCurrency(Object wert) {
+		if (wert instanceof Currency) {
+			return ((Currency) wert).getCurrencyCode();
+		}
+		return wert.toString();
 	}
 
 	private String askUserForKonto() throws RemoteException, Exception {

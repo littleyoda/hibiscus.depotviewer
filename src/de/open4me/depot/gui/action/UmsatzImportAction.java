@@ -80,7 +80,7 @@ public class UmsatzImportAction implements Action {
 			for (GenericObjectHashMap x : daten) {
 				for (FeldDefinitionen f : fd) {
 					Object value = x.getAttribute(f.getAttr());
-					if (f.isRequired() &&  value.toString().isEmpty()) {
+					if (f.isRequired() && (value == null  || value.toString().isEmpty())) {
 						fehlt += ", " + f.getBeschreibung();
 					}
 					if (value instanceof BigDecimalWithCurrency) {
