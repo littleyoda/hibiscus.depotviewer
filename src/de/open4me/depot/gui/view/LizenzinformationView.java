@@ -1,7 +1,5 @@
 package de.open4me.depot.gui.view;
 
-import java.rmi.RemoteException;
-
 import de.open4me.depot.gui.control.LizenzinformationControl;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.gui.AbstractView;
@@ -22,9 +20,17 @@ public class LizenzinformationView extends AbstractView
 			control.getTextPart().paint(getParent());
 			if ("depotviewerdebug".equals(System.getenv().get("depotviewerdebug"))) {
 				ButtonArea buttons = new ButtonArea();
-				buttons.addButton("Leere Depot Informationen", new Action() {
+				buttons.addButton("Leere alles", new Action() {
 					public void handleAction(Object context) throws ApplicationException {
 						for (String s : new String[] { "truncate table depotviewer_umsaetze;", "truncate table depotviewer_bestand;", "truncate table depotviewer_wertpapier;", "truncate table depotviewer_kurse;" } ) {
+							SQLUtils.exec(s);
+						}
+					}
+
+				},null,true,"ok.png");
+				buttons.addButton("Leere Kursinformationen", new Action() {
+					public void handleAction(Object context) throws ApplicationException {
+						for (String s : new String[] { "truncate table depotviewer_kurse;" } ) {
 							SQLUtils.exec(s);
 						}
 					}
