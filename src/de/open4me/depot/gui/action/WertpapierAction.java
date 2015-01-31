@@ -8,9 +8,9 @@ import de.willuhn.util.ApplicationException;
 public class WertpapierAction implements Action
 {
 
-	 public void handleAction(Object context) throws ApplicationException
-	 {
-	 	GUI.startView(WertpapierView.class.getName(),null);
-	 }
-
+	public void handleAction(Object context) throws ApplicationException
+	{
+		GUI.startView(WertpapierView.class.getName(),null);
 	}
+
+}
