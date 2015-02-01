@@ -28,7 +28,11 @@ public class SQLUtils {
 			HBCIDBServiceImpl db = (HBCIDBServiceImpl) Application.getServiceFactory().lookup(HBCI.class,"database");
 			driver = (AbstractDBSupportImpl) db.getDriver();
 		}
-		return DriverManager.getConnection(driver.getJdbcUrl(), driver.getJdbcUsername(), driver.getJdbcPassword());
+		String url = driver.getJdbcUrl();
+		if (driver instanceof de.willuhn.jameica.hbci.server.DBSupportMySqlImpl) {
+			url += "&useServerPrepStmts=false&rewriteBatchedStatements=true";
+		}
+		return DriverManager.getConnection(url, driver.getJdbcUsername(), driver.getJdbcPassword());
 	}
 
 	public static int delete(GenericObjectSQL obj) {

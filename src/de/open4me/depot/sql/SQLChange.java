@@ -209,6 +209,11 @@ public class SQLChange {
 			liste.add(new SQLChange(17, 
 					"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `aktion` varchar(30) NOT NULL;"));
 		}
+		if (currentversion < 18) {
+			liste.add(new SQLChange(18, 	
+					"create index idxKurseId on depotviewer_kurse(id);"
+					));
+		}
 
 //		liste.add(new SQLChange(currentversion,
 //		"truncate table depotviewer_umsaetze;",

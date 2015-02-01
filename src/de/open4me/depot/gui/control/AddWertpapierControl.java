@@ -10,7 +10,6 @@ import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
-import de.open4me.depot.gui.action.OrderList;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.tools.WertpapierSuche;
 import de.willuhn.jameica.gui.AbstractControl;
@@ -45,7 +44,7 @@ public class AddWertpapierControl  extends AbstractControl {
 			return trefferListe;
 		}
 		
-		trefferListe = new TablePart(getDummy(),new OrderList());
+		trefferListe = new TablePart(getDummy(),null);
 		trefferListe.setSummary(false);
 		trefferListe.addColumn(Settings.i18n().tr("Name"), "Name");
 		trefferListe.addColumn(Settings.i18n().tr("Typ"),"Typ");

@@ -21,7 +21,6 @@ import de.open4me.depot.gui.dialogs.KursAktualisierenDialog;
 import de.open4me.depot.messaging.KursUpdatesMsg;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
-import de.willuhn.jameica.hbci.messaging.ImportMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.BackgroundTask;
 import de.willuhn.util.ApplicationException;
@@ -156,21 +155,27 @@ public class UpdateStock implements BackgroundTask {
 
 	}
 
+	// Speichert die Kursinformationen
 	private static void saveStockData(GenericObjectSQL wertpapier,
 			BaseFetcher base) throws Exception, SQLException, RemoteException,
 			ApplicationException {
-		Connection conn = SQLUtils.getConnection();
+		// Kurse
+		Connection conn = SQLUtils.getConnection();	
 		PreparedStatement del = conn.prepareStatement("delete from depotviewer_kurse where wpid = ? ");
 		del.setString(1, wertpapier.getID());
 		del.executeUpdate();
+
 		PreparedStatement insert = conn.prepareStatement("insert into depotviewer_kurse (wpid, kurs, kursw, kursdatum) values (?,?,?,?)");
 		for (Datacontainer dc : base.getHistQuotes()) {
 			insert.setString(1, wertpapier.getID());
 			insert.setBigDecimal(2, (BigDecimal) dc.data.get("last")); 
 			insert.setString(3, (String) dc.data.get("currency")); 
 			insert.setDate(4,  new java.sql.Date(((Date) dc.data.get("date")).getTime()));
-			insert.executeUpdate();
+			insert.addBatch();
 		}
+		insert.executeBatch();
+
+		// Events
 		del = conn.prepareStatement("delete from depotviewer_kursevent where wpid = ? ");
 		del.setString(1, wertpapier.getID());
 		del.executeUpdate();
@@ -198,9 +203,12 @@ public class UpdateStock implements BackgroundTask {
 				insert.setString(4, action); 
 				insert.setDate(5,  new java.sql.Date(((Date) dc.data.get("date")).getTime()));
 				insert.setString(6, (String) dc.data.get("currency")); 
-				insert.executeUpdate();
+				insert.addBatch();
 			}
+			insert.executeBatch();
 		}
+
+		// PerformanceKurs
 		calcPerformanceKurse(wertpapier, conn);
 		Utils.markRecalc(null);
 	}
@@ -281,8 +289,9 @@ public class UpdateStock implements BackgroundTask {
 			k = k.add(korrektur);
 			update.setBigDecimal(1, k);
 			update.setString(2, kurs.getID());
-			update.executeUpdate();
+			update.addBatch();;
 		}
+		update.executeBatch();
 	}
 
 
