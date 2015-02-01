@@ -128,7 +128,7 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 				String aktion = "";
 				if (t.transaction_indicator == Transaction.INDICATOR_CORPORATE_ACTION 
 						&& t.richtung == Transaction.RICHTUNG_ERHALT) {
-					aktion = DepotAktion.EINLAGE.internal();
+					aktion = DepotAktion.EINBUCHUNG.internal();
 				} else if (t.transaction_indicator == Transaction.INDICATOR_SETTLEMENT_CLEARING 
 						&& t.richtung == Transaction.RICHTUNG_ERHALT) {
 					aktion = DepotAktion.KAUF.internal();

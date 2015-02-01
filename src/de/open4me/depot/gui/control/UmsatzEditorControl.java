@@ -199,7 +199,7 @@ public class UmsatzEditorControl extends AbstractControl
 		List<DepotAktion> liste = new ArrayList<DepotAktion>();
 		liste.add(DepotAktion.KAUF);
 		liste.add(DepotAktion.VERKAUF);
-		liste.add(DepotAktion.EINLAGE);
+		liste.add(DepotAktion.EINBUCHUNG);
 		liste.add(DepotAktion.AUSBUCHUNG);
 		aktion = new SelectInput(liste, null);
 		aktion.setMandatory(true);

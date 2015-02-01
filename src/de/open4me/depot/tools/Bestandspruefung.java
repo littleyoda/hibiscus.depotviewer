@@ -158,9 +158,9 @@ public class Bestandspruefung {
 			BigDecimal aktuellerBestand = (bestandLautOrder.containsKey(wpid)) ? bestandLautOrder.get(wpid) : new BigDecimal(0);
 
 			DepotAktion  aktion = DepotAktion.getByString((String) x.getAttribute("aktion"));
-			if (aktion.equals(DepotAktion.KAUF) || aktion.equals(DepotAktion.EINLAGE)) {
+			if (aktion.equals(DepotAktion.KAUF) || aktion.equals(DepotAktion.EINBUCHUNG)) {
 				aktuellerBestand = aktuellerBestand.add(transactionanzahl);
-			} else if (aktion.equals(DepotAktion.VERKAUF)) {
+			} else if (aktion.equals(DepotAktion.VERKAUF) || aktion.equals(DepotAktion.AUSBUCHUNG)) {
 				aktuellerBestand = aktuellerBestand.subtract(transactionanzahl);
 			}
 			bestandLautOrder.put(wpid, aktuellerBestand);
