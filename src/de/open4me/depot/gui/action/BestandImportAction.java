@@ -133,7 +133,7 @@ public class BestandImportAction implements Action {
 				// Alle Einträge sind vorläufig und werden bei der Neuberechnung des Offline-Kontos gelöscht
 				Object kursW = x.getAttribute("kursW");
 				Object wertW = x.getAttribute("wertW");
-
+				System.out.println(x);
 				Utils.addBestand(
 						Utils.getORcreateWKN((String) x.getAttribute("wkn"), (String) x.getAttribute("isin"), (String) x.getAttribute("name")),
 						konto,

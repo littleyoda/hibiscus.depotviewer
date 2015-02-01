@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -181,7 +180,6 @@ public class CSVImportConfigDialog extends AbstractDialog
 					isheader = false;
 					continue;
 				}
-				System.out.println(header);
 				GenericObjectHashMap g = new GenericObjectHashMap();
 				g.setAttribute("_DEPOTVIEWER_IGNORE", "");
 				g.setAttribute("_DEPOTVIEWER_IDX", "" + (record.getRecordNumber() + headerline));
@@ -194,15 +192,8 @@ public class CSVImportConfigDialog extends AbstractDialog
 					g.setAttribute(header.get(i), record.get(i));
 					
 				}
-//				if (record.size() == 0 || (record.get(0) == null || record.get(0).isEmpty())) {
-//					g.setAttribute("_DEPOTVIEWER_IGNORE", "X");
-//					iserror = true;
-//				}
 				list.add(g);
 			}
-//			for (Entry<String, Integer> x: parser.getHeaderMap().entrySet()) {
-//				header.add(x.getKey());
-//			}
 			if (iserror) {
 				getError().setValue("Die mit X markierten Zeilen werden ignoriert.");
 			}

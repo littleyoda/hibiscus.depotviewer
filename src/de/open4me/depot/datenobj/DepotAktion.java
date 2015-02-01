@@ -1,8 +1,6 @@
 package de.open4me.depot.datenobj;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.jfree.util.Log;
 
@@ -31,8 +29,8 @@ public class DepotAktion {
 
 	static private HashMap<String, DepotAktion> all = new HashMap<String, DepotAktion>();
 	
-	static public final DepotAktion EINLAGE = new DepotAktion("Einlieferung", "EINLIEFERUNG","EINBUCHUNG",  "EINLAGE");
-	static public final DepotAktion AUSBUCHUNG = new DepotAktion("Auslieferungen", "AUSLIEFERUNGEN", "AUSBUCHUNG");
+	static public final DepotAktion EINLAGE = new DepotAktion("Einlieferung", "EINLIEFERUNG","EINLIEFERUNGEN", "EINBUCHUNG",  "EINLAGE");
+	static public final DepotAktion AUSBUCHUNG = new DepotAktion("Auslieferungen", "AUSLIEFERUNG", "AUSLIEFERUNGEN", "AUSBUCHUNG");
 	static public final DepotAktion VERKAUF = new DepotAktion("Verkauf", "VERKAUF");
 	static public final DepotAktion KAUF = new DepotAktion("Kauf", "KAUF");
 	

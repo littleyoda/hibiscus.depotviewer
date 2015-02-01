@@ -115,9 +115,9 @@ public class UmsatzImportAction implements Action {
 				if (x.getAttribute("kostenW").toString().isEmpty()) {
 					x.setAttribute("kostenW", x.getAttribute("_depotviewer_default_curr")); 
 				}
-//				if (x.getAttribute("aktion").toString().equals("Einlieferung")) {
-//					x.setAttribute("aktion", "einlage");
-//				}
+				if (((BigDecimal) x.getAttribute("anzahl")).signum() == -1) {
+					x.setAttribute("anzahl", ((BigDecimal) x.getAttribute("anzahl")).abs()); 
+				}
 				if (x.getAttribute("kurs").toString().isEmpty()  && !x.getAttribute("kosten").toString().isEmpty()) {
 					BigDecimal d = ((BigDecimal) x.getAttribute("kosten")).divide((BigDecimal) x.getAttribute("anzahl"),5, RoundingMode.HALF_UP);
 					x.setAttribute("kurs", d); 
@@ -127,11 +127,6 @@ public class UmsatzImportAction implements Action {
 					x.setAttribute("kosten", d); 
 				}
 				DepotAktion aktion = Utils.checkTransaktionsBezeichnung(x.getAttribute("aktion").toString().toUpperCase());
-				if (aktion == null) {
-					continue;
-//					Logger.error("Fehler beim CSV-Import. Umbekannte Transaktionsart: " + aktion);
-	//				throw new ApplicationException("Fehler beim CSV-Import. Umbekannte Transaktionsart: " + aktion);
-				}
 				if (aktion.equals(DepotAktion.KAUF)) {
 					x.setAttribute("kosten", ((BigDecimal) x.getAttribute("kosten")).abs().negate());
 				}

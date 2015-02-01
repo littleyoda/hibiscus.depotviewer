@@ -269,7 +269,11 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 						// Sourcedaten entsprechend parsen
 						sourcedata = dp.parse(sourcedata.toString());
 					} else if (feldtype.equals(DepotAktion.class)) {
-						sourcedata = DepotAktion.getByString(sourcedata.toString());
+						DepotAktion da = DepotAktion.getByString(sourcedata.toString());
+						if (da == null) {
+							throw new IllegalArgumentException();
+						}
+						sourcedata = da;
 					} else if (feldtype.equals(Currency.class)) {
 							sourcedata = Currency.getInstance(sourcedata.toString());
 					} else if (feldtype.equals(String.class)) {
