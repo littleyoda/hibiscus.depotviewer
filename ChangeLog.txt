@@ -1,3 +1,4 @@
+	Default Einstellungen für CSV Import geändert (fixed #39)
 	Korrekte Behandlung von Auslieferungen im Bestand (fixed #38)
 
 0.3.18 -- 2015-02-01

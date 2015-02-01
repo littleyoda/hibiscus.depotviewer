@@ -36,6 +36,7 @@ import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
+@SuppressWarnings("rawtypes")
 public class CSVImportConfigDialog extends AbstractDialog
 {	  
 	private SelectInput charset;
@@ -223,7 +224,7 @@ public class CSVImportConfigDialog extends AbstractDialog
 	private SelectInput getCharset() {
 		if (charset == null) {
 			charset = getSelectInput("Charset", Arrays.asList( 
-					new String[] { "ISO-8859-1", "ISO-8859-15", "WINDOWS-1252", "US-ASCII", "UTF-8", "UTF-16BE", "UTF-16LE", "UTF-16" }));
+					new String[] { "WINDOWS-1252", "ISO-8859-1", "ISO-8859-15", "US-ASCII", "UTF-8", "UTF-16BE", "UTF-16LE", "UTF-16" }));
 		}
 		return charset;
 
@@ -232,7 +233,7 @@ public class CSVImportConfigDialog extends AbstractDialog
 	private SelectInput getTrennzeichen() {
 		if (trennzeichen == null) {
 			trennzeichen = getSelectInput("Trennzeichen", Arrays.asList( 
-					new String[] { ",", ";", "|", "\t" }));
+					new String[] { ";", ",", "|", "\t" }));
 		}
 		return trennzeichen;
 	}
