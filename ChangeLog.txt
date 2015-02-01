@@ -1,3 +1,4 @@
+0.3.18 -- 2015-02-01
 	Performance-Verbesserung im Zusammenhang mit Mysql (fixes #41)
 	Import Umsätzen: Bessere Rückmeldung bei unbekannten Aktionen 
 
