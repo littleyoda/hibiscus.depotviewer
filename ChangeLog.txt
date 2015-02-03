@@ -1,3 +1,5 @@
+	Performancekurse: Fehlerhafte Berechnung bei Kursevents in der Zukunft
+
 0.3.19 -- 2015-02-03
 	Default Einstellungen für CSV Import geändert (fixed #39)
 	Korrekte Behandlung von Auslieferungen im Bestand (fixed #38)

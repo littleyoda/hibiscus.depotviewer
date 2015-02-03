@@ -249,11 +249,18 @@ public class UpdateStock implements BackgroundTask {
 	}
 
 	private static void calcPerformanceKurse(GenericObjectSQL wertpapier,
-			Connection conn) throws SQLException, RemoteException {
+			Connection conn) throws Exception {
 		// Performance Kurs berechnen
 		PreparedStatement update = conn.prepareStatement("update depotviewer_kurse set kursperf = ? where id = ?");
 		List<GenericObjectSQL> kurse = SQLUtils.getResultSet("select *   from depotviewer_kurse where wpid = " + wertpapier.getID() + " order by kursdatum desc", "", "id");
-		List<GenericObjectSQL> kursevt = SQLUtils.getResultSet("select *  from depotviewer_kursevent where wpid = " + wertpapier.getID() + " order by datum desc", "", "id");
+		Date lastKurs = null;
+		if (kurse.size() > 0) {
+			lastKurs = (Date) kurse.get(0).getAttribute("kursdatum");
+		}
+		PreparedStatement queryKursEvet = SQLUtils.getPreparedSQL("select *  from depotviewer_kursevent where wpid = ? and datum <= ? order by datum desc");
+		queryKursEvet.setString(1, wertpapier.getID());
+		queryKursEvet.setDate(2, SQLUtils.getSQLDate(lastKurs));
+		List<GenericObjectSQL> kursevt = SQLUtils.getResultSet(queryKursEvet, "depotviewer_kursevent", "", "id");
 		int kurseEvtIdx = 0;
 		GenericObjectSQL currentEvt = null;
 		if (kursevt.size() > 0 ) {
@@ -262,7 +269,6 @@ public class UpdateStock implements BackgroundTask {
 		BigDecimal korrektur = new BigDecimal("0.0000");
 		BigDecimal faktor = new BigDecimal("1.0000");
 		for (GenericObjectSQL kurs : kurse) {
-
 			if (kurseEvtIdx < kursevt.size()) {
 				Date kursdatum = (Date) kurs.getAttribute("kursdatum");
 				Date evtdatum = (Date) currentEvt.getAttribute("datum");
