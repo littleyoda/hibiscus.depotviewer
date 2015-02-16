@@ -1,3 +1,4 @@
+0.3.20 -- 2015-02-16
 	Performancekurse: Fehlerhafte Berechnung bei Kursevents in der Zukunft
 
 0.3.19 -- 2015-02-03
