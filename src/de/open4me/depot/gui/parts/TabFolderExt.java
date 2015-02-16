@@ -20,7 +20,9 @@ public class TabFolderExt extends TabFolder {
 			public void widgetSelected(SelectionEvent e) {
 				String name = getSelection()[0].getText(); 
 				TabGroupExt tab = tabs.get(name);
-				tab.active();
+				if (tab != null) {
+					tab.active();
+				}
 			}
 
 			@Override
