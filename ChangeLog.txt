@@ -1,3 +1,7 @@
+0.3.22 -- 2015-06-07
+0.3.22 -- 2015-06-07
+	Work-a-round für ein Problem mit Consors
+
 0.3.20 -- 2015-02-16
 	Performancekurse: Fehlerhafte Berechnung bei Kursevents in der Zukunft
 
