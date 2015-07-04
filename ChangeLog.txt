@@ -1,4 +1,7 @@
-0.3.22 -- 2015-06-07
+0.3.23 -- 2015-07-04
+0.3.23 -- 2015-07-04
+	Anpassungen für die Fonds Depotbank
+
 0.3.22 -- 2015-06-07
 	Work-a-round für ein Problem mit Consors
 
