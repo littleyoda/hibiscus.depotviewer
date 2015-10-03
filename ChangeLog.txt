@@ -1,3 +1,6 @@
+0.3.24 -- 2015-10-03
+	Anpassung for Cortalconsors
+
 0.3.23 -- 2015-07-04
 0.3.23 -- 2015-07-04
 	Anpassungen für die Fonds Depotbank
