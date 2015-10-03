@@ -15,7 +15,7 @@ public class DepotAktion {
 		this.name = name;
 		all.put(internal, this);
 		for (String s : alternativeSchreibweisen) {
-			all.put(s, this);
+			all.put(s.toUpperCase(), this);
 		}
 	}
 	
@@ -31,8 +31,8 @@ public class DepotAktion {
 	
 	static public final DepotAktion EINBUCHUNG = new DepotAktion("Einlieferung", "EINLIEFERUNG","EINLIEFERUNGEN", "EINBUCHUNG",  "EINLAGE");
 	static public final DepotAktion AUSBUCHUNG = new DepotAktion("Auslieferungen", "AUSLIEFERUNG", "AUSLIEFERUNGEN", "AUSBUCHUNG");
-	static public final DepotAktion VERKAUF = new DepotAktion("Verkauf", "VERKAUF");
-	static public final DepotAktion KAUF = new DepotAktion("Kauf", "KAUF");
+	static public final DepotAktion VERKAUF = new DepotAktion("Verkauf", "VERKAUF", "GESAMTVERKAUF BESTAND", "Verkauf Betrag");
+	static public final DepotAktion KAUF = new DepotAktion("Kauf", "KAUF", "Kauf Betrag");
 	
 	public static DepotAktion getByString(String s) {
 		DepotAktion x = all.get(s.toUpperCase());

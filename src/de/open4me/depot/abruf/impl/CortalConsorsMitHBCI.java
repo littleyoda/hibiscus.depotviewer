@@ -1,8 +1,5 @@
 package de.open4me.depot.abruf.impl;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -12,20 +9,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
+import org.jfree.util.Log;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.ThreadedRefreshHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlTable;
-import com.gargoylesoftware.htmlunit.util.NameValuePair;
 
 import de.open4me.depot.DepotViewerPlugin;
 import de.open4me.depot.abruf.utils.HtmlUtils;
@@ -86,24 +81,19 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 
 
 			// Viel Ajax auf der Webseite, mit dem HTMLUnit nicht zu recht kommt.
-			// Also brauchen wir uns den Login-Request selber zusammen
 			HtmlPage page = webClient.getPage("https://www.consorsbank.de/ev/System/Login?showEVLoginForm=true");
 			seiten.add(page.asXml());
-			WebRequest requestSettings = new WebRequest(new URL("https://www.consorsbank.de/euroWebDe/-?$part=login.json&$event=login"), HttpMethod.POST);
-			requestSettings.setRequestParameters(new ArrayList<NameValuePair>());
-			requestSettings.getRequestParameters().add(new NameValuePair("userId", username));
-			requestSettings.getRequestParameters().add(new NameValuePair("nip", password));
-			requestSettings.getRequestParameters().add(new NameValuePair("sender", ""));
-			requestSettings.getRequestParameters().add(new NameValuePair("referer", ""));
-			requestSettings.setAdditionalHeader("Referer", "https://www.consorsbank.de/ev/System/Login?showEVLoginForm=true");
-			requestSettings.setAdditionalHeader("X-Requested-With", "XMLHttpRequest");
-			requestSettings.setAdditionalHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-			com.gargoylesoftware.htmlunit.UnexpectedPage p = webClient.getPage(requestSettings);
-			StringWriter writer = new StringWriter();
-			IOUtils.copy(p.getInputStream(), writer, Charset.forName("UTF-8"));
-			// TODO Json Antwort prüfen
-			seiten.add(writer.toString());
-
+			String url = getLoginUrl(page);
+			
+			//
+			page = webClient.getPage(url);
+			seiten.add(page.asXml());
+			
+			// Login
+			((HtmlInput) page.getElementById("username")).setValueAttribute(username);
+			((HtmlInput) page.getElementById("passwort")).setValueAttribute(username);
+			page = ((HtmlInput) page.getByXPath("//input[@value='Einloggen']").get(0)).click();
+			seiten.add(page.asXml());
 
 
 			// Und die Orderübersicht hart reincodieren.
@@ -126,7 +116,10 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 				HtmlUtils.tabUntereinander2hash(infos, (HtmlTable) list.get(1), 0, 1); // Spalte 1 und 2
 				HtmlUtils.tabUntereinander2hash(infos, (HtmlTable) list.get(1), 3, 4); // Spalte 4 und 5; Spalte 3 ist leer
 				HtmlUtils.tabNebeneinander2hash(infos, (HtmlTable) list.get(2));
-				System.out.println(infos.entrySet());
+				if (!infos.containsKey("kurs")) {
+					missingOrderDate = true;
+					continue;
+				}
 				String[] kurs = ((String) infos.get("kurs")).replaceAll("  *", " ").split(" ");
 				if (!infos.containsKey("zeitpunkt der abrechnung")) {
 					missingOrderDate = true;
@@ -135,8 +128,6 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 				Date d;
 				try {
 					d = df.parse(infos.get("zeitpunkt der abrechnung").substring(0,10));
-
-					//						d = df.parse(infos.get("zeitpunkt der abrechnung").substring(0,10));
 				} catch (ParseException e) {
 					throw new ApplicationException("Unbekanntes Datumsformat beim Abrechnungszeitpunkt: " + infos.get("zeitpunkt der abrechnung"));
 				}
@@ -156,7 +147,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 			}
 
 			if (missingOrderDate) {
-				throw new ApplicationException("Nicht alle Order konnten übernommen werden, da das Orderdatum fehlt");
+				Log.error("Nicht alle Order konnten übernommen werden, da das Orderdatum oder der Kurs fehlt.");
 			}
 
 
@@ -171,6 +162,20 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 			}
 		}
 
+	}
+
+	private String getLoginUrl(HtmlPage page) throws ApplicationException {
+		// Das parsen der Seite scheitert. Also manuell im Text suchen :-(
+		String url = "";
+		for (String s : page.asXml().split("\n")) {
+			if (s.contains("gallery.authentication.modals.Login")) {
+				url = "https://www.consorsbank.de" + s.replace("  href=\"", "").replace("\"", "");
+			}
+		}
+		if (url.isEmpty()) {
+			throw new ApplicationException("Login-Link nicht gefunden");
+		}
+		return url;
 	}
 
 

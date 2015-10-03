@@ -6,6 +6,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Part;
 import de.willuhn.jameica.gui.util.SWTUtil;
 
@@ -42,5 +43,18 @@ public class ReplaceableComposite extends Composite {
 //			e.printStackTrace();
 //		}
 //		layout(true);
+	}
+
+	public void replace(AbstractView rv) {
+		SWTUtil.disposeChildren(this);
+		setLayoutData(new GridData(GridData.FILL_BOTH));
+		setLayout(new GridLayout());
+		rv.setParent(this);
+		try {
+			rv.bind();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		layout(true);
 	}
 }

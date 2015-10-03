@@ -123,7 +123,7 @@ public class Utils {
 			}
 			DepotAktion a = checkTransaktionsBezeichnung(aktion.toUpperCase());
 			if (a == null) {
-				Logger.error("Unbekannte Buchungsart" + aktion);
+				Logger.error("Unbekannte Buchungsart: " + aktion);
 				return;
 			}
 			if ((a.equals(DepotAktion.KAUF) && (kosten >= 0.0f))
@@ -131,12 +131,12 @@ public class Utils {
 				throw new ApplicationException("Bei Käufen muss der Gesamtbetrag negativ sein, beim Verkauf positiv. ("
 						+ aktion.toUpperCase() + " " + kosten + ")");
 			}
-			if (anzahl < 0.0f) {
-				throw new ApplicationException("Anzahl muss immer positiv sein.");
-			}
-			if (kurs <  0.0f) {
-				throw new ApplicationException("Der Kurs muss immer positiv sein.");
-			}
+//			if (anzahl < 0.0f) {
+//				throw new ApplicationException("Anzahl muss immer positiv sein.");
+//			}
+//			if (kurs <  0.0f) {
+//				throw new ApplicationException("Der Kurs muss immer positiv sein.");
+//			}
 			if (orderid == null) {
 				orderid = "" + ("" + kontoid + wpid + aktion + date + anzahl + kurs + kursW).hashCode(); 
 			}
@@ -379,25 +379,6 @@ public class Utils {
 		}
 		return wpid;
 	}
-
-
-	//	public static List<Konto> getDepotKonten() throws RemoteException, ApplicationException {
-	//		DVHBCISynchronizeJobProviderDepotKontoauszug j = new DVHBCISynchronizeJobProviderDepotKontoauszug();
-	//		List<Konto> list = new ArrayList<Konto>();
-	//		DBIterator liste = Settings.getDBService().createList(Konto.class);
-	//		while (liste.hasNext()) {
-	//			Konto k = (Konto) liste.next();
-	//			if (DepotAbrufFabrik.getDepotAbruf(k) != null) {
-	//				list.add(k);
-	//			} else {
-	//				if (j.supports(null, k)) {
-	//					list.add(k);
-	//				}
-	//				
-	//			}
-	//		}
-	//		return list;
-	//	}
 
 
 	// Die vom Job-Provider unterstuetzten Konto-Arten
