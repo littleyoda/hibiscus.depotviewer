@@ -17,6 +17,7 @@ import de.open4me.depot.DepotViewerPlugin;
 import de.open4me.depot.abruf.utils.Utils;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
@@ -28,7 +29,7 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 			"set getbyid(\"Form2073790314_1_j_username\") to value \"${user}\"", 
 			"set getbyid(\"Form2073790314_1_j_password\") to value \"${pwd}\"", 
 			"click getbyxpath(\"//button[contains(@class,'evt-login')]\")",
-			"assertExists \"Login nicht möglich. Zugangsdaten falsch?\" getbyxpath(\"//p[starts-with(.,'Zeit bis zur Abmeldung: ')]\")" + 
+			"assertExists \"Login nicht möglich. Zugangsdaten falsch?\" getbyxpath(\"//p[contains(.,'Zeit bis zur Abmeldung: ')]\")" + 
 			"", 
 			"#Main Page", 
 			"open \"https://finanzportal.fondsdepotbank.de/fdb/abaxx-?$part=Home.content.Welcome\"",
@@ -91,7 +92,8 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new ApplicationException("Fehler beim Abruf der Daten", e);
+			throw new ApplicationException("Fehler beim Abruf der Daten\n" 
+					+ e.getMessage(), e);
 		}
 	}
 
@@ -138,10 +140,17 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 			String[] wertpapier = buchung.get("wertpapier").split(" / ");
 			String id = Utils.getORcreateWKN(wertpapier[1], wertpapier[0], wertpapier[2]);
 			Date d;
+			if (buchung.get("ausführung") == null) {
+				continue; // erstmal nicht behandeln
+			}
 			try {
 				d = df.parse(buchung.get("ausführung"));
 			} catch (ParseException e) {
-				throw new ApplicationException("Unbekanntes Datumsformat: " + buchung.get("Ausführung"));	
+				Logger.error("Aktuelle Zeile: " + buchungen.toString());
+				throw new ApplicationException("Unbekanntes Datumsformat: [" + buchung.get("Ausführung") + "] " + buchungen.toString());	
+			} catch (NullPointerException e) {
+				Logger.error("Aktuelle Zeile: " + buchungen.toString());
+				throw new ApplicationException("Unbekanntes Datumsformat: [" + buchung.get("Ausführung") + "] " + buchungen.toString());	
 			}
 			if (buchung.get("geschäftsart").equals("Erträgnis")) {
 				continue;
