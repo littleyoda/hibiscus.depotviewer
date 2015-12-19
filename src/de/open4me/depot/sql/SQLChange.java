@@ -25,7 +25,6 @@ public class SQLChange {
 
 	public static List<SQLChange> getChangesSinceVersion(int currentversion) {
 		ArrayList<SQLChange> liste = new ArrayList<SQLChange>();
-
 		if (currentversion < 3) {
 
 			liste.add(new SQLChange(3, 		
