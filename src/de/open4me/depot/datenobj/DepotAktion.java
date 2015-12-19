@@ -31,8 +31,8 @@ public class DepotAktion {
 	
 	static public final DepotAktion EINBUCHUNG = new DepotAktion("Einlieferung", "EINLIEFERUNG","EINLIEFERUNGEN", "EINBUCHUNG",  "EINLAGE");
 	static public final DepotAktion AUSBUCHUNG = new DepotAktion("Auslieferungen", "AUSLIEFERUNG", "AUSLIEFERUNGEN", "AUSBUCHUNG");
-	static public final DepotAktion VERKAUF = new DepotAktion("Verkauf", "VERKAUF", "GESAMTVERKAUF BESTAND", "Verkauf Betrag");
-	static public final DepotAktion KAUF = new DepotAktion("Kauf", "KAUF", "Kauf Betrag");
+	static public final DepotAktion VERKAUF = new DepotAktion("Verkauf", "VERKAUF", "GESAMTVERKAUF BESTAND", "Verkauf Betrag", "S");
+	static public final DepotAktion KAUF = new DepotAktion("Kauf", "KAUF", "Kauf Betrag", "B");
 	
 	public static DepotAktion getByString(String s) {
 		DepotAktion x = all.get(s.toUpperCase());

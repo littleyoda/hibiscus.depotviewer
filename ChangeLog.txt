@@ -1,3 +1,5 @@
+Komplette Überarbeitung des Consorsbank-Zugang.
+
 0.3.25 -- 2015-11-18
 Übereinstimmungen in Binärdatei plugin.xml. -- 2015-11-18
 	Anpassungen für die Fonds-Depotbank

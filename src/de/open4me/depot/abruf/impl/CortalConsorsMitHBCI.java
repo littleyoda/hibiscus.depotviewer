@@ -1,39 +1,42 @@
 package de.open4me.depot.abruf.impl;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.rmi.RemoteException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.jfree.util.Log;
+import org.apache.commons.io.IOUtils;
 
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
-import com.gargoylesoftware.htmlunit.ThreadedRefreshHandler;
+import com.gargoylesoftware.htmlunit.HttpMethod;
+import com.gargoylesoftware.htmlunit.UnexpectedPage;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlInput;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlTable;
+import com.gargoylesoftware.htmlunit.WebRequest;
+import com.jayway.jsonpath.JsonPath;
 
-import de.open4me.depot.DepotViewerPlugin;
-import de.open4me.depot.abruf.utils.HtmlUtils;
-import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.gui.dialogs.DebugDialogWithTextarea;
+import de.willuhn.jameica.hbci.gui.dialogs.DebugDialog;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
-import de.willuhn.util.I18N;
+
+/***
+ * Genutzt wird hierbei die Schnittstelle, welche auch die Consorsbank-APP nutzt.
+ * Leider gibt es keine Dokumentation für diese Schnittstelle.
+ * Informationen muss man sich selber zusammenreihmen, indem man die Kommunikation zwischen der APP und dem Server belauscht. 
+ * 
+ * @author sven
+ *
+ */
 
 public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 
-	private final static I18N i18n = Application.getPluginLoader().getPlugin(DepotViewerPlugin.class).getResources().getI18N();
+	//	private final static I18N i18n = Application.getPluginLoader().getPlugin(DepotViewerPlugin.class).getResources().getI18N();
 	final static String PROP_KUNDENNUMMER = "Kontonummer / UserID (Webseite)";
 	final static String PROP_PASSWORD = "PIN / Passwort (Webseite)";
 
@@ -52,21 +55,18 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 
 	@SuppressWarnings("unchecked")
 	public void runUmsaetze(Konto konto) throws ApplicationException {
-		String kontonummer = null;
+		List<String> fehlerhafteOrder = new ArrayList<String>();
+		String depotnummer = null;
 		try {
-			kontonummer = konto.getKontonummer();
+			depotnummer = konto.getKontonummer();
 		} catch (RemoteException e2) {
 			throw new ApplicationException("Kontonummer nicht gefunden", e2);
 		}
 		ArrayList<String> seiten = new ArrayList<String>(); 
-		final WebClient webClient = new WebClient();
-		webClient.setCssErrorHandler(new SilentCssErrorHandler());
-		webClient.setRefreshHandler(new ThreadedRefreshHandler());
-		webClient.getOptions().setJavaScriptEnabled(false);
 		try {
 			String username = konto.getMeta(PROP_KUNDENNUMMER, null);
 			if (username == null || username.length() == 0) {
-				throw new ApplicationException(i18n.tr("Bitte geben ihre Kundenummer in den Synchronisationsoptionen ein"));
+				throw new ApplicationException("Bitte geben ihre Kundenummer in den Synchronisationsoptionen ein");
 			}
 			String password = konto.getMeta(PROP_PASSWORD, null);
 
@@ -80,113 +80,65 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 			}
 
 
-			// Viel Ajax auf der Webseite, mit dem HTMLUnit nicht zu recht kommt.
-			HtmlPage page = webClient.getPage("https://www.consorsbank.de/ev/System/Login?showEVLoginForm=true");
-			seiten.add(page.asXml());
-			String url = getLoginUrl(page);
-			
-			//
-			page = webClient.getPage(url);
-			seiten.add(page.asXml());
-			
-			// Login
-			((HtmlInput) page.getElementById("username")).setValueAttribute(username);
-			((HtmlInput) page.getElementById("passwort")).setValueAttribute(username);
-			page = ((HtmlInput) page.getByXPath("//input[@value='Einloggen']").get(0)).click();
-			seiten.add(page.asXml());
+			final WebClient webClient = new WebClient();
+			String url = "https://webservices.consorsbank.de/WebServicesDe/services/restful/login";
+
+			// Login und "sessionID" speichern
+			// TODO Password und Username entsprechend escapen
+			String request = "{\"1\":{\"2\":\"" + password + "\",\"3\":\"" + username + "\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCLogin\",\"3\":\"\",\"4\":\"1\"}}}";
+			String json = getRequest(webClient, url, request);
+			String sessionID = JsonPath.parse(json).read("$.2.0.3");
+
+			// Request: Alle Order
+			String allordersRequest = "{\"6\":{\"1\":\"" + depotnummer + "\",\"600\":{\"2\":\"30\",\"3\":\"orderNo DESC\",\"1\":\"1\",\"0\":\"Order\"},\"601\":\"Q\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCOrderAllInquiry\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
+			json = getRequest(webClient, "https://webservices.consorsbank.de/WebServicesDe/services/restful/getAllOrders", allordersRequest);
 
 
-			// Und die Orderübersicht hart reincodieren.
-			page = webClient.getPage("https://www.consorsbank.de/euroWebDe/-?$part=MonalisaDE.Desks.InvestmentAccounts.Desks.OrderInfo.content.orderInfo.main.accountTabs&$event=selectAccountViaRequestParam&accountno=" + kontonummer);
-			seiten.add(page.asXml());
-			HashMap<String, String> infos = new HashMap<String, String>();
-			DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-			boolean missingOrderDate = false;
-			for (HtmlAnchor x : page.getAnchors()) {
-				if (!x.getAttribute("href").contains("event=details&orderInfoPageNumber=1&orderno=")) {
-					continue;
+			// Für alle Order, die Detailinformationen requesten und Umsatz-Eintrag generieren
+			List<Map<String, Object>> orders = JsonPath.parse(json).read("$.7.2", List.class);
+			for (Map<String, Object> orderinfo : orders) {
+				String orderRequest = "{\"101\":{\"1\":\"" + depotnummer + "\",\"2\":\"" + orderinfo.get("4").toString() + "\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCOrderDetailInquiry\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
+				String order = getRequest(webClient, "https://webservices.consorsbank.de/WebServicesDe/services/restful/getOrderDetail", orderRequest);
+				Map<String, Object> detailInfo = JsonPath.parse(order).read("$.102.50", Map.class);
+
+				CortalConsorsMitHBCIJSONWrapper wrapper = new CortalConsorsMitHBCIJSONWrapper(orderinfo, detailInfo);
+				if (!wrapper.addUmsatz(konto.getID())) {
+					fehlerhafteOrder.add(wrapper.getAnnoymisierterBuchungstext());
 				}
-				infos.clear();
-				page =  x.click();
-				seiten.add(page.asXml());
-				DomNodeList<DomElement> list = page.getElementsByTagName("table");
-//				if (list.size() != 3) {
-//					//throw new ApplicationException("Anzahl der Tabelen in Orderinfo stimmt nicht. Ist: " + list.size());
-//				}
-				HtmlUtils.tabUntereinander2hash(infos, (HtmlTable) list.get(1), 0, 1); // Spalte 1 und 2
-				HtmlUtils.tabUntereinander2hash(infos, (HtmlTable) list.get(1), 3, 4); // Spalte 4 und 5; Spalte 3 ist leer
-				HtmlUtils.tabNebeneinander2hash(infos, (HtmlTable) list.get(2));
-				if (!infos.containsKey("kurs")) {
-					missingOrderDate = true;
-					continue;
-				}
-				String[] kurs = ((String) infos.get("kurs")).replaceAll("  *", " ").split(" ");
-				if (!infos.containsKey("zeitpunkt der abrechnung")) {
-					missingOrderDate = true;
-					continue;
-				}
-				Date d;
-				try {
-					d = df.parse(infos.get("zeitpunkt der abrechnung").substring(0,10));
-				} catch (ParseException e) {
-					throw new ApplicationException("Unbekanntes Datumsformat beim Abrechnungszeitpunkt: " + infos.get("zeitpunkt der abrechnung"));
-				}
-
-
-				Utils.addUmsatz(konto.getID(), Utils.getORcreateWKN(infos.get("wkn"), infos.get("isin"), infos.get("wertpapiername")), infos.get("orderart"), 
-						infos.toString(),
-						Utils.getDoubleFromZahl(infos.get("stück/nominale")),
-						Utils.getDoubleFromZahl(kurs[0]), kurs[1],
-
-						((infos.get("orderart").toUpperCase().equals("KAUF")) ? -1 : 1) *
-						Math.rint(Utils.getDoubleFromZahl(kurs[0]) * Utils.getDoubleFromZahl(infos.get("stück/nominale")) * 100) / 100,
-						kurs[1],
-						d,
-						infos.get("ordernummer"), "",0.0d, "EUR", 0.0d, "EUR"
-						);
 			}
 
-			if (missingOrderDate) {
-				Log.error("Nicht alle Order konnten übernommen werden, da das Orderdatum oder der Kurs fehlt.");
-			}
 
+			// Logout
+			String logoutRequest = "{\"17\":{\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCLogout\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
+			json = getRequest(webClient, "https://webservices.consorsbank.de/WebServicesDe/services/restful/logout", logoutRequest);
+			// @TODO Anwort verifizieren
 
 		} catch (IOException e) {
 			throw new ApplicationException(e);
 		} finally {
 			try {
-				forcelogoff(webClient);
 				debug(seiten, konto);
 			} catch (RemoteException e) {
 				throw new ApplicationException(e);
 			}
 		}
 
-	}
 
-	private String getLoginUrl(HtmlPage page) throws ApplicationException {
-		// Das parsen der Seite scheitert. Also manuell im Text suchen :-(
-		String url = "";
-		for (String s : page.asXml().split("\n")) {
-			if (s.contains("gallery.authentication.modals.Login")) {
-				url = "https://www.consorsbank.de" + s.replace("  href=\"", "").replace("\"", "");
+		try
+		{
+			if (fehlerhafteOrder.size() > 0) {
+				DebugDialogWithTextarea dialog = new DebugDialogWithTextarea(DebugDialog.POSITION_CENTER, fehlerhafteOrder);
+				dialog.open();
 			}
+		} catch (OperationCanceledException oce) {
+			//
+		} catch (Exception e) {
+			Logger.error("unable to display debug dialog",e);
 		}
-		if (url.isEmpty()) {
-			throw new ApplicationException("Login-Link nicht gefunden");
-		}
-		return url;
+
 	}
 
 
-
-	private void forcelogoff(WebClient webClient) {
-		try {
-			webClient.getPage("https://www.consorsbank.de/euroWebDe/-?$part=Home.login-status&$event=logout");
-		} catch (FailingHttpStatusCodeException | IOException e) {
-			// Mehr kann ich dann auch nicht tun
-		}
-	}
 
 	@Override
 	public List<String> getPROP(Konto konto) {
@@ -218,4 +170,26 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 						|| konto.getBic().toUpperCase().equals("CSDBDE71XXX"));
 	}
 
+
+	/**
+	 * Führt ein JSON-Request auf
+	 * @param webClient htmlunit-client
+	 * @param url URL
+	 * @param request Request im JSON Format
+	 * @return Antwort des Server, auch in JSON Format
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 */
+	private String getRequest(final WebClient webClient, String url, String request)
+			throws MalformedURLException, IOException {
+		WebRequest requestSettings = new WebRequest(new URL(url), HttpMethod.POST);
+		requestSettings.setRequestBody(request);
+		requestSettings.setAdditionalHeader("Content-Type", "application/json");
+
+		UnexpectedPage p = (UnexpectedPage) webClient.getPage(requestSettings);
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(p.getInputStream(), writer, Charset.forName("UTF-8"));
+		String json = writer.toString();
+		return json;
+	}
 }
