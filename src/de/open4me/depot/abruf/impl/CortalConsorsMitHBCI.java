@@ -102,7 +102,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 				Map<String, Object> detailInfo = JsonPath.parse(order).read("$.102.50", Map.class);
 
 				CortalConsorsMitHBCIJSONWrapper wrapper = new CortalConsorsMitHBCIJSONWrapper(orderinfo, detailInfo);
-				if (!wrapper.addUmsatz(konto.getID())) {
+				if (wrapper.addUmsatz(konto.getID())) {
 					fehlerhafteOrder.add(wrapper.getAnnoymisierterBuchungstext());
 				}
 			}
