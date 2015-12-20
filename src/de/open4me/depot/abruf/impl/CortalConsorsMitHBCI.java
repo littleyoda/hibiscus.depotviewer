@@ -16,6 +16,7 @@ import com.gargoylesoftware.htmlunit.UnexpectedPage;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 
 import de.open4me.depot.gui.dialogs.DebugDialogWithTextarea;
 import de.willuhn.jameica.hbci.gui.dialogs.DebugDialog;
@@ -81,36 +82,57 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 
 
 			final WebClient webClient = new WebClient();
+			webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+		    
+		    
 			String url = "https://webservices.consorsbank.de/WebServicesDe/services/restful/login";
 
 			// Login und "sessionID" speichern
 			// TODO Password und Username entsprechend escapen
 			String request = "{\"1\":{\"2\":\"" + password + "\",\"3\":\"" + username + "\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCLogin\",\"3\":\"\",\"4\":\"1\"}}}";
 			String json = getRequest(webClient, url, request);
-			String sessionID = JsonPath.parse(json).read("$.2.0.3");
+			seiten.add(json);
+			// Prüfen, ob Login Fehlgeschlagen ist
+			if (!"CCLogin".equals(jsonRead(json,"$.2.0.0"))) {
+				Logger.debug(json);
+				String msg = jsonRead(json,"$.20[0].1");
+				if (msg == null || msg.isEmpty()) {
+					msg = "Login aus unbekannten Grund nicht möglich!";
+				}
+				throw new ApplicationException(msg);
+			}
+			String sessionID = jsonRead(json,"$.2.0.3");
 
 			// Request: Alle Order
 			String allordersRequest = "{\"6\":{\"1\":\"" + depotnummer + "\",\"600\":{\"2\":\"30\",\"3\":\"orderNo DESC\",\"1\":\"1\",\"0\":\"Order\"},\"601\":\"Q\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCOrderAllInquiry\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
 			json = getRequest(webClient, "https://webservices.consorsbank.de/WebServicesDe/services/restful/getAllOrders", allordersRequest);
+			seiten.add(json);
 
 
 			// Für alle Order, die Detailinformationen requesten und Umsatz-Eintrag generieren
-			List<Map<String, Object>> orders = JsonPath.parse(json).read("$.7.2", List.class);
-			for (Map<String, Object> orderinfo : orders) {
-				String orderRequest = "{\"101\":{\"1\":\"" + depotnummer + "\",\"2\":\"" + orderinfo.get("4").toString() + "\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCOrderDetailInquiry\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
-				String order = getRequest(webClient, "https://webservices.consorsbank.de/WebServicesDe/services/restful/getOrderDetail", orderRequest);
-				Map<String, Object> detailInfo = JsonPath.parse(order).read("$.102.50", Map.class);
+			try {
+				List<Map<String, Object>> orders = JsonPath.parse(json).read("$.7.2", List.class);
+				for (Map<String, Object> orderinfo : orders) {
+					String orderRequest = "{\"101\":{\"1\":\"" + depotnummer + "\",\"2\":\"" + orderinfo.get("4").toString() + "\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCOrderDetailInquiry\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
+					String order = getRequest(webClient, "https://webservices.consorsbank.de/WebServicesDe/services/restful/getOrderDetail", orderRequest);
+					seiten.add(order);
+					Map<String, Object> detailInfo = JsonPath.parse(order).read("$.102.50", Map.class);
 
-				CortalConsorsMitHBCIJSONWrapper wrapper = new CortalConsorsMitHBCIJSONWrapper(orderinfo, detailInfo);
-				if (!wrapper.addUmsatz(konto.getID())) {
-					fehlerhafteOrder.add(wrapper.getAnnoymisierterBuchungstext());
+					CortalConsorsMitHBCIJSONWrapper wrapper = new CortalConsorsMitHBCIJSONWrapper(orderinfo, detailInfo);
+					if (!wrapper.addUmsatz(konto.getID())) {
+						fehlerhafteOrder.add(wrapper.getAnnoymisierterBuchungstext());
+					}
 				}
+			} catch (PathNotFoundException pnfe) {
+				Logger.info("Keine Umsätze gefunden");
+				Logger.debug("JSON für Order: " + json);
 			}
 
 
 			// Logout
 			String logoutRequest = "{\"17\":{\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCLogout\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
 			json = getRequest(webClient, "https://webservices.consorsbank.de/WebServicesDe/services/restful/logout", logoutRequest);
+			seiten.add(json);
 			// @TODO Anwort verifizieren
 
 		} catch (IOException e) {
@@ -191,5 +213,13 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 		IOUtils.copy(p.getInputStream(), writer, Charset.forName("UTF-8"));
 		String json = writer.toString();
 		return json;
+	}
+	
+	private String jsonRead(String json, String xpath) {
+		try {
+			return JsonPath.parse(json).read(xpath);
+		} catch (com.jayway.jsonpath.PathNotFoundException e) {
+			return null;
+		}
 	}
 }
