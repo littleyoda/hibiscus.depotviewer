@@ -12,6 +12,7 @@ import org.kapott.hbci.structures.TypedValue;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.datenobj.DepotAktion;
 import de.willuhn.jameica.hbci.HBCIProperties;
+import de.willuhn.jameica.hbci.rmi.HibiscusDBObject;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.rmi.Protokoll;
 import de.willuhn.jameica.hbci.server.Converter;
@@ -186,6 +187,11 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 		String msg = i18n.tr("Fehler beim Abrufen der Umsätze: {0}",error);
 		konto.addToProtokoll(msg,Protokoll.TYP_ERROR);
 		return msg;
+	}
+
+	@Override
+	protected HibiscusDBObject getContext() {
+		return null;
 	}
 
 
