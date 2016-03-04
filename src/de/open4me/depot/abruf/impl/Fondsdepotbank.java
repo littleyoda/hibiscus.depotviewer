@@ -134,17 +134,17 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 			RemoteException {
 		DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 
-		System.out.println(page.getContent());
+		//System.out.println(page.getContent());
 		ArrayList<HashMap<String, String>> buchungen = parseCSV(page.getContent(), "Buchung");
 		for (HashMap<String, String> buchung : buchungen) {
 			String[] wertpapier = buchung.get("wertpapier").split(" / ");
 			String id = Utils.getORcreateWKN(wertpapier[1], wertpapier[0], wertpapier[2]);
 			Date d;
-			if (buchung.get("ausführung") == null) {
+			if (buchung.get("ausführungsdatum") == null) {
 				continue; // erstmal nicht behandeln
 			}
 			try {
-				d = df.parse(buchung.get("ausführung"));
+				d = df.parse(buchung.get("ausführungsdatum"));
 			} catch (ParseException e) {
 				Logger.error("Aktuelle Zeile: " + buchungen.toString());
 				throw new ApplicationException("Unbekanntes Datumsformat: [" + buchung.get("Ausführung") + "] " + buchungen.toString());	
@@ -158,7 +158,7 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 			}
 			String[] kurs = buchung.get("kurs").split(" ");
 			String[] umsatz = buchung.get("umsatz").split(" ");
-			String orderid = wertpapier[0] + buchung.get("ausführung") + buchung.get("geschäftsart")  
+			String orderid = wertpapier[0] + buchung.get("ausführungsdatum") + buchung.get("geschäftsart")  
 					         + buchung.get("umsatz") + buchung.get("kurz") + buchung.get("stück");  
 			Utils.addUmsatz(konto.getID(), id, 
 					buchung.get("geschäftsart"), 
