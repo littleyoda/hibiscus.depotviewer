@@ -3,9 +3,9 @@
 <plugin xmlns="http://www.willuhn.de/schema/jameica-plugin"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.willuhn.de/schema/jameica-plugin http://www.willuhn.de/schema/jameica-plugin-1.2.xsd"
-        name="hibiscus.depotviewer" version="0.3.32" class="de.open4me.depot.DepotViewerPlugin">
+        name="hibiscus.depotviewer" version="0.3.33" class="de.open4me.depot.DepotViewerPlugin">
 
-  <description>Depot Viewer -- Beta-Version für Tester </description>
+  <description>Depot Viewer</description>
   <url>http://www.open4me.de/hibiscus/hibiscus.depotviewer/hibiscus.depotviewer.zip</url>
   <homepage>https://github.com/littleyoda/hibiscus.depotviewer</homepage>
   <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
