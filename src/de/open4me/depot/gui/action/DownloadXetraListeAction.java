@@ -36,7 +36,7 @@ public class DownloadXetraListeAction implements Action
 
 				TransportService ts = Application.getBootLoader().getBootable(TransportService.class);
 				try {
-					t = ts.getTransport(new URL("http://xetra.com/xetra/dispatch/de/xetraCSV/navigation/xetra/100_market_structure_instruments/100_instruments/100_all_tradable_instruments"));
+					t = ts.getTransport(new URL("http://www.xetra.com/blob/1424940/390db87ea909a4d792ce7b244395582e/data/allTradableInstruments.csv"));
 					if (!t.exists()) {
 						Application.getMessagingFactory().sendMessage(new StatusBarMessage(Application.getI18n().tr("Datei nicht gefunden! Keine Internetverbindung?"),StatusBarMessage.TYPE_ERROR));
 						return;
@@ -61,6 +61,7 @@ public class DownloadXetraListeAction implements Action
 					}
 					br.close();
 					writer.close();
+					temp.delete();
 					Logger.info("Finished");
 					Application.getMessagingFactory().sendMessage(new StatusBarMessage(Application.getI18n().tr("Download komplett!"),StatusBarMessage.TYPE_SUCCESS));
 				} catch (Exception e) {
