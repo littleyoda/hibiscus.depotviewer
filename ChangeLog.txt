@@ -1,3 +1,7 @@
+0.3.34 -- 2016-05-26
+
+	Fehler beim Speichern von Configs in Rahmen von Kursabrufen (fixes #48)
+
 0.3.33 -- 2016-05-26
 
 Downloadlink für xetra-Liste angepasst
