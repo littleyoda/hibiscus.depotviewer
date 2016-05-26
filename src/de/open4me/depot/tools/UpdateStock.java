@@ -9,6 +9,10 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+import org.jfree.util.Log;
+
+import com.sun.glass.ui.Window.Level;
+
 import jsq.config.Config;
 import jsq.config.ConfigTuple;
 import jsq.datastructes.Const;
@@ -25,6 +29,9 @@ import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.BackgroundTask;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.ProgressMonitor;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import de.willuhn.logging.Logger;
+
 
 
 public class UpdateStock implements BackgroundTask {
@@ -59,6 +66,7 @@ public class UpdateStock implements BackgroundTask {
 				String anbietername = getAnbieterName(wpid);
 				monitor.setPercentComplete((int) (proWert * i));
 				monitor.setStatusText("Starte mit " + searchterm);
+				Logger.info("Update Stock: Starte mit " + searchterm);
 				if (anbietername == null || forceNewSettings) {
 					KursAktualisierenAnbieterAuswahlDialog dialog1 = new KursAktualisierenAnbieterAuswahlDialog(KursAktualisierenDialog.POSITION_CENTER,
 							wertpapier.getAttribute("wertpapiername").toString());
@@ -80,10 +88,12 @@ public class UpdateStock implements BackgroundTask {
 						dialog.open();
 						base.process(cfg);
 						if (saveSettings) {
+							Logger.debug("Gespeicherte Config: " + cfg);
 							doSaveSettings(wertpapier.getAttribute("id").toString(), cfg);
 						}
 					}
 				} else {
+					Logger.debug("Gespeicherter Name: " + anbietername);
 					base = null;
 					for (BaseFetcher x :Factory.getHistoryFetcher()) {
 						if (anbietername.equals(x.getName())) {
@@ -92,6 +102,7 @@ public class UpdateStock implements BackgroundTask {
 						}
 					}
 					if (base == null) {
+						Logger.debug("Anbieter nicht gefunden.");
 						doCleanSaveSettings(wpid);
 						throw new ApplicationException("Fehler beim Abruf der Kurse. Bitte nochmal aktualisieren und Einstellungen neu vornehmen!");
 					}
@@ -109,8 +120,10 @@ public class UpdateStock implements BackgroundTask {
 						for (Config cfg : cfgs) {
 							getCfg.setString(2, cfg.getBeschreibung());
 							String ret = (String) SQLUtils.getObject(getCfg);
+							Logger.debug("Gefunde Config: " + cfg.getBeschreibung() + ": " + ret);
 							if (ret == null) {
 								doCleanSaveSettings(wpid);
+								Logger.debug("Gespeicherter Wert: null");
 								throw new ApplicationException("Fehler beim Abruf der Kurse. Bitte nochmal aktualisieren und Einstellungen neu vornehmen!");
 							}
 							ConfigTuple selected = null;
@@ -122,6 +135,7 @@ public class UpdateStock implements BackgroundTask {
 							}
 							if (selected == null) {
 								doCleanSaveSettings(wpid);
+								Logger.debug("Selected is null");
 								throw new ApplicationException("Fehler beim Abruf der Kurse. Bitte nochmal aktualisieren und Einstellungen neu vornehmen!");
 							}
 							cfg.addSelectedOptions(selected);
@@ -241,7 +255,12 @@ public class UpdateStock implements BackgroundTask {
 		for (Config c : cfg) {
 			for (ConfigTuple sel : c.getSelected()) {
 				pre.setString(1, string);
-				pre.setString(2, sel.getObj().toString());
+				String value = sel.getObj().toString();
+				if (sel.getObj() instanceof ScriptObjectMirror) {
+					ScriptObjectMirror o = (ScriptObjectMirror) sel.getObj();
+					value = o.callMember("toString").toString();
+				}
+				pre.setString(2, value);
 				pre.setString(3, sel.getDescription());
 				pre.execute();
 			}
