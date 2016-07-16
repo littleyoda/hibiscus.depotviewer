@@ -18,6 +18,7 @@ import com.gargoylesoftware.htmlunit.WebRequest;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 
+import de.open4me.depot.abruf.utils.HtmlUtils;
 import de.open4me.depot.gui.dialogs.DebugDialogWithTextarea;
 import de.willuhn.jameica.hbci.gui.dialogs.DebugDialog;
 import de.willuhn.jameica.hbci.rmi.Konto;
@@ -82,6 +83,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 
 
 			final WebClient webClient = new WebClient();
+			HtmlUtils.setProxyCfg(webClient, "https://webservices.consorsbank.de/");
 			webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
 		    
 		    

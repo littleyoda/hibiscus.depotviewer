@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import jsq.tools.HtmlUnitTools;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -22,7 +20,9 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlTable;
 
 import de.open4me.depot.DepotViewerPlugin;
+import de.open4me.depot.abruf.utils.HtmlUtils;
 import de.open4me.depot.abruf.utils.Utils;
+import jsq.tools.HtmlUnitTools;
 
 public class WertpapierSuche {
 	/**
@@ -54,6 +54,7 @@ public class WertpapierSuche {
 			throws IOException {
 		List<HashMap<String, String>> x = new ArrayList<HashMap<String, String>>();
 		WebClient webClient = new WebClient();
+		HtmlUtils.setProxyCfg(webClient, "https://de.finance.yahoo.com/");
 		webClient.getOptions().setTimeout(3000);
 		webClient.setCssErrorHandler(new SilentCssErrorHandler());
 		webClient.setRefreshHandler(new ThreadedRefreshHandler());
@@ -63,6 +64,7 @@ public class WertpapierSuche {
 		HtmlPage page = webClient.getPage("https://de.finance.yahoo.com/lookup/all?s=" + search +  "&t=A&m=ALL&r=");
 		HtmlTable tab = (HtmlTable) HtmlUnitTools.getElementByPartContent(page, "Ticker", "table");
 		if (tab == null) {
+			webClient.close();
 			return x;
 		}
 		x = HtmlUnitTools.analyse(tab);
@@ -77,6 +79,7 @@ public class WertpapierSuche {
 				out.add(e);
 			}
 		}
+		webClient.close();
 		return out;
 	}
 

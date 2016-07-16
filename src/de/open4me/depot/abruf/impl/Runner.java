@@ -18,6 +18,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
+import de.open4me.depot.abruf.utils.HtmlUtils;
 import de.willuhn.jameica.system.BackgroundTask;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ProgressMonitor;
@@ -81,6 +82,7 @@ public abstract class Runner implements BackgroundTask {
 	public void run(ProgressMonitor pm)  {
 		results = new ArrayList<ResultSets>(); 
 		final WebClient webClient = new WebClient();
+		HtmlUtils.setProxyCfg(webClient, "https://www.willuhn.de");
 		webClient.setCssErrorHandler(new SilentCssErrorHandler());
 		webClient.setRefreshHandler(new ThreadedRefreshHandler());
 		webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
