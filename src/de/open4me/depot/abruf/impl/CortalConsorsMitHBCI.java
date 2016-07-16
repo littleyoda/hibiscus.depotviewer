@@ -85,8 +85,8 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 			final WebClient webClient = new WebClient();
 			HtmlUtils.setProxyCfg(webClient, "https://webservices.consorsbank.de/");
 			webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
-		    
-		    
+
+
 			String url = "https://webservices.consorsbank.de/WebServicesDe/services/restful/login";
 
 			// Login und "sessionID" speichern
@@ -114,15 +114,20 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 			// Für alle Order, die Detailinformationen requesten und Umsatz-Eintrag generieren
 			try {
 				List<Map<String, Object>> orders = JsonPath.parse(json).read("$.7.2", List.class);
-				for (Map<String, Object> orderinfo : orders) {
-					String orderRequest = "{\"101\":{\"1\":\"" + depotnummer + "\",\"2\":\"" + orderinfo.get("4").toString() + "\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCOrderDetailInquiry\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
-					String order = getRequest(webClient, "https://webservices.consorsbank.de/WebServicesDe/services/restful/getOrderDetail", orderRequest);
-					seiten.add(order);
-					Map<String, Object> detailInfo = JsonPath.parse(order).read("$.102.50", Map.class);
+				if (orders == null) {
+					Logger.info("Es wurden keine Order gefunden!");
+					Logger.info("JSON für Order: " + json);
+				} else {
+					for (Map<String, Object> orderinfo : orders) {
+						String orderRequest = "{\"101\":{\"1\":\"" + depotnummer + "\",\"2\":\"" + orderinfo.get("4").toString() + "\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCOrderDetailInquiry\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
+						String order = getRequest(webClient, "https://webservices.consorsbank.de/WebServicesDe/services/restful/getOrderDetail", orderRequest);
+						seiten.add(order);
+						Map<String, Object> detailInfo = JsonPath.parse(order).read("$.102.50", Map.class);
 
-					CortalConsorsMitHBCIJSONWrapper wrapper = new CortalConsorsMitHBCIJSONWrapper(orderinfo, detailInfo);
-					if (!wrapper.addUmsatz(konto.getID())) {
-						fehlerhafteOrder.add(wrapper.getAnnoymisierterBuchungstext());
+						CortalConsorsMitHBCIJSONWrapper wrapper = new CortalConsorsMitHBCIJSONWrapper(orderinfo, detailInfo);
+						if (!wrapper.addUmsatz(konto.getID())) {
+							fehlerhafteOrder.add(wrapper.getAnnoymisierterBuchungstext());
+						}
 					}
 				}
 			} catch (PathNotFoundException pnfe) {
@@ -216,7 +221,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 		String json = writer.toString();
 		return json;
 	}
-	
+
 	private String jsonRead(String json, String xpath) {
 		try {
 			return JsonPath.parse(json).read(xpath);
