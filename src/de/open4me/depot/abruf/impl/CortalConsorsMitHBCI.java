@@ -113,10 +113,18 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 
 			// Für alle Order, die Detailinformationen requesten und Umsatz-Eintrag generieren
 			try {
-				List<Map<String, Object>> orders = JsonPath.parse(json).read("$.7.2", List.class);
+				Logger.info("JSON für Order: " + json);
+				Integer anzahlOrders = JsonPath.parse(json).read("$.7.602.2");
+				List<Map<String, Object>> orders;
+				if (anzahlOrders == 1) {
+					orders = new ArrayList<Map<String, Object>>(); 
+					orders.add(JsonPath.parse(json).read("$.7.2", Map.class));
+				} else {
+					orders = JsonPath.parse(json).read("$.7.2", List.class);
+ 				}
+
 				if (orders == null) {
 					Logger.info("Es wurden keine Order gefunden!");
-					Logger.info("JSON für Order: " + json);
 				} else {
 					for (Map<String, Object> orderinfo : orders) {
 						String orderRequest = "{\"101\":{\"1\":\"" + depotnummer + "\",\"2\":\"" + orderinfo.get("4").toString() + "\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCOrderDetailInquiry\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
