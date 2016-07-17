@@ -17,8 +17,7 @@ Kontakt via depotviewer@open4me.de
 
 
 #Installation
-Stand 01. Jan 2015: Das Plugin funktioniert nur mit einer Nightly-Build Version von Hibiscus (27. Dez. 2014 oder neuer) und nicht mit der 2.6.11. 
-Voraussichtlich wird es mit der 2.6.12 funktionieren.
+Voraussetzung ist Hibiscus in Version 2.6.12 oder neuer
 
 ## Plugin installieren
 * Menü Datei/Einstellungen
@@ -50,3 +49,7 @@ Die Anfänge des Programmes basiert von dem Beispiel Plugin für Jameica und Hib
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+# Spenden
+Über kleine Spenden und eine Wertschätzung der Arbeit freut sich jeder:
+[![Paypal Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/paypalme/littleyoda/)
