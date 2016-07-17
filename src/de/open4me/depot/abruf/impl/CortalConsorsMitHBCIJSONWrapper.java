@@ -27,7 +27,7 @@ public class CortalConsorsMitHBCIJSONWrapper {
 			return  orderinfo.get("30").equals("ACTIVE")
 					&& orderinfo.get("39").equals("piece")
 					&& orderinfo.get("0").equals("")
-					&& orderinfo.get("2").equals("")
+					&& (orderinfo.get("2").equals("") || orderinfo.get("2").equals("LIMIT_BASED"))
 					&& orderinfo.get("12").equals("E")
 					&& orderinfo.get("17").equals("N")
 					&& orderinfo.get("7").equals(orderinfo.get("10"))
