@@ -71,7 +71,7 @@ public class CortalConsorsMitHBCIJSONWrapper {
 	}
 
 	private String getIsis() {
-		return (String) orderinfo.get("8");
+		return orderinfo.get("8").toString();
 	}
 
 	private String getOrderID() {
@@ -97,11 +97,11 @@ public class CortalConsorsMitHBCIJSONWrapper {
 	}
 
 	private Double getKurs() {
-		return Double.parseDouble((String) detailInfo.get("1"));
+		return Double.parseDouble(detailInfo.get("1").toString());
 	}
 
 	private Double getStueckzahl() {
-		return Double.parseDouble((String) detailInfo.get("12"));
+		return Double.parseDouble(detailInfo.get("12").toString());
 	}
 
 	private String getOrderArt() {
@@ -113,7 +113,7 @@ public class CortalConsorsMitHBCIJSONWrapper {
 	}
 
 	private String getWkn() {
-		return (String) orderinfo.get("11");
+		return orderinfo.get("11").toString();
 	}
 
 	public String getAnnoymisierterBuchungstext() {
