@@ -1,0 +1,9 @@
+<form><p>
+<b>Orderbuch</b><br/>
+<br/>Ihre verschiedenen Wertpapier-Order tauchen im Bereich <b>Orderbuch</b> auf.
+<br/>
+<br/>Da es keine Umsätze im klassischen Sinne sind, tauchen sie nicht im Bereich Umsätze auf.
+</p>
+<!-- Action: de.open4me.depot.gui.action.OrderList -->
+<!-- Next: AllgemeineHinweise3 -->
+</form>

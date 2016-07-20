@@ -4,5 +4,5 @@
 <b>"Synchronisierung starten"</b> auswählen. Ein manueller Abruf mit Hilfe von "Abrufen" ist in der Regel nicht notwendig.<br/>
 </p>
 <!-- Action: de.willuhn.jameica.gui.internal.action.Start -->
-<!-- Next: QuelleWeitereInformationen -->
+<!-- Next: AllgemeineHinweise2 -->
 </form>
