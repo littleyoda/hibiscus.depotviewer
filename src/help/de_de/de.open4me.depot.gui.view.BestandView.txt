@@ -3,7 +3,7 @@
 In der Bestandsübersicht sehen sie alle Wertpapiere, die in ihrem Debot sind. Die Berechnung des Wertes basiert auf den Wertes des letzten Bank-Abrufes.
 <br/><b>Inkonsistenzen zwischen Order und Beständen</b><br/>
 Der Depotviewer vergleicht den aktuellen Bestand mit den verfügbaren Ordern. Sofern nicht für alle
-Wertpapiere passtende Order gefunden wird, kommt es zu dieser Fehlermeldung. Diese Informationen sind jedoch notwendig, um
+Wertpapiere passende Order gefunden wird, kommt es zu dieser Fehlermeldung. Diese Informationen sind jedoch notwendig, um
 u.a. Performance-Zahlen korrekt berechnen zu können.
 
 <br/>Diese Fehlermeldung kann zwei Gründe haben:
