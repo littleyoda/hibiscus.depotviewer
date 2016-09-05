@@ -1,3 +1,6 @@
+0.3.42 -- 2016-09-05
+	weitere Auftragsart hinzugefügt
+
 0.3.41 -- 2016-07-31
 	ungenutzte Wertpapiere können gelöscht werden
 
