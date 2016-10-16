@@ -1,3 +1,6 @@
+0.3.43 -- 2016-10-16
+	Debugcode ergänzt
+
 0.3.42 -- 2016-09-05
 	weitere Auftragsart hinzugefügt
 
