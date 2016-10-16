@@ -113,7 +113,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 
 			// Für alle Order, die Detailinformationen requesten und Umsatz-Eintrag generieren
 			try {
-				Logger.info("JSON für Order: " + json);
+				Logger.debug("JSON für Order: " + json.replace(depotnummer, "000111222333"));
 				Integer anzahlOrders = JsonPath.parse(json).read("$.7.602.2");
 				List<Map<String, Object>> orders;
 				if (anzahlOrders == 1) {
@@ -121,26 +121,21 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 					orders.add(JsonPath.parse(json).read("$.7.2", Map.class));
 				} else {
 					orders = JsonPath.parse(json).read("$.7.2", List.class);
- 				}
+				}
 
 				if (orders == null) {
 					Logger.info("Es wurden keine Order gefunden!");
 				} else {
+					Logger.info("Es wurden " + orders.size() + " Order gefunden!");
 					for (Map<String, Object> orderinfo : orders) {
 						String orderRequest = "{\"101\":{\"1\":\"" + depotnummer + "\",\"2\":\"" + orderinfo.get("4").toString() + "\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCOrderDetailInquiry\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
 						String order = getRequest(webClient, "https://webservices.consorsbank.de/WebServicesDe/services/restful/getOrderDetail", orderRequest);
 						seiten.add(order);
-						Map<String, Object> detailInfo = JsonPath.parse(order).read("$.102.50", Map.class);
-
-						CortalConsorsMitHBCIJSONWrapper wrapper = new CortalConsorsMitHBCIJSONWrapper(orderinfo, detailInfo);
-						if (!wrapper.addUmsatz(konto.getID())) {
-							fehlerhafteOrder.add(wrapper.getAnnoymisierterBuchungstext());
-						}
+						parseOrder(depotnummer, konto, fehlerhafteOrder, orderinfo, order);
 					}
 				}
 			} catch (PathNotFoundException pnfe) {
-				Logger.info("Keine Umsätze gefunden");
-				Logger.debug("JSON für Order: " + json);
+				Logger.error("Fehler bei der Verarbeitung der JSON", pnfe);
 			}
 
 
@@ -173,6 +168,21 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 			Logger.error("unable to display debug dialog",e);
 		}
 
+	}
+
+	private void parseOrder(String depotnummer, Konto konto, List<String> fehlerhafteOrder, Map<String, Object> orderinfo, String order)
+			throws RemoteException {
+		try {
+			Map<String, Object> detailInfo = JsonPath.parse(order).read("$.102.50", Map.class);
+
+			CortalConsorsMitHBCIJSONWrapper wrapper = new CortalConsorsMitHBCIJSONWrapper(orderinfo, detailInfo);
+			if (!wrapper.addUmsatz(konto.getID())) {
+				fehlerhafteOrder.add(wrapper.getAnnoymisierterBuchungstext());
+			}
+		} catch (PathNotFoundException pnfe) {
+			Logger.error("Fehler bei der Verarbeitung der JSON", pnfe);
+			Logger.info("Orderjson: " + order.replace(depotnummer, "000111222333"));
+		}
 	}
 
 
