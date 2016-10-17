@@ -128,6 +128,10 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 				} else {
 					Logger.info("Es wurden " + orders.size() + " Order gefunden!");
 					for (Map<String, Object> orderinfo : orders) {
+						if (orderinfo.get("6").equals("0")) {
+							Logger.info("Offene Order übersprungen!");
+							continue;
+						}
 						String orderRequest = "{\"101\":{\"1\":\"" + depotnummer + "\",\"2\":\"" + orderinfo.get("4").toString() + "\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCOrderDetailInquiry\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
 						String order = getRequest(webClient, "https://webservices.consorsbank.de/WebServicesDe/services/restful/getOrderDetail", orderRequest);
 						seiten.add(order);
@@ -136,6 +140,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 				}
 			} catch (PathNotFoundException pnfe) {
 				Logger.error("Fehler bei der Verarbeitung der JSON", pnfe);
+				fehlerhafteOrder.add(pnfe + json.replace(depotnummer, "000111222333"));
 			}
 
 
@@ -182,6 +187,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 		} catch (PathNotFoundException pnfe) {
 			Logger.error("Fehler bei der Verarbeitung der JSON", pnfe);
 			Logger.info("Orderjson: " + order.replace(depotnummer, "000111222333"));
+			fehlerhafteOrder.add(pnfe + order.replace(depotnummer, "000111222333"));
 		}
 	}
 
