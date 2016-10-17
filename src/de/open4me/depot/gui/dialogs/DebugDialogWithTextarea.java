@@ -50,7 +50,7 @@ public class DebugDialogWithTextarea extends AbstractDialog
 		for (String x : fehlerhafteOrder) {
 			sb.append(x);
 			sb.append(System.lineSeparator());
-			sb.append(System.lineSeparator());
+			sb.append("------------------------------------------------------------------------------------------------" + System.lineSeparator());
 			sb.append(System.lineSeparator());
 		}
 
@@ -61,7 +61,8 @@ public class DebugDialogWithTextarea extends AbstractDialog
 		     + "Um die Software zu verbessern, bitte ich sie, mir die Umsätze<br/>"
 		     + "per E-Mail an depotviewer@open4me.de zuzusenden. (Verschlüsselung auf Anfrage)</p>"
 		     + "<p>In den unten aufgeführten Umsätzen sind relevante Informationen<br/>"
-		     + "(Aktienname, Kurs, Depotnummer, Auftragsnummer) bereits annoymisiert worden.</p>"
+		     + "(Aktienname, Kurs, Depotnummer, Auftragsnummer) bereits teilweise(!) annoymisiert worden.<br/>"
+		     + "Je nach Fehler ist eine Annoymisierung jedoch nicht möglich.</p>"
 		     + "</form>");
 
 		    container.addPart(text);
