@@ -12,7 +12,9 @@ public class Wertpapier {
 			{"depotviewer_umsaetze","wpid" },
 			{"depotviewer_kurse", "wpid" },
 			{"depotviewer_kursevent", "wpid" },
-			{"depotviewer_wertpapier", "id" }};
+			{"depotviewer_wertpapier", "id" },
+			{"depotviewer_cfgupdatestock", "wpid" }
+	};
 
 	public static void deleteWertpapier(String id) {
 		try {
