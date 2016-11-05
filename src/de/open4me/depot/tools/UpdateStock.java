@@ -2,6 +2,11 @@ package de.open4me.depot.tools;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.ProxySelector;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,16 +14,8 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import org.jfree.util.Log;
+import com.gargoylesoftware.htmlunit.ProxyConfig;
 
-import com.sun.glass.ui.Window.Level;
-
-import jsq.config.Config;
-import jsq.config.ConfigTuple;
-import jsq.datastructes.Const;
-import jsq.datastructes.Datacontainer;
-import jsq.fetch.factory.Factory;
-import jsq.fetcher.history.BaseFetcher;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.dialogs.KursAktualisierenAnbieterAuswahlDialog;
 import de.open4me.depot.gui.dialogs.KursAktualisierenDialog;
@@ -27,10 +24,16 @@ import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.BackgroundTask;
+import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.ProgressMonitor;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
-import de.willuhn.logging.Logger;
+import jsq.config.Config;
+import jsq.config.ConfigTuple;
+import jsq.datastructes.Const;
+import jsq.datastructes.Datacontainer;
+import jsq.fetch.factory.Factory;
+import jsq.fetcher.history.BaseFetcher;
 
 
 
@@ -43,6 +46,36 @@ public class UpdateStock implements BackgroundTask {
 	public UpdateStock(GenericObjectSQL[] context, boolean forceNewSettings)   {
 		this.wertpapiere = context;
 		this.forceNewSettings = forceNewSettings;
+		setProxy();
+	}
+
+	private void setProxy() {
+		boolean useSystem = Application.getConfig().getUseSystemProxy();
+		try {
+			if (useSystem) {
+				List<Proxy> proxies;
+				proxies = ProxySelector.getDefault().select(new URI("https://www.willuhn.de/"));
+				Logger.info("Using system proxy settings: " + proxies);
+				for (Proxy p : proxies) {
+					if (p.type() == Proxy.Type.HTTP && p.address() instanceof InetSocketAddress) {
+						InetSocketAddress addr = (InetSocketAddress) p.address();
+						Factory.setProxy(addr.getHostString(), addr.getPort());
+						return;
+					}
+				}
+				Logger.error("No default Proxy found");
+			} else {
+				String host = Application.getConfig().getHttpsProxyHost();
+				int port = Application.getConfig().getHttpsProxyPort();
+				if (host != null && host.length() > 0 && port > 0) {
+					Factory.setProxy(host, port);
+					return;
+				}
+			}
+			Logger.info("Keine gültige Proxy-Einstellunge gefunden. (" + useSystem + ")");
+		} catch (URISyntaxException e) {
+			Logger.error("Keine gültige Proxy-Einstellunge gefunden", e);
+		}
 	}
 
 	@Override
@@ -164,7 +197,7 @@ public class UpdateStock implements BackgroundTask {
 		monitor.setStatusText("Fertig");
 		monitor.setStatus(ProgressMonitor.STATUS_DONE);
 		monitor.setPercentComplete(101);
-		
+
 
 
 	}
@@ -172,7 +205,7 @@ public class UpdateStock implements BackgroundTask {
 	// Speichert die Kursinformationen
 	private static void saveStockData(GenericObjectSQL wertpapier,
 			BaseFetcher base) throws Exception, SQLException, RemoteException,
-			ApplicationException {
+	ApplicationException {
 		// Kurse
 		Connection conn = SQLUtils.getConnection();	
 		PreparedStatement del = conn.prepareStatement("delete from depotviewer_kurse where wpid = ? ");
