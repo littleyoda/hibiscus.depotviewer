@@ -74,7 +74,7 @@ public class AddWertpapierControl  extends AbstractControl {
 			public void handleAction(Object context)
 					throws ApplicationException {
 				try {
-					List<HashMap<String, String>> x = WertpapierSuche.search((String) getSuchbox().getValue()); 
+					List<HashMap<String, String>> x = WertpapierSuche.search(((String) getSuchbox().getValue()).trim()); 
 					TablePart ziel = getTab();
 					ziel.removeAll();
 					for (HashMap<String, String> map : x) {
