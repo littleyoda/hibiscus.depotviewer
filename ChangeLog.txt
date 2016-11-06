@@ -1,3 +1,6 @@
+0.4.1 -- 2016-11-06
+	Aktualisierung von Wertpapieren korrigiert
+
 0.4.0 -- 2016-11-05
 	Suche nach Wertpapieren entfernt nun Spaces am Anfang und Ende
 	Proxy-Support für Wertpapier abfragen
