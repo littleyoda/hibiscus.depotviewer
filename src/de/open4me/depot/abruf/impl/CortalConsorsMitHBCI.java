@@ -115,11 +115,11 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 			try {
 				Logger.debug("JSON für Order: " + json.replace(depotnummer, "000111222333"));
 				Integer anzahlOrders = JsonPath.parse(json).read("$.7.602.2");
-				List<Map<String, Object>> orders;
+				List<Map<String, Object>> orders = null;
 				if (anzahlOrders == 1) {
 					orders = new ArrayList<Map<String, Object>>(); 
 					orders.add(JsonPath.parse(json).read("$.7.2", Map.class));
-				} else {
+				} else if (anzahlOrders > 1){
 					orders = JsonPath.parse(json).read("$.7.2", List.class);
 				}
 
