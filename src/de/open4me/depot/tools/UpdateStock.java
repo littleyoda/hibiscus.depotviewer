@@ -149,6 +149,7 @@ public class UpdateStock implements BackgroundTask {
 			doCleanSaveSettings(wpid);
 			throw new ApplicationException("Fehler beim Abruf der Kurse. Bitte nochmal aktualisieren und Einstellungen neu vornehmen!");
 		}
+		Logger.debug("Anbieter für Kursaktualisierung: " + base.getName());
 		Date d = new Date();
 		base.prepare(searchterm, 2000, 1, 1, d.getYear() + 1900, d.getMonth() + 1, d.getDate());
 		PreparedStatement getCfg = SQLUtils.getPreparedSQL("select value from depotviewer_cfgupdatestock where `wpid`= ? and `key` = ?");

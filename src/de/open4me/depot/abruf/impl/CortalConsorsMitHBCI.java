@@ -128,7 +128,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 				} else {
 					Logger.info("Es wurden " + orders.size() + " Order gefunden!");
 					for (Map<String, Object> orderinfo : orders) {
-						if (orderinfo.get("6").equals("0")) {
+						if (orderinfo.get("6").toString().equals("0")) {
 							Logger.info("Offene Order übersprungen!");
 							continue;
 						}
@@ -177,17 +177,19 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 
 	private void parseOrder(String depotnummer, Konto konto, List<String> fehlerhafteOrder, Map<String, Object> orderinfo, String order)
 			throws RemoteException {
+		Map<String, Object> detailInfo = null;
 		try {
-			Map<String, Object> detailInfo = JsonPath.parse(order).read("$.102.50", Map.class);
+			detailInfo = JsonPath.parse(order).read("$.102.50", Map.class);
 
 			CortalConsorsMitHBCIJSONWrapper wrapper = new CortalConsorsMitHBCIJSONWrapper(orderinfo, detailInfo);
 			if (!wrapper.addUmsatz(konto.getID())) {
-				fehlerhafteOrder.add(wrapper.getAnnoymisierterBuchungstext());
+				fehlerhafteOrder.add(CortalConsorsMitHBCIJSONWrapper.getAnnoymisierterBuchungstext(orderinfo, detailInfo));
 			}
 		} catch (PathNotFoundException pnfe) {
 			Logger.error("Fehler bei der Verarbeitung der JSON", pnfe);
-			Logger.info("Orderjson: " + order.replace(depotnummer, "000111222333"));
-			fehlerhafteOrder.add(pnfe + order.replace(depotnummer, "000111222333"));
+			String out = CortalConsorsMitHBCIJSONWrapper.getAnnoymisierterBuchungstext(orderinfo, detailInfo).replace(depotnummer, "000111222333") + "\n" + order;
+			Logger.info("Orderjson: " + out);
+			fehlerhafteOrder.add(pnfe + out);
 		}
 	}
 

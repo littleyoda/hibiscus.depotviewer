@@ -115,22 +115,22 @@ public class CortalConsorsMitHBCIJSONWrapper {
 		return orderinfo.get("11").toString();
 	}
 
-	public String getAnnoymisierterBuchungstext() {
-		annoIfExists(orderinfo, "3");
-		annoIfExists(orderinfo, "4");
-		annoIfExists(orderinfo, "5");
-		annoIfExists(orderinfo, "8");
-		annoIfExists(orderinfo, "9");
-		annoIfExists(orderinfo, "11");
-		annoIfExists(orderinfo, "15");
-		annoIfExists(orderinfo, "27");
+	public static String getAnnoymisierterBuchungstext(Map<String, Object> oi, Map<String, Object>  di) {
+		annoIfExists(oi, "3");
+		annoIfExists(oi, "4");
+		annoIfExists(oi, "5");
+		annoIfExists(oi, "8");
+		annoIfExists(oi, "9");
+		annoIfExists(oi, "11");
+		annoIfExists(oi, "15");
+		annoIfExists(oi, "27");
 		
-		annoIfExists(detailInfo, "1");
-		annoIfExists(detailInfo, "3");
-		annoIfExists(detailInfo, "4");
-		annoIfExists(detailInfo, "11");
-		annoIfExists(detailInfo, "14");
-		return orderinfo.entrySet() + System.lineSeparator() + detailInfo.entrySet();
+		annoIfExists(di, "1");
+		annoIfExists(di, "3");
+		annoIfExists(di, "4");
+		annoIfExists(di, "11");
+		annoIfExists(di, "14");
+		return oi.entrySet() + System.lineSeparator() + ((di == null) ? "DetailInfo == null" : di.entrySet());
 	}
 	
 	/**
@@ -138,7 +138,10 @@ public class CortalConsorsMitHBCIJSONWrapper {
 	 * @param m Map
 	 * @param key Key für das Element, welches anonymisiert werden soll.
 	 */
-	public void annoIfExists(Map<String, Object> m, String key) {
+	public static void annoIfExists(Map<String, Object> m, String key) {
+		if (m == null) {
+			return;
+		}
 		if (m.containsKey(key)) {
 			String value = m.get(key).toString();
 			String out = "";
