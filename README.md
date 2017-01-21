@@ -2,8 +2,8 @@ hibiscus.depotviewer
 ====================
 
 Depot-Viewer-Plugin für Hibiscus
-
 Kontakt via depotviewer@open4me.de
+weitere Informationen im [Wiki](https://github.com/littleyoda/hibiscus.depotviewer/wiki)
 
 #Features
 * Unterstützung von Depots, die via HBCI abrufbar sind [Mehr Informationen](banken.md)
@@ -51,5 +51,5 @@ Die Anfänge des Programmes basiert von dem Beispiel Plugin für Jameica und Hib
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 # Spenden
-Über kleine Spenden und eine Wertschätzung der Arbeit freut sich jeder:
+Über kleine Spenden als Wertschätzung der Arbeit freut sich jeder. Ich auch:
 [![Paypal Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/paypalme/littleyoda/)
