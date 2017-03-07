@@ -12,7 +12,7 @@ import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
 public class CortalConsorsMitHBCIJSONWrapper {
-	
+	private String grund;
 
 	private Map<String, Object> orderinfo;
 	private Map<String, Object> detailInfo;
@@ -38,7 +38,9 @@ public class CortalConsorsMitHBCIJSONWrapper {
 	}
 
 	public boolean addUmsatz(String kontoID)  {
+		setGrund("");
 		if (!check()) {
+			setGrund("Check fehlgeschlagen");
 			return false;
 		}
 
@@ -63,6 +65,7 @@ public class CortalConsorsMitHBCIJSONWrapper {
 			);
 		} catch (RemoteException | ApplicationException | ParseException e) {
 			Logger.error("Fehler beim Anlegen eines Umsatzes", e);
+			setGrund(e.toString());
 			return false;
 		}
 		return true;
@@ -130,7 +133,7 @@ public class CortalConsorsMitHBCIJSONWrapper {
 		annoIfExists(di, "4");
 		annoIfExists(di, "11");
 		annoIfExists(di, "14");
-		return oi.entrySet() + System.lineSeparator() + ((di == null) ? "DetailInfo == null" : di.entrySet());
+		return "OI->" + oi.entrySet() + System.lineSeparator() + ((di == null) ? "DetailInfo == null" : "DI->" + di.entrySet());
 	}
 	
 	/**
@@ -160,6 +163,14 @@ public class CortalConsorsMitHBCIJSONWrapper {
 			m.put(key, out);
 		}
 		
+	}
+
+	public String getGrund() {
+		return grund;
+	}
+
+	public void setGrund(String grund) {
+		this.grund = grund;
 	}
 
 }
