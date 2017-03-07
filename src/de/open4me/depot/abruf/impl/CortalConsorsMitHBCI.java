@@ -183,7 +183,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 
 			CortalConsorsMitHBCIJSONWrapper wrapper = new CortalConsorsMitHBCIJSONWrapper(orderinfo, detailInfo);
 			if (!wrapper.addUmsatz(konto.getID())) {
-				fehlerhafteOrder.add(CortalConsorsMitHBCIJSONWrapper.getAnnoymisierterBuchungstext(orderinfo, detailInfo));
+				fehlerhafteOrder.add(wrapper.getGrund() + System.lineSeparator() + CortalConsorsMitHBCIJSONWrapper.getAnnoymisierterBuchungstext(orderinfo, detailInfo));
 			}
 		} catch (PathNotFoundException pnfe) {
 			Logger.error("Fehler bei der Verarbeitung der JSON", pnfe);
