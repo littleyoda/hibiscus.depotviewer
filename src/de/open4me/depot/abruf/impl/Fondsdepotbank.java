@@ -15,6 +15,7 @@ import com.gargoylesoftware.htmlunit.TextPage;
 
 import de.open4me.depot.DepotViewerPlugin;
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.ly.webscraper.runner.Runner;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
@@ -57,9 +58,7 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 	final static String PROP_PASSWORD = "Passwort";
 
 
-	@SuppressWarnings("unchecked")
 	public void run(Konto konto) throws ApplicationException {
-		ArrayList<String> seiten = new ArrayList<String>(); 
 		try {
 			String username = konto.getKundennummer();
 			String password = konto.getMeta(PROP_PASSWORD, null);
@@ -76,15 +75,18 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 				throw new ApplicationException("Password-Eingabe:" + e1.getMessage());
 			}
 			
-			Runner r = new Runner(basescript, username, password, logout) {
+			HashMap<String, String> info = getKontoInformationen(konto);
 
-				@Override
-				public void finish() {
-				}
+			Runner r = new Runner() {
+
 				
 				
 			};
-			r.run(null);
+			info.put("user", username);
+			info.put("pwd", password);
+			r.setInfo(info);
+			r.setCode(basescript);
+			r.run();
 			umsaetze(konto, (TextPage) r.getDownloads().get(0));
 			bestaende(konto, (TextPage) r.getDownloads().get(1));
 			
@@ -132,23 +134,22 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 			RemoteException {
 		DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 
-		//System.out.println(page.getContent());
 		ArrayList<HashMap<String, String>> buchungen = parseCSV(page.getContent(), "Buchung");
 		for (HashMap<String, String> buchung : buchungen) {
 			String[] wertpapier = buchung.get("wertpapier").split(" / ");
 			String id = Utils.getORcreateWKN(wertpapier[1], wertpapier[0], wertpapier[2]);
 			Date d;
-			if (buchung.get("ausführungsdatum") == null) {
+			if (buchung.get("buchungsdatum") == null) {
 				continue; // erstmal nicht behandeln
 			}
 			try {
-				d = df.parse(buchung.get("ausführungsdatum"));
+				d = df.parse(buchung.get("buchungsdatum"));
 			} catch (ParseException e) {
 				Logger.error("Aktuelle Zeile: " + buchungen.toString());
-				throw new ApplicationException("Unbekanntes Datumsformat: [" + buchung.get("Ausführung") + "] " + buchungen.toString());	
+				throw new ApplicationException("Unbekanntes Datumsformat: [" + buchung.get("buchungsdatum") + "] " + buchungen.toString());	
 			} catch (NullPointerException e) {
 				Logger.error("Aktuelle Zeile: " + buchungen.toString());
-				throw new ApplicationException("Unbekanntes Datumsformat: [" + buchung.get("Ausführung") + "] " + buchungen.toString());	
+				throw new ApplicationException("Unbekanntes Datumsformat: [" + buchung.get("buchungsdatum") + "] " + buchungen.toString());	
 			}
 			if (buchung.get("geschäftsart").equals("Erträgnis")) {
 				continue;
@@ -156,7 +157,7 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 			}
 			String[] kurs = buchung.get("kurs").split(" ");
 			String[] umsatz = buchung.get("umsatz").split(" ");
-			String orderid = wertpapier[0] + buchung.get("ausführungsdatum") + buchung.get("geschäftsart")  
+			String orderid = wertpapier[0] + buchung.get("buchungsdatum") + buchung.get("geschäftsart")  
 					         + buchung.get("umsatz") + buchung.get("kurz") + buchung.get("stück");  
 			Utils.addUmsatz(konto.getID(), id, 
 					buchung.get("geschäftsart"), 
@@ -239,4 +240,16 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 				|| getName().toLowerCase().replace(" ", "").equals(unterkontoExtract);
 	}
 
+	  public static HashMap<String, String> getKontoInformationen(Konto konto) throws RemoteException {
+			HashMap<String, String> kontoInfo = new HashMap<String, String>();
+			kontoInfo.put("blz", konto.getBLZ());
+			kontoInfo.put("bic", konto.getBic());
+			kontoInfo.put("iban", konto.getIban());
+			kontoInfo.put("userid", konto.getKundennummer());
+			kontoInfo.put("subid", konto.getUnterkonto());
+			kontoInfo.put("nummer", konto.getKontonummer());
+			return kontoInfo;
+		  
+	  }
+	
 }
