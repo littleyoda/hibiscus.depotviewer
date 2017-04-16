@@ -27,6 +27,7 @@ import org.jfree.ui.Layer;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.gui.parts.PrintfColumn;
 import de.open4me.depot.gui.parts.TabFolderExt;
 import de.open4me.depot.gui.parts.TabGroupExt;
 import de.open4me.depot.sql.GenericObjectHashMap;
@@ -241,8 +242,8 @@ public class WertpapiereDatenControl {
 						}
 						String id = d.getAttribute("id").toString();
 						ids += id;
-						spalten += ", concat(a" + id + ".kurs, ' ', a" + id + ".kursw) as A" + id + "k"; 
-						spalten += ", concat(a" + id + ".kursperf, ' ', a" + id + ".kursw)  as A" + id + "kp";
+						spalten += ", a" + id + ".kurs as A" + id + "k, a" + id + ".kursw as A" + id + "kw"; 
+						spalten += ", a" + id + ".kursperf as A" + id + "kp, a" + id + ".kursw as A" + id + "kpw";
 						sql +="left join depotviewer_kurse as A" + id + " on A" + id + ".wpid = " + id + " and A" + id + ".kursdatum = datum.kursdatum\n";
 					}
 					sql = "select "  + spalten + " from (select distinct kursdatum from depotviewer_kurse where wpid in (" + ids + ") order by 1 desc) as datum\n" + sql;
@@ -252,8 +253,8 @@ public class WertpapiereDatenControl {
 					tab.addColumn(Settings.i18n().tr("Zeitraum"), "zeitraum");
 					for (GenericObjectSQL d : currentSelection) {
 						String id = d.getAttribute("id").toString();
-						tab.addColumn(d.getAttribute("wertpapiername").toString(), "a" +id + "k");
-						tab.addColumn(d.getAttribute("wertpapiername").toString() + " (P)", "a" +id + "kp");
+						tab.addColumn(new PrintfColumn(Settings.i18n().tr(d.getAttribute("wertpapiername").toString()), "a" + id + "k", "%.6f %s", "a" + id + "k", "a" + id + "kw"));
+						tab.addColumn(new PrintfColumn(Settings.i18n().tr(d.getAttribute("wertpapiername").toString()), "a" + id + "kp", "%.6f %s", "a" + id + "kp", "a" + id + "kpw"));
 					}
 					getReplaceableComposite().replace(tab);
 				} catch (Exception e) {

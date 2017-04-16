@@ -7,15 +7,18 @@ import java.util.Date;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.PieSectionLabelGenerator;
-import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.plot.PiePlot3D;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 import org.jfree.experimental.chart.swt.ChartComposite;
+import org.jfree.experimental.swt.SWTUtils;
+import org.jfree.util.Rotation;
 
 import de.open4me.depot.gui.DatumsSlider;
 import de.open4me.depot.sql.GenericObjectSQL;
@@ -42,10 +45,17 @@ public class BestandPieChartControl implements Listener
 
 	public ChartComposite getBestandChart(Composite comp) throws ApplicationException
 	{
-		JFreeChart chart = ChartFactory.createPieChart("Bestand", dataset, true, true, false);       
-		PiePlot plot = (PiePlot) chart.getPlot();
+		Font font = SWTUtils.toAwtFont(Display.getCurrent(), Display.getCurrent().getSystemFont());
+		JFreeChart chart = ChartFactory.createPieChart3D("Bestand", dataset, true, true, false);
+		chart.getLegend().setItemFont(font.deriveFont(9.0f));
+		PiePlot3D plot = (PiePlot3D) chart.getPlot();
+		plot.setBackgroundAlpha(0);
+		plot.setStartAngle(290);
+		plot.setDirection(Rotation.CLOCKWISE);
+		plot.setForegroundAlpha(0.8f);
+		plot.setOutlineVisible(false);
 		plot.setSectionOutlinesVisible(false);
-		plot.setLabelFont(new Font("SansSerif", Font.PLAIN, 12));
+		plot.setLabelFont(font.deriveFont(9.0f));
 		plot.setNoDataMessage("Kein Bestand verfügbar. Wahrscheinlich fehlen die Kursdaten.");
 		plot.setCircular(false);
 		plot.setLabelGap(0.02);

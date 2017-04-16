@@ -39,10 +39,12 @@ public class DepotListControl extends AbstractControl
 					exec(context);
 			}
 		});
+		orderList.setRememberColWidths(true);
+		orderList.setRememberOrder(true);
 		orderList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
 		orderList.addColumn(Settings.i18n().tr("BLZ"), "blz");
 		orderList.addColumn(Settings.i18n().tr("Konto"), "kontonummer");
-		orderList.addColumn(Settings.i18n().tr("zugangsart"), "zugangsart"); 
+		orderList.addColumn(Settings.i18n().tr("Zugangsart"), "zugangsart"); 
 		return orderList;
 	}
 

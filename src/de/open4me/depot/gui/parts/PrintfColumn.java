@@ -1,6 +1,7 @@
 package de.open4me.depot.gui.parts;
 
 import de.willuhn.datasource.GenericObject;
+import de.willuhn.jameica.gui.parts.Column;
 import de.willuhn.logging.Logger;
 
 /**
@@ -61,5 +62,8 @@ public class PrintfColumn extends de.willuhn.jameica.gui.parts.Column {
 		return display != null ? display : "";
 	}
 
-
+	@Override
+	public int getSortMode() {
+		return Column.SORT_BY_VALUE;
+	}
 }

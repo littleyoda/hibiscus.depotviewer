@@ -13,6 +13,7 @@ import de.open4me.depot.Settings;
 import de.open4me.depot.gui.DatumsSlider;
 import de.open4me.depot.gui.action.OrderList;
 import de.open4me.depot.gui.menu.BestandsListMenu;
+import de.open4me.depot.gui.parts.PrintfColumn;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.tools.Bestandsabfragen;
 import de.willuhn.jameica.gui.AbstractControl;
@@ -91,12 +92,14 @@ public class BestandTableControl extends AbstractControl implements Listener
 
 		};
 
+		bestandsList.setRememberColWidths(true);
+		bestandsList.setRememberOrder(true);
 		bestandsList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
-		bestandsList.addColumn(Settings.i18n().tr("wkn"),"wkn");
+		bestandsList.addColumn(Settings.i18n().tr("WKN"),"wkn");
 		bestandsList.addColumn(Settings.i18n().tr("Name"),"wertpapiername");
 		bestandsList.addColumn(Settings.i18n().tr("Anzahl"),"anzahl"); 
-		bestandsList.addColumn(Settings.i18n().tr("Kurs"),"joinkurs"); 
-		bestandsList.addColumn(Settings.i18n().tr("Wert"),"joinwert"); 
+		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Kurs"), "kurs", "%.6f %s", "kurs", "kursw"));
+		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Wert"), "wert", "%.2f %s", "wert", "wertw"));
 		bestandsList.addColumn(Settings.i18n().tr("Bewertungsdatum"),"bewertungszeitpunkt", new DateFormatter(Settings.DATEFORMAT)); 
 		bestandsList.addColumn(Settings.i18n().tr("Abrufdatum"),"datum", new DateFormatter(Settings.DATEFORMAT)); 
 		bestandsList.setContextMenu(new BestandsListMenu(bestandsList));

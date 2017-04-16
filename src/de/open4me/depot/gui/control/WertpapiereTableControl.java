@@ -37,7 +37,9 @@ public class WertpapiereTableControl
 		List<GenericObjectSQL> list = SQLQueries.getWertpapiereMitKursdatum();
 
 		orderList = new TablePart(list,new OrderList());
-		orderList.addColumn(Settings.i18n().tr("wkn"),"wkn");
+		orderList.setRememberColWidths(true);
+		orderList.setRememberOrder(true);
+		orderList.addColumn(Settings.i18n().tr("WKN"),"wkn");
 		orderList.addColumn(Settings.i18n().tr("ISIN"),"isin");
 		orderList.addColumn(Settings.i18n().tr("Name"),"wertpapiername");
 		orderList.addColumn(Settings.i18n().tr("Letzter Kurs"),"kursdatum");

@@ -24,7 +24,6 @@ import de.willuhn.jameica.system.BackgroundTask;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.ProgressMonitor;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jsq.config.Config;
 import jsq.config.ConfigTuple;
 import jsq.datastructes.Const;

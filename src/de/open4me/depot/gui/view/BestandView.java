@@ -19,6 +19,7 @@ import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.LabelGroup;
+import de.willuhn.jameica.gui.util.ScrolledContainer;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.jameica.gui.util.TabGroup;
 import de.willuhn.util.ApplicationException;
@@ -64,7 +65,7 @@ public class BestandView extends AbstractView
 
 		TabGroup tabellenTab = new TabGroup(folder, "Tabellarisch");
 		BestandTableControl control = new BestandTableControl(this, datumsSlider);
-		Container container = new SimpleContainer(tabellenTab.getComposite());
+		Container container = new ScrolledContainer(tabellenTab.getComposite());
 		container.addPart(control.getBestandsTabelle());
 
 		final TabGroup piechartTab = new TabGroup(folder, "Graphisch");
