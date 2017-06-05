@@ -106,7 +106,7 @@ public class UpdateStock implements BackgroundTask {
 				monitor.setStatusText("Speichern");
 				saveStockData(wertpapier, base);
 
-				monitor.setStatusText("Ferting mit " + searchterm);
+				monitor.setStatusText("Fertig mit " + searchterm);
 				Application.getMessagingFactory().sendMessage(new KursUpdatesMsg(wpid));
 
 			}
