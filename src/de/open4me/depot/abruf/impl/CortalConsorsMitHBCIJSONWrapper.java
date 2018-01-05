@@ -30,8 +30,8 @@ public class CortalConsorsMitHBCIJSONWrapper {
 					&& orderinfo.get("12").equals("E")
 					&& orderinfo.get("17").equals("N")
 					&& orderinfo.get("7").equals(orderinfo.get("10"))
-					&& orderinfo.get("7").equals(orderinfo.get("28"))
-					&& orderinfo.get("7").equals(orderinfo.get("29"))
+//					&& orderinfo.get("7").equals(orderinfo.get("28"))
+//					&& orderinfo.get("7").equals(orderinfo.get("29"))
 					&& !orderinfo.get("3").equals("")
 					&& (orderinfo.get("6").equals("B") || orderinfo.get("6").equals("S"))
 					;
