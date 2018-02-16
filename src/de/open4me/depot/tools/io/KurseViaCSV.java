@@ -10,6 +10,7 @@ import jsq.datastructes.Datacontainer;
 import jsq.fetcher.history.BaseFetcher;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.tools.CSVImportHelper;
+import de.willuhn.jameica.gui.GUI;
 
 public class KurseViaCSV extends BaseFetcher {
 
@@ -30,13 +31,23 @@ public class KurseViaCSV extends BaseFetcher {
 		super.prepare(search, beginYear, beginMon, beginDay, stopYear, stopMon, stopDay);
 			
 			// FeldDefinitionen anwenden 
-			ArrayList<FeldDefinitionen> fd = new ArrayList<FeldDefinitionen>();
+			final ArrayList<FeldDefinitionen> fd = new ArrayList<FeldDefinitionen>();
 			fd.add(new FeldDefinitionen("Datum", java.util.Date.class, "date", true));
 			fd.add(new FeldDefinitionen("Kurs", BigDecimal.class, "last", true));
 
-			CSVImportHelper csv = new CSVImportHelper("kurse." + search);
-			List<GenericObjectHashMap> daten = csv.run(fd);
-			if (daten == null) {
+			final List<GenericObjectHashMap> daten = new ArrayList<GenericObjectHashMap>();
+			final CSVImportHelper csv = new CSVImportHelper("kurse." + search);
+			GUI.getDisplay().syncExec(new Runnable() {
+				public void run()
+				{
+					try {
+						daten.addAll(csv.run(fd));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			if (daten.size() == 0) {
 				return;
 			}
 			
