@@ -391,8 +391,8 @@ public class WertpapiereDatenControl {
 			return "Keine Kursdaten";
 		}
 		Long daysdiff = (Long) referenz.get(0).getAttribute("diff");
-		if (daysdiff > 7) {
-			return "Keine aktuellen Kursdaten";
+		if (daysdiff > 7 && (jahr !=  Calendar.getInstance().get(Calendar.YEAR))) {
+			return "Keine aktuellen Kursdaten (" + daysdiff + " Tage alt)";
 		}
 		BigDecimal jahresEnde = (BigDecimal) referenz.get(0).getAttribute("kursperf");
 
@@ -405,7 +405,7 @@ public class WertpapiereDatenControl {
 		}
 		daysdiff = (Long) referenz.get(0).getAttribute("diff");
 		if (daysdiff > 7) {
-			return "Keine aktuellen Kursdaten";
+			return "Keine Kursdaten des Vorjahres (" + daysdiff + " Tage alt)";
 		}
 		BigDecimal vorjahresEnde = (BigDecimal) referenz.get(0).getAttribute("kursperf");
 
