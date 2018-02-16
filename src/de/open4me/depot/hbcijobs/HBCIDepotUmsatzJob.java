@@ -149,7 +149,7 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 					if (t.betrag != null) {
 						gesamtbetrag = t.betrag.getValue().doubleValue();
 						waehrung = t.betrag.getCurr();
-						einzelbetrag = gesamtbetrag / t.anzahl.getValue().doubleValue(); 
+						einzelbetrag = Math.abs(gesamtbetrag) / t.anzahl.getValue().doubleValue();
 					}
 					Utils.addUmsatz(konto.getID(), 
 							Utils.getORcreateWKN(i.wkn, i.isin, i.name), aktion,
