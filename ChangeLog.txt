@@ -1,3 +1,5 @@
+0.5.2 -- 2018-02-16
+	Bugfix für den CSV-Import von Kursen
 0.5.1 -- 2018-01-05
 	Bugfix für Überprüfung von Consorsbank Umsätze
 0.5.0 -- 2017-04-23
