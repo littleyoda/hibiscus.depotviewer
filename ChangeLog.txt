@@ -1,3 +1,5 @@
+0.5.3 -- 2018-02-26
+	NPE im Einrichtungsassistenten
 0.5.2 -- 2018-02-16
 	Bugfix für den CSV-Import von Kursen
 0.5.1 -- 2018-01-05
