@@ -221,8 +221,10 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 	public boolean isSupported(Konto konto) throws ApplicationException,
 	RemoteException {
 		return 	super.isSupported(konto) && 
-				(konto.getBLZ().equals("76030080") 
-						|| konto.getBic().toUpperCase().equals("CSDBDE71XXX"));
+				(
+					(konto.getBLZ() != null && konto.getBLZ().equals("76030080")) 
+						|| (konto.getBic() != null && konto.getBic().toUpperCase().equals("CSDBDE71XXX"))
+				);
 	}
 
 
