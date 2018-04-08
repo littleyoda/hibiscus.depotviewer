@@ -198,7 +198,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 	@Override
 	public List<String> getPROP(Konto konto) {
 		List<String> result = super.getPROP(konto);
-		result.add(0, PROP_PASSWORD);
+		result.add(0, PROP_PASSWORD + "(pwd)");
 		result.add(0, PROP_KUNDENNUMMER);
 		return result;
 	}
