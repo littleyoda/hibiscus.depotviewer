@@ -115,6 +115,10 @@ public class Utils {
 			Double kurs, String kursW, Double kosten, String kostenW, Date date, String orderid, String kommentar,
 			Double gebuehren, String gebuehrenW, Double steuern, String steuernW) throws ApplicationException {
 		try {
+			if (orderid == null) {
+				orderid = "" + ("" + kontoid + wpid + aktion + date + anzahl + kurs + kursW).hashCode();
+				Logger.info("Setting id to " + orderid);
+			}
 			DBIterator liste = Settings.getDBService().createList(Umsatz.class);
 			liste.addFilter("orderid=?", orderid);
 			if (liste.hasNext()) {
@@ -137,9 +141,6 @@ public class Utils {
 //			if (kurs <  0.0f) {
 //				throw new ApplicationException("Der Kurs muss immer positiv sein.");
 //			}
-			if (orderid == null) {
-				orderid = "" + ("" + kontoid + wpid + aktion + date + anzahl + kurs + kursW).hashCode(); 
-			}
 			markRecalc(null); // Kein Konto-obj im Moment verfügbar
 			// create new project
 			Umsatz p = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
