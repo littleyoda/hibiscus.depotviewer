@@ -1,3 +1,4 @@
+0.5.4 -- 2018-07-04
 0.5.3 -- 2018-02-26
 	NPE im Einrichtungsassistenten
 0.5.2 -- 2018-02-16
