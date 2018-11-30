@@ -100,7 +100,7 @@ public class UmsatzeAusBestandsAenderung {
 								(isKauf) ? ((BigDecimal) ref.getAttribute("wert")).negate().doubleValue() : ((BigDecimal) ref.getAttribute("wert")).doubleValue(),
 										(String) ref.getAttribute("kursw"),
 										(Date) ref.getAttribute("datum"),
-										null, "aus Bestandsänderungen generiert"
+										null, "aus Bestandsänderungen generierte Schätzung"
 										,0.0d, "EUR", 0.0d, "EUR");
 			}
 		} catch (Exception e) {

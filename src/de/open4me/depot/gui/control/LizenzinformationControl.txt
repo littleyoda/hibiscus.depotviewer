@@ -1,0 +1,18 @@
+com.fasterxml.jackson.core jackson-annotations;http://github.com/FasterXML/jackson;http://www.apache.org/licenses/LICENSE-2.0.txt;The Apache Software License, Version 2.0
+com.fasterxml.jackson.core jackson-core;https://github.com/FasterXML/jackson-core;http://www.apache.org/licenses/LICENSE-2.0.txt;The Apache Software License, Version 2.0
+com.fasterxml.jackson.core jackson-databind;http://github.com/FasterXML/jackson;http://www.apache.org/licenses/LICENSE-2.0.txt;The Apache Software License, Version 2.0
+com.fasterxml.jackson.datatype jackson-datatype-jdk8;https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jdk8;http://www.apache.org/licenses/LICENSE-2.0.txt;The Apache Software License, Version 2.0
+com.fasterxml.jackson.datatype jackson-datatype-jsr310;https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jsr310;http://www.apache.org/licenses/LICENSE-2.0.txt;The Apache Software License, Version 2.0
+com.google.errorprone error_prone_annotations;http://nexus.sonatype.org/oss-repository-hosting.html/error_prone_parent/error_prone_annotations;http://www.apache.org/licenses/LICENSE-2.0.txt;Apache 2.0
+org.glassfish.jersey.inject jersey-hk2;https://jersey.github.io/project/jersey-hk2/;https://oss.oracle.com/licenses/CDDL+GPL-1.1;CDDL 1.1 -https://oss.oracle.com/licenses/CDDL+GPL-1.1;GPL2 w/ CPE
+org.slf4j slf4j-api;http://www.slf4j.org;http://www.opensource.org/licenses/mit-license.php;MIT License
+org.glassfish.jersey.core jersey-client;https://jersey.github.io/jersey-client/;https://oss.oracle.com/licenses/CDDL+GPL-1.1;CDDL 1.1 -https://oss.oracle.com/licenses/CDDL+GPL-1.1;GPL2 w/ CPE
+javax.ws.rs javax.ws.rs-api;http://jax-rs-spec.java.net;https://oss.oracle.com/licenses/CDDL+GPL-1.1;CDDL 1.1 -https://oss.oracle.com/licenses/CDDL+GPL-1.1;GPL2 w/ CPE
+org.immutables value;http://immutables.org/value;http://www.apache.org/licenses/LICENSE-2.0.txt;The Apache Software License, Version 2.0
+javax.annotation javax.annotation-api;http://jcp.org/en/jsr/detail?id=250;https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html;CDDL + GPLv2 with classpath exception
+javax.inject javax.inject;http://code.google.com/p/atinject/;http://www.apache.org/licenses/LICENSE-2.0.txt;The Apache Software License, Version 2.0
+org.glassfish.hk2 hk2-api;https://github.com/hk2-project/hk2/hk2-api;https://glassfish.java.net/nonav/public/CDDL+GPL_1_1.html;CDDL + GPLv2 with classpath exception
+org.glassfish.hk2 hk2-locator;https://github.com/hk2-project/hk2/hk2-locator;https://glassfish.java.net/nonav/public/CDDL+GPL_1_1.html;CDDL + GPLv2 with classpath exception
+org.glassfish.hk2 hk2-utils;https://github.com/hk2-project/hk2/hk2-utils;https://glassfish.java.net/nonav/public/CDDL+GPL_1_1.html;CDDL + GPLv2 with classpath exception
+org.glassfish.hk2.external;https://github.com/hk2-project/hk2/external/javax.inject;javax.inject;https://glassfish.java.net/nonav/public/CDDL+GPL_1_1.html;CDDL + GPLv2 with classpath exception
+org.glassfish.jersey.core jersey-common;https://jersey.github.io/jersey-common/;https://oss.oracle.com/licenses/CDDL+GPL-1.1;CDDL 1.1 -https://oss.oracle.com/licenses/CDDL+GPL-1.1;GPL2 w/ CPE

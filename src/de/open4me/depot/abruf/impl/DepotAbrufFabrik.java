@@ -22,6 +22,7 @@ public class DepotAbrufFabrik {
 			// Deshalb muss die Reihenfolge von Spezial (Unterstützung einzelner Banken) zu Allgemein (HBCI) eingehalten werden
 			depotAbrufs = new ArrayList<BasisDepotAbruf>();
 			depotAbrufs.add(new Fondsdepotbank());
+			depotAbrufs.add(new FfbDepot());
 		}
 		return depotAbrufs;
 	}

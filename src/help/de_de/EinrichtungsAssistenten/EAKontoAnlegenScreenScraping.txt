@@ -17,6 +17,24 @@ Unterkontonummer:                Depot Fondsdepot Bank<br/>
 Zugangsverfahren:                Depot Viewer<br/><br/>
 "Speichern"
 </p>
+<p><b>FFB Bank</b><br/><br/>
+Es muss manuell ein Konto angelegt werden:<br/>
+<br/>
+<b>Eigenschaften</b><br/>
+Bezeichnung des Kontos:          frei wählbar<br/>
+Kontoart:                          Wertpapierdepot<br/>
+Kontoinhalber:                     frei wählbar<br/>
+<b>Zugangsdaten</b><br/>
+Kundenkennung:                     Zugangsnummer, wie auf der Webseite genutzt wird<br/>
+IBAN:                               leer lassen<br/>
+Kontonummer:                     Depotnummer<br/>
+BIC:                               <br/>
+Bankleitzahl:                     <br/>
+Offline-Konto:                     muss deaktiviert(!) sein<br/>
+Unterkontonummer:                Depot FFB<br/>
+Zugangsverfahren:                Depot Viewer<br/><br/>
+"Speichern"
+</p>
 <!-- Next: KontoAbrufTestenScreenScraping -->
 <!-- Action: de.willuhn.jameica.hbci.gui.action.KontoNew -->
 </form>

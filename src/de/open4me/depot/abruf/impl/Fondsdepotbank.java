@@ -24,34 +24,40 @@ import de.willuhn.util.I18N;
 
 public class Fondsdepotbank extends BasisDepotAbruf {
 	final static String logout = "https://finanzportal.fondsdepotbank.de/fdb/abaxx-?$part=Home.short-login-info&$event=logout"; 
-	final static String[] basescript = new String[] { 
-			"#Login", 
-			"open \"https://finanzportal.fondsdepotbank.de/\"", 
+	final static String[] basescript = new String[] {
+			"engine chromedriver",
+			"",
+			"#Login",
+			"open \"https://finanzportal.fondsdepotbank.de/fdb/\"",
 			"set getbyid(\"Form2073790314_1_j_username\") to value \"${user}\"", 
 			"set getbyid(\"Form2073790314_1_j_password\") to value \"${pwd}\"", 
 			"click getbyxpath(\"//button[contains(@class,'evt-login')]\")",
-			"assertExists \"Login nicht möglich. Zugangsdaten falsch?\" getbyxpath(\"//p[contains(.,'Zeit bis zur Abmeldung: ')]\")" + 
-			"", 
-			"#Main Page", 
+			"assertExists \"Login nicht möglich. Zugangsdaten falsch?\" getbyxpath(\"//p[contains(.,'Zeit bis zur Abmeldung: ')]\")",
+			"#Main Page",
 			"open \"https://finanzportal.fondsdepotbank.de/fdb/abaxx-?$part=Home.content.Welcome\"",
 			"",
-			"#Umsätze", 
+			"#Umsätze",
+			"click getbytext(\"Depots\")",
 			"click getbytext(\"Depotumsätze\")",
-			"click getbyxpath(\"//button[normalize-space(.)='Aktionen']\")",
-			"download getbytext(\"CSV-Export\")",
-			"assertExists \"CSV Export für Umsätze nicht gefunden\" getbytext(\"CSV-Export\")",
-			"", 
-			"#Back to Main Page", 
-			"open \"https://finanzportal.fondsdepotbank.de/fdb/abaxx-?$part=Home.content.Welcome\"", 
-			"", 
-			"#Bestand", 
-			"click getbytext(\"Depotbestand\")", 
-			"click getbyxpath(\"//button[normalize-space(.)='Aktionen']\")",
-			"download getbytext(\"CSV-Export\")", 
-			"assertExists \"CSV Export für Umsätze nicht gefunden\" getbytext(\"CSV-Export\")",
-			"", 
-			"#Logout", 
-			"click getbytext(\"Abmelden\")"};
+			"",
+			"click getbyxpath(\"//button[contains(@class,'abx-button evt-openSubMenuCommon')]\")",
+			"download getbyxpath(\"//a[text()[contains(.,'CSV-Export')]]\") charset \"ISO-8859-15\"",
+			"",
+			"",
+			"click getbytext(\"Depots\")",
+			"click getbytext(\"Depotbestand\")",
+			"",
+			"click getbyxpath(\"//button[contains(@class,'abx-button evt-openSubMenuCommon')]\")",
+			"download getbyxpath(\"//a[text()[contains(.,'CSV-Export')]]\") charset \"ISO-8859-15\"",
+			"",
+			"",
+			"",
+			"",
+			"#Logout",
+			"click getbytext(\"Abmelden\")",
+	};
+	
+	
 	
 	private final static I18N i18n = Application.getPluginLoader().getPlugin(DepotViewerPlugin.class).getResources().getI18N();
 
@@ -151,7 +157,7 @@ public class Fondsdepotbank extends BasisDepotAbruf {
 				Logger.error("Aktuelle Zeile: " + buchungen.toString());
 				throw new ApplicationException("Unbekanntes Datumsformat: [" + buchung.get("buchungsdatum") + "] " + buchungen.toString());	
 			}
-			if (buchung.get("geschäftsart").equals("Erträgnis")) {
+			if (buchung.get("geschäftsart").equals("Erträgnis") || buchung.get("geschäftsart").equals("Erträgnis ohne Wiederanlage")) {
 				continue;
 //				throw new ApplicationException("Unbekannte Geschäftsart (" + buchung.get("Geschäftsart") + "). Bitte den Entwickler kontaktieren!" );	
 			}
