@@ -1,3 +1,5 @@
+0.5.5 -- 2018-11-30
+	Support für Fondsdepot Bank (FFB) hinzugefügt
 0.5.4 -- 2018-07-04
 0.5.3 -- 2018-02-26
 	NPE im Einrichtungsassistenten
