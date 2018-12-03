@@ -6,7 +6,7 @@
         name="hibiscus.depotviewer" version="0.5.5" class="de.open4me.depot.DepotViewerPlugin">
 
   <description>Depot Viewer (bitte auch Toolkit installieren)</description>
-  <url>http://www.open4me.de/hibiscus/hibiscus.depotviewer/hibiscus.depotviewer.zip</url>
+  <url>https://www.open4me.de/hibiscus/hibiscus.depotviewer/hibiscus.depotviewer.zip</url>
   <homepage>https://github.com/littleyoda/hibiscus.depotviewer</homepage>
   <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
 
