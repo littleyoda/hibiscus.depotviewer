@@ -103,6 +103,7 @@ public class SQLUtils {
 		pre.setString(1, key);
 		pre.setString(2, value);
 		pre.executeUpdate();
+		Logger.info("Speichere " + key + ":" + value);
 	}
 	
 	public static String getCfg(String key) {

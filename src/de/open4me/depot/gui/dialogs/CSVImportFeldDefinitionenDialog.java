@@ -2,7 +2,6 @@ package de.open4me.depot.gui.dialogs;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
-import java.sql.PreparedStatement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,26 +56,26 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 	private List<GenericObjectHashMap> quellDaten;
 	private ArrayList<FeldDefinitionen> feldDefinitionen;
 	private Map<FeldDefinitionen, AbstractInput> controls;
-	private Map<FeldDefinitionen, AbstractInput> extendedControls;
 	private Map<String, SimpleDateFormat> dateparser = new HashMap<String, SimpleDateFormat>();
 
 	private FeldConverter[] fcBigDecimal = new FeldConverter[]{ new BigDecimalDezimaltrennzeichenKomma(), new BigDecimalDezimaltrennzeichenPunkt()}; 
 
 	private List<String> header;
 	private ReplaceableComposite rc;
-	private String savename;
 	private SelectInput zahlenFormat;
 	private TextInput datumsFormat;
 	private SelectInput waehrung;
+	private Map<String, String> options;
+	private boolean save = false;
 
 
 
-	public CSVImportFeldDefinitionenDialog(ArrayList<FeldDefinitionen> fd, List<GenericObjectHashMap> liste, List<String> header, String savename)
+	public CSVImportFeldDefinitionenDialog(ArrayList<FeldDefinitionen> fd, List<GenericObjectHashMap> liste, List<String> header, Map<String, String> map)
 	{
 		super(POSITION_CENTER);
 		setTitle("CSV Felddefinitionen");
 		this.feldDefinitionen = fd;
-		this.savename = "csvimport." + savename + ".";
+		this.options = map;
 		this.quellDaten = liste;
 		this.header = new ArrayList<String>();
 		this.header.add("");
@@ -89,41 +88,44 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 	protected void paint(Composite parent) throws Exception
 	{
 		controls = new HashMap<FeldDefinitionen, AbstractInput>();
-		extendedControls = new HashMap<FeldDefinitionen, AbstractInput>();
-
-		
 
 		SimpleContainer columns = new SimpleContainer(parent, true, 2);
 		ScrolledContainer left = new ScrolledContainer(columns.getComposite());
 		SimpleContainer right = new SimpleContainer(columns.getComposite());
 		
 		left.addText("Bitte ordnen sie die einzelnen Spalten zu:", false);
-		zahlenFormat = new SelectInput(Arrays.asList(fcBigDecimal), null);
+		zahlenFormat = new SelectInput(Arrays.asList(fcBigDecimal), options.get("zahlenformat"));
+		zahlenFormat.setName("zahlenformat");
 		left.addLabelPair("Format für Zahlen", zahlenFormat);
 		
 		datumsFormat = new TextInput("dd.MM.yyyy");
+		datumsFormat.setValue(options.get("datumsformat"));
+		datumsFormat.setName("datumsformat");
 		left.addLabelPair("Format für Datum (yyyy-MM-dd)", datumsFormat);
 
 		Locale locale = Locale.getDefault();
 		ArrayList<Currency> currencies = new ArrayList<Currency>(Currency.getAvailableCurrencies());
 		Collections.sort(currencies, new Comparator<Currency>() {
 
-			@Override
-			public int compare(Currency o1, Currency o2) {
-				return o1.toString().compareTo(o2.toString());
-			}
-			
+		@Override
+		public int compare(Currency o1, Currency o2) {
+			return o1.toString().compareTo(o2.toString());
+		}
+		
 		});
-		waehrung = new SelectInput(currencies, Currency.getInstance(locale));
+
+		Currency c = Currency.getInstance(locale);
+		if (options.get("waehrung") != null) {
+			c = Currency.getInstance(options.get("waehrung"));
+		}
+		waehrung = new SelectInput(currencies, c);
+		waehrung.setName("waehrung");
 		left.addLabelPair("Standard Währung", waehrung);
 
 		left.addSeparator();
 		for (FeldDefinitionen x : feldDefinitionen) {
-//			String saved = SQLUtils.getCfg(getSaveKey(x, "ext"));
-//			if (saved == null) {
-//				saved = "";
-//			}
-			AbstractInput control = new SelectInput(header, SQLUtils.getCfg(getSaveKey(x, "")));
+			String key = getSaveKey(x);
+			AbstractInput control = new SelectInput(header, options.get(key)); 
 			String desc = x.getBeschreibung();
 			if (x.isRequired()) {
 				desc = desc + " (*)";
@@ -138,7 +140,7 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 					reload();
 				} catch (RemoteException e) {
 					throw new ApplicationException(e);
-				}
+				} 
 
 			}
 
@@ -146,6 +148,16 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 		weiterbutton = new Button("Weiter", new Action() {
 			public void handleAction(Object context) throws ApplicationException
 			{
+				for (Entry<FeldDefinitionen, AbstractInput> x : controls.entrySet()) {
+				Object value = x.getValue().getValue();
+				if (value != null) {
+						options.put(getSaveKey(x.getKey()), value.toString());
+				}
+				for (AbstractInput inp : new AbstractInput[] { zahlenFormat, datumsFormat, waehrung}) {
+					options.put(getName(inp), inp.getValue().toString());
+				}
+				
+			}
 				close();
 			}
 
@@ -162,26 +174,7 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 		buttons.addButton("Einstellungen speichern", new Action() {
 			public void handleAction(Object context) throws ApplicationException
 			{
-				try {
-				PreparedStatement pre = SQLUtils.getPreparedSQL("delete from depotviewer_cfg where key like concat(?,'%')");
-				pre.setString(1, savename);
-				pre.execute();
-				for (Entry<FeldDefinitionen, AbstractInput> x : controls.entrySet()) {
-					Object value = x.getValue().getValue();
-					if (value != null) {
-							SQLUtils.saveCfg(getSaveKey(x.getKey(), ""), value.toString());
-					}
-				}
-				for (Entry<FeldDefinitionen, AbstractInput> x : extendedControls.entrySet()) {
-					Object value = x.getValue().getValue();
-					if (value != null) {
-							SQLUtils.saveCfg(getSaveKey(x.getKey(), "ext"), value.toString());
-					}
-				}
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}					
+				save = true;
 			}
 
 		},null,false,"document-save.png");
@@ -192,11 +185,8 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 
 	}
 
-	private String getSaveKey(FeldDefinitionen x, String erweitert) {
-		if (erweitert.isEmpty()) {
-			return savename + x.getAttr();
-		}
-		return savename + erweitert + "." + x.getAttr(); 
+	private String getSaveKey(FeldDefinitionen x) {
+		return x.getAttr(); 
 	}
 	
 	private void reload() throws RemoteException {
@@ -338,4 +328,16 @@ public class CSVImportFeldDefinitionenDialog extends AbstractDialog
 		return tablist;
 	}
 
+	public boolean isSave() {
+		return save;
+	}
+
+	public void setSave(boolean save) {
+		this.save = save;
+	}
+
+	private String getName(AbstractInput inp) {
+		return inp.getName().toLowerCase().trim().replace(" ", "");
+	}
+	
 }

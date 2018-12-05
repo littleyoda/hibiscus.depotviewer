@@ -6,9 +6,9 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
@@ -48,14 +48,14 @@ public class CSVImportConfigDialog extends AbstractDialog
 	private List<GenericObjectHashMap> list = new ArrayList<GenericObjectHashMap>();
 	private List<String> header = new ArrayList<String>();
 	private File file;
-	private String savename;
+	private HashMap<String, String> options;
 
 
-	public CSVImportConfigDialog(File file, String savename)
+	public CSVImportConfigDialog(File file, HashMap<String, String> options)
 	{
 		super(POSITION_CENTER);
 		this.file = file;
-		this.savename = "csvimportfile." + savename + ".";
+		this.options = options;
 		setTitle("CSV Einstellungen");
 	}
 
@@ -93,8 +93,12 @@ public class CSVImportConfigDialog extends AbstractDialog
 
 		},null,true,"ok.png");
 		weiterbutton = new Button("Weiter", new Action() {
+
 			public void handleAction(Object context) throws ApplicationException
 			{
+				for (SelectInput x : new SelectInput[] { charset, trennzeichen, skiplines }) {
+					options.put(getName(x), x.getValue().toString());
+				}
 				close();
 			}
 
@@ -108,27 +112,14 @@ public class CSVImportConfigDialog extends AbstractDialog
 			}
 
 		},null,false,"process-stop.png");
-		buttons.addButton("Einstellungen speichern", new Action() {
-			public void handleAction(Object context) throws ApplicationException
-			{
-				try {
-					PreparedStatement pre = SQLUtils.getPreparedSQL("delete from depotviewer_cfg where key like concat(?,'%')");
-					pre.setString(1, savename);
-					pre.execute();
-
-					for (SelectInput x : new SelectInput[] { charset, trennzeichen, skiplines }) {
-						SQLUtils.saveCfg(getSaveKey(x), x.getValue().toString());
-					}
-				} catch (Exception e) {
-					Logger.error("Fehler beim Löschen der Pref", e);
-				}
-
-			}
-
-		},null,false,"document-save.png");
 		group.addButtonArea(buttons);
 	}
 
+	
+	private String getName(SelectInput x) {
+		return x.getName().toLowerCase().trim().replace(" ", "");
+	}
+	
 	private void reload() throws RemoteException {
 		this.getError().setValue("");
 		boolean enable = true;
@@ -225,6 +216,7 @@ public class CSVImportConfigDialog extends AbstractDialog
 		if (charset == null) {
 			charset = getSelectInput("Charset", Arrays.asList( 
 					new String[] { "WINDOWS-1252", "ISO-8859-1", "ISO-8859-15", "US-ASCII", "UTF-8", "UTF-16BE", "UTF-16LE", "UTF-16" }));
+			charset.setValue(options.get("charset"));
 		}
 		return charset;
 
@@ -234,6 +226,7 @@ public class CSVImportConfigDialog extends AbstractDialog
 		if (trennzeichen == null) {
 			trennzeichen = getSelectInput("Trennzeichen", Arrays.asList( 
 					new String[] { ";", ",", "|", "\t" }));
+			trennzeichen.setValue(options.get("trennzeichen"));
 		}
 		return trennzeichen;
 	}
@@ -242,6 +235,7 @@ public class CSVImportConfigDialog extends AbstractDialog
 		if (skiplines == null) {
 			skiplines = getSelectInput("Zeile mit den Spaltennamen", Arrays.asList( 
 					new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9,10 }));
+			skiplines.setValidChars("zeilemitdenspaltennamen");
 		}
 		return skiplines;
 	}
@@ -290,7 +284,7 @@ public class CSVImportConfigDialog extends AbstractDialog
 	}
 
 	private String getSaveKey(SelectInput x) {
-			return savename + x.getName().toLowerCase().trim().replace(" ", "");
+			return x.getName().toLowerCase().trim().replace(" ", "");
 	}
 	
 }
