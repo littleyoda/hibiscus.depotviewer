@@ -189,7 +189,7 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 			Logger.error("Fehler bei der Verarbeitung der JSON", pnfe);
 			String out = CortalConsorsMitHBCIJSONWrapper.getAnnoymisierterBuchungstext(orderinfo, detailInfo).replace(depotnummer, "000111222333") + "\n" + order;
 			Logger.info("Orderjson: " + out);
-			fehlerhafteOrder.add(pnfe + out);
+			fehlerhafteOrder.add(pnfe + "\r\n" + out);
 		}
 	}
 
