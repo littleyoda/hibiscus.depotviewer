@@ -24,10 +24,10 @@ Voraussetzung ist Hibiscus in Version 2.6.12 oder neuer
 ## Plugin installieren
 * Menü Datei/Einstellungen
 * Reiter "Updates"
-* Falls hier "http://www.open4me.de/hibiscus/" noch nicht aufgeführt ist:
+* Falls hier "https://www.open4me.de/hibiscus/" noch nicht aufgeführt ist:
 ⋅⋅* Neues Repository hinzufügen
-⋅⋅* "http://www.open4me.de/hibiscus/" in die Textbox eintragen
-* Doppel-Klick auf "http://www.open4me.de/hibiscus/"
+⋅⋅* "https://www.open4me.de/hibiscus/" in die Textbox eintragen
+* Doppel-Klick auf "https://www.open4me.de/hibiscus/"
 * Die Installation des gewünschten Plugins durch Doppel-Klick beginnen
 * Hibiscus neu starten
 
