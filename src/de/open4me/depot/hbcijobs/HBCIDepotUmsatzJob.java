@@ -7,6 +7,7 @@ import java.util.List;
 import org.kapott.hbci.GV_Result.GVRWPDepotUms;
 import org.kapott.hbci.GV_Result.GVRWPDepotUms.Entry.FinancialInstrument;
 import org.kapott.hbci.GV_Result.GVRWPDepotUms.Entry.FinancialInstrument.Transaction;
+import org.kapott.hbci.structures.BigDecimalValue;
 import org.kapott.hbci.structures.TypedValue;
 
 import de.open4me.depot.abruf.utils.Utils;
@@ -148,6 +149,10 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 					double einzelbetrag = 0.0d;
 					if (t.betrag != null) {
 						gesamtbetrag = t.betrag.getValue().doubleValue();
+						if (konto.getBic().equals("BIWBDE33XXX") || konto.getBLZ().equals("10130800"))  {
+							// Hack für FlatEx
+							gesamtbetrag = -gesamtbetrag;
+						}
 						waehrung = t.betrag.getCurr();
 						einzelbetrag = Math.abs(gesamtbetrag) / t.anzahl.getValue().doubleValue();
 					}
