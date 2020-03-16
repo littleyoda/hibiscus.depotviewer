@@ -65,7 +65,7 @@ public class UmsatzImportAction implements Action {
 		List<GenericObjectHashMap> daten;
 		try {
 			CSVImportHelper csv = new CSVImportHelper("umsatz." + kontoid);
-			daten = csv.run(fd);
+			daten = csv.run(fd, false);
 		} catch (Exception e) {
 			Logger.error("Fehler beim CSV-Import", e);
 			throw new ApplicationException(e);

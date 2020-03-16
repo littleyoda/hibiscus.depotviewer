@@ -1,22 +1,45 @@
 package de.open4me.depot.tools.io;
 
+import java.math.BigDecimal;
+
+import de.open4me.depot.datenobj.DepotAktion;
+import de.open4me.depot.datenobj.rmi.BigDecimalWithCurrency;
+import de.open4me.depot.tools.io.feldConverter.BigDecimalFeld;
+import de.open4me.depot.tools.io.feldConverter.BigDecimalWithCurrencyFeld;
+import de.open4me.depot.tools.io.feldConverter.DateFormatFeld;
+import de.open4me.depot.tools.io.feldConverter.DepotAktionFeld;
+import de.open4me.depot.tools.io.feldConverter.FeldConverter;
+import de.open4me.depot.tools.io.feldConverter.StringFeld;
+import de.open4me.depot.tools.io.feldConverter.WaehrungFeld;
+
+import java.util.Currency;
+import java.util.Date;
+
 /**
  * Definitiert ein notwendiges Feld beim Import von Daten
  * @author sven
  *
  */
-public class FeldDefinitionen implements Comparable {
+public class FeldDefinitionen implements Comparable<Object> {
 	
 	private String beschreibung;
 	private	Class<?> feldtype;
 	private String attr;
 	private boolean required;
+	private FeldConverter<?> converter;
+	private String setSpalte;
 	
 	public FeldDefinitionen(String b, Class<?> c, String attr, Boolean required) {
-		beschreibung = b;
-		feldtype = c;
+		this.beschreibung = b;
+		this.feldtype = c;
 		this.attr = attr;
 		this.required = required;
+		setConverter();
+	}
+	
+	@Override
+	public String toString() {
+		return beschreibung + " " + feldtype.getName() + " " + required; 
 	}
 
 	public String getBeschreibung() {
@@ -82,6 +105,36 @@ public class FeldDefinitionen implements Comparable {
 		return true;
 	}
 	
+	public FeldConverter<?> getConverters() {
+		return converter;
+	}
 	
+	private void setConverter() {
+		Class<?> feldtype = getFeldtype();
+		if (feldtype.equals(BigDecimal.class)) {
+				converter = new BigDecimalFeld();
+		} else if (feldtype.equals(Date.class)) {
+				converter = new DateFormatFeld();
+		} else if (feldtype.equals(String.class)) {
+			converter = new StringFeld();
+		} else if (feldtype.equals(DepotAktion.class)) {
+			converter = new DepotAktionFeld();
+		} else if (feldtype.equals(Currency.class)) {
+			converter = new WaehrungFeld();
+		} else if (feldtype.equals(BigDecimalWithCurrency.class)) {
+			converter = new BigDecimalWithCurrencyFeld();
+		} else {
+			throw new RuntimeException("Converter nicht gefunden");
+		}
+	}
+
+	public void setSpalte(String value) {
+		this.setSpalte = value;
+	}
+
+	public String getSpalte() {
+		return setSpalte;
+	}
+
 	
 }

@@ -119,6 +119,10 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 		konto.store();
 		Utils.clearBestand(konto);
 		for (Gattung  g : depot.getEntries()) {
+			if (g.saldo == null || g.price == null || g.depotwert == null) {
+				Logger.error("Eintrag ohne Saldo oder Wert. Saldo: " + g.saldo_type + " " + g.saldo + " " + "Wert: " + g.depotwert + " Price: " + g.pricetype + " " + g.pricequalifier + " " + g.price);
+				continue;
+			}
 			Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, g.saldo.getValue().doubleValue(), g.price.getValue().doubleValue(), 
 					g.price.getCurr(), g.depotwert.getValue().doubleValue(),  g.depotwert.getCurr(), depot.timestamp, g.timestamp_price);
 		}
