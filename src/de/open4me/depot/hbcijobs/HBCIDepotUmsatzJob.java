@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.kapott.hbci.GV_Result.GVRWPDepotUms;
+import org.kapott.hbci.GV_Result.GVRWPDepotUms.Entry;
 import org.kapott.hbci.GV_Result.GVRWPDepotUms.Entry.FinancialInstrument;
 import org.kapott.hbci.GV_Result.GVRWPDepotUms.Entry.FinancialInstrument.Transaction;
-import org.kapott.hbci.structures.BigDecimalValue;
 import org.kapott.hbci.structures.TypedValue;
 
 import de.open4me.depot.abruf.utils.Utils;
@@ -98,7 +98,17 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 			}
 
 			if (result.getEntries().length > 1) {
-				throw new ApplicationException("Zuviele Depots wurden zurückgeliefert");
+				String out = "";
+				for (int idx = 0; idx < result.getEntries().length; idx++) {
+					Entry depot = result.getEntries()[idx];
+					if (depot.depot != null && depot.depot.iban != null) {
+						out = out + " " + depot.depot.iban;
+					} else {
+						out = out + " NULL";
+					}
+				}
+				Logger.error("Folgende Depots wurden zurückgeliefert:" + out);
+				throw new ApplicationException("Zuviele Depots wurden zurückgeliefert (Umsatz)");
 			}
 			parseDepotUmsatz(result, konto);
 

@@ -102,7 +102,17 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 			throw new ApplicationException(result.getJobStatus().getErrorString());
 		}
 		if (result.getEntries().length > 1) {
-			throw new ApplicationException("Zuviele Depots wurden zurückgeliefert");
+			String out = "";
+			for (int idx = 0; idx < result.getEntries().length; idx++) {
+				Entry depot = result.getEntries()[idx];
+				if (depot.depot != null && depot.depot.iban != null) {
+					out = out + " " + depot.depot.iban;
+				} else {
+					out = out + " NULL";
+				}
+			}
+			Logger.error("Folgende Depots wurden zurückgeliefert:" + out);
+			throw new ApplicationException("Zuviele Depots wurden zurückgeliefert (Besand)");
 		}
 
 		UmsatzeAusBestandsAenderung umsaetzeAusBestaenden = null;
