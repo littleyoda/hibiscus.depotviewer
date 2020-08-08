@@ -20,6 +20,7 @@ public class DateFormatFeld extends FeldConverter<Date> {
 	public Object convert(String roh) throws Exception {
 		if (df == null || !df.toPattern().equals(opt.getAuswahl())) {
 			df = new SimpleDateFormat(opt.getAuswahl(), Locale.GERMAN);
+			df.setLenient(false);
 		}
 		return df.parse(roh);
 	}
