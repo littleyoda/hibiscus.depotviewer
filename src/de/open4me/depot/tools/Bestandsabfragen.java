@@ -11,8 +11,8 @@ import java.util.Set;
 
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
-import de.willuhn.jameica.hbci.accounts.balance.AccountBalanceProvider;
 import de.willuhn.jameica.hbci.gui.chart.AbstractChartDataSaldo;
+import de.willuhn.jameica.hbci.report.balance.AccountBalanceProvider;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.rmi.KontoType;
 import de.willuhn.logging.Logger;
