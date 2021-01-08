@@ -1,5 +1,6 @@
 package de.open4me.depot.sql;
 
+import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -8,7 +9,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.open4me.depot.abruf.utils.Utils;
 import de.willuhn.jameica.hbci.HBCI;
@@ -251,4 +254,25 @@ public class SQLUtils {
 		return new java.sql.Date(d.getTime());		
 	}
 
+	/**
+	 * Group a List of GenericObjectSQL by one of its attributes, so that the map key is the attribute value
+	 * and the Map entries are lists of corresponding objects.
+	 * @param <T> Type of the attribute, e.g. String or Integer
+	 * @param list List to group
+	 * @param attribute Attribute to group by
+	 * @return A map from the attribute value to all corresponding entries from the list.
+	 * @throws RemoteException
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> Map<T, List<GenericObjectSQL>> groupBy(List<GenericObjectSQL> list, String attribute) throws RemoteException {
+		HashMap<T, List<GenericObjectSQL>> ret = new HashMap<T, List<GenericObjectSQL>>();
+		for(GenericObjectSQL item : list) {
+			T key = (T)item.getAttribute(attribute);
+			if(!ret.containsKey(key)) {
+				ret.put(key, new ArrayList<GenericObjectSQL>());
+			}
+			ret.get(key).add(item);
+		}
+		return ret;
+	}
 }
