@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.TableItem;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.gui.action.OrderList;
+import de.open4me.depot.gui.action.UmsatzEditorAction;
 import de.open4me.depot.gui.menu.OrderListMenu;
 import de.open4me.depot.gui.parts.PrintfColumn;
 import de.open4me.depot.sql.GenericObjectSQL;
@@ -51,7 +52,7 @@ public class OrderListControl extends AbstractControl
 				, 
 				"depotviewer_umsaetze", "id");
 
-		orderList = new TablePart(list,new OrderList());
+		orderList = new TablePart(list, new UmsatzEditorAction(false));
 		orderList.setRememberColWidths(true);
 		orderList.setRememberOrder(true);
 		orderList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
