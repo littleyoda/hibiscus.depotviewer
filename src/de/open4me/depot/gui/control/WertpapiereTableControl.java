@@ -42,7 +42,8 @@ public class WertpapiereTableControl
 		orderList.addColumn(Settings.i18n().tr("WKN"),"wkn");
 		orderList.addColumn(Settings.i18n().tr("ISIN"),"isin");
 		orderList.addColumn(Settings.i18n().tr("Name"),"wertpapiername");
-		orderList.addColumn(Settings.i18n().tr("Letzter Kurs"),"kursdatum");
+		orderList.addColumn(Settings.i18n().tr("Letzter Kurs"),"kurs");
+		orderList.addColumn(Settings.i18n().tr("Letzter Kurs Datum"),"kursdatum");
 		orderList.addSelectionListener(new Listener() {
 
 			@Override

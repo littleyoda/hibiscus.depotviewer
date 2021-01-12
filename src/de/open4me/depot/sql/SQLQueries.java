@@ -5,8 +5,17 @@ import java.util.List;
 public class SQLQueries {
 
 	public static List<GenericObjectSQL> getWertpapiereMitKursdatum() {
-		return SQLUtils.getResultSet("SELECT * , ( " + 
-				"SELECT max( kursdatum ) " + 
+		return SQLUtils.getResultSet("SELECT * , " +
+				"(SELECT kurs " +
+				"	FROM depotviewer_kurse k " +
+				"	INNER JOIN " +
+				"		(SELECT wpid, max( kursdatum ) as MaxDatum " +
+				"		FROM depotviewer_kurse " +
+				"		GROUP BY wpid" +
+				"		) AS groupeddatum " +
+				"	ON k.wpid = groupeddatum.wpid AND k.wpid = depotviewer_wertpapier.id " +
+				"	AND k.kursdatum = groupeddatum.MaxDatum) AS Kurs," +
+				"(SELECT max( kursdatum ) " + 
 				"FROM depotviewer_kurse " + 
 				"WHERE wpid = depotviewer_wertpapier.id " + 
 				") AS Kursdatum " + 
