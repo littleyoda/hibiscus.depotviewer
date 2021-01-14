@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Listener;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.gui.action.AddWertpapierAction;
+import de.open4me.depot.gui.action.ModifyWertpapierAction;
 import de.open4me.depot.gui.action.OrderList;
 import de.open4me.depot.gui.action.WertpapiereAktualisierenAction;
 import de.open4me.depot.gui.menu.WertpapierMenu;
@@ -36,7 +37,7 @@ public class WertpapiereTableControl
 
 		List<GenericObjectSQL> list = SQLQueries.getWertpapiereMitKursdatum();
 
-		orderList = new TablePart(list,new OrderList());
+		orderList = new TablePart(list,new ModifyWertpapierAction());
 		orderList.setRememberColWidths(true);
 		orderList.setRememberOrder(true);
 		orderList.addColumn(Settings.i18n().tr("WKN"),"wkn");
