@@ -12,6 +12,8 @@ import org.kapott.hbci.structures.TypedValue;
 
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.datenobj.DepotAktion;
+import de.open4me.depot.datenobj.rmi.Umsatz;
+import de.open4me.depot.tools.UmsatzHelper;
 import de.willuhn.jameica.hbci.HBCIProperties;
 import de.willuhn.jameica.hbci.rmi.HibiscusDBObject;
 import de.willuhn.jameica.hbci.rmi.Konto;
@@ -166,7 +168,7 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 						waehrung = t.betrag.getCurr();
 						einzelbetrag = Math.abs(gesamtbetrag) / t.anzahl.getValue().doubleValue();
 					}
-					Utils.addUmsatz(konto.getID(), 
+					Umsatz u = Utils.addUmsatz(konto.getID(), 
 							Utils.getORcreateWKN(i.wkn, i.isin, i.name), aktion,
 							i.toString() + "\n" + t.toString(),
 							t.anzahl.getValue().doubleValue(),
@@ -176,6 +178,7 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 							String.valueOf(orderid.hashCode()),
 							"",0.0d, "EUR", 0.0d, "EUR"
 							);
+					UmsatzHelper.storeUmsatzInHibiscus(u);
 				} catch (RemoteException e) {
 					e.printStackTrace();
 					throw new ApplicationException(e);

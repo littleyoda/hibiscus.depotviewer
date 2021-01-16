@@ -8,6 +8,7 @@ import java.util.List;
 
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.datenobj.DepotAktion;
+import de.open4me.depot.datenobj.rmi.Umsatz;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.hbci.rmi.Konto;
@@ -90,7 +91,7 @@ public class UmsatzeAusBestandsAenderung {
 				}
 
 				// Umsatz hinzufügen
-				Utils.addUmsatz(konto.getID(), 
+				Umsatz u = Utils.addUmsatz(konto.getID(), 
 						"" + wpid,
 						(isKauf) ? DepotAktion.KAUF.internal() : DepotAktion.VERKAUF.internal(),
 								"",
@@ -102,6 +103,7 @@ public class UmsatzeAusBestandsAenderung {
 										(Date) ref.getAttribute("datum"),
 										null, "aus Bestandsänderungen generierte Schätzung"
 										,0.0d, "EUR", 0.0d, "EUR");
+				UmsatzHelper.storeUmsatzInHibiscus(u);
 			}
 		} catch (Exception e) {
 			throw new ApplicationException(e);

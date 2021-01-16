@@ -17,6 +17,7 @@ import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLQueries;
 import de.open4me.depot.sql.SQLUtils;
+import de.open4me.depot.tools.UmsatzHelper;
 import de.open4me.depot.tools.VarDecimalFormat;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
@@ -237,7 +238,7 @@ public class UmsatzEditorControl extends AbstractControl
 			throw new ApplicationException("Bitte vervollständigen sie die Eingabe.");
 		}
 		if ((Double) getAnzahl().getValue() <=0 || ((Double) getEinzelkurs().getValue() < 0)) {
-			throw new ApplicationException("Die Anzahl und der Kurs mmüssen positiv sein.");
+			throw new ApplicationException("Die Anzahl und der Kurs müssen positiv sein.");
 		}
 		if (umsatz == null) {
 			umsatz = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
@@ -246,7 +247,7 @@ public class UmsatzEditorControl extends AbstractControl
 			umsatz.setOrderid("" + (((GenericObjectSQL) getWertpapiere().getValue()).getID() + getAktionAuswahl().getValue().toString() +
 						getAnzahl().getValue().toString() + getEinzelkurs().getValue().toString() + "EUR" + getDate().getValue()
 						).hashCode());
-			umsatz.setKurzW("EUR");
+			umsatz.setKursW("EUR");
 			umsatz.setKostenW("EUR");
 			umsatz.setSteuernW("EUR");
 			umsatz.setTransaktionsgebuehrenW("EUR");
@@ -255,14 +256,15 @@ public class UmsatzEditorControl extends AbstractControl
 		umsatz.setKontoid(Integer.parseInt(k.getID()));
 		umsatz.setWPid(((GenericObjectSQL) getWertpapiere().getValue()).getID());
 		umsatz.setAktion((DepotAktion) getAktionAuswahl().getValue());
-		umsatz.setAnzahl(new BigDecimal((Double) getAnzahl().getValue()));
-		umsatz.setKurs(new BigDecimal((Double) getEinzelkurs().getValue()));
-		umsatz.setKosten(new BigDecimal(faktor * (Double) getKurswert().getValue()));
+		umsatz.setAnzahl(BigDecimal.valueOf((Double) getAnzahl().getValue()));
+		umsatz.setKurs(BigDecimal.valueOf((Double) getEinzelkurs().getValue()));
+		umsatz.setKosten(BigDecimal.valueOf(faktor * (Double) getKurswert().getValue()));
 		umsatz.setBuchungsdatum((Date) getDate().getValue());
-		umsatz.setSteuern(new BigDecimal((Double) getSteuern().getValue()));
-		umsatz.setTransaktionsgebuehren(new BigDecimal((Double) getTransaktionskosten().getValue()));
+		umsatz.setSteuern(BigDecimal.valueOf((Double) getSteuern().getValue()));
+		umsatz.setTransaktionsgebuehren(BigDecimal.valueOf((Double) getTransaktionskosten().getValue()));
 		umsatz.store();
-
+		
+		UmsatzHelper.storeUmsatzInHibiscus(umsatz);
 	}
 
 	public Part getBuchungen() throws RemoteException {
