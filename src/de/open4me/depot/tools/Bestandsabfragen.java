@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.DateUtils;
 
+import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.hbci.gui.chart.AbstractChartDataSaldo;
@@ -117,8 +118,7 @@ public class Bestandsabfragen implements AccountBalanceProvider {
 			Map<Integer, List<GenericObjectSQL>> buchungenProWertpapier = getBuchungenProWertpapier(konto, start, end);
 			Map<Integer, List<GenericObjectSQL>> kurseProWertpapier = getKurseProWertpapier(konto, start, end);		
 			
-			long diffInMillies = Math.abs(end.getTime() - start.getTime());
-		    int numdays = (int)TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) + 1;
+		    int numdays = (int)Utils.getDifferenceDays(start, end) + 1; 
 		    BigDecimal[] wpTagWerte = new BigDecimal[numdays]; // für das aktuelle Wertpapier werden hier Anzahl * Kurs für jeden Tag verwaltet
 		    
 		    // Ausgabe vorbereiten

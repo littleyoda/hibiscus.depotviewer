@@ -480,4 +480,16 @@ public class Utils {
 	public static Date getDatum(int year, int month, int day) {
 		return new Date(year - 1900, month - 1, day);
 	}
+	
+	/**
+	 * Berechnet die Anzahl an Tagen zwischen zwei Daten. 
+	 * @param d1
+	 * @param d2
+	 * @return
+	 */
+	public static long getDifferenceDays(Date d1, Date d2) {
+		java.time.LocalDate date1 = d1.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+		java.time.LocalDate date2 = d2.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+		return java.time.temporal.ChronoUnit.DAYS.between(date1, date2);
+	}
 }
