@@ -43,7 +43,7 @@ public class UmsatzEditorView extends AbstractView {
 		right.addLabelPair("Anzahl", control.getAnzahl());
 		right.addLabelPair("Einzelkurs", control.getEinzelkurs());
 		right.addLabelPair("Kurswert", control.getKurswert());
-		right.addCheckbox(control.getCBKurswertBerechnen(), "Kurswert automtaisch berechnen?");
+		right.addCheckbox(control.getCBKurswertBerechnen(), "Kurswert automatisch berechnen?");
 		right.addLabelPair("Transaktionskosten", control.getTransaktionskosten());
 		right.addLabelPair("Steuern", control.getSteuern());
 		right.addLabelPair("Gesamt Kosten/Erlöse", control.getGesamtSumme());

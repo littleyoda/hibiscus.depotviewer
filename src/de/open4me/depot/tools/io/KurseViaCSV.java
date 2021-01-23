@@ -42,7 +42,8 @@ public class KurseViaCSV extends BaseFetcher {
 				{
 					try {
 						List<GenericObjectHashMap> l = csv.run(fd, false);
-						daten.addAll(l);
+						if(l != null)
+							daten.addAll(l);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

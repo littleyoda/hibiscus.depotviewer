@@ -1,10 +1,12 @@
 package de.open4me.depot.hbcijobs;
 
+import java.math.BigDecimal;
 import java.rmi.RemoteException;
 
 import org.kapott.hbci.GV_Result.GVRWPDepotList;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry.Gattung;
+import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry.Gattung.SubSaldo;
 
 import de.open4me.depot.abruf.impl.BasisDepotAbruf;
 import de.open4me.depot.abruf.utils.Utils;
@@ -137,7 +139,14 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 				Logger.error("Eintrag ohne Saldo oder Wert. Saldo: " + g.saldo_type + " " + g.saldo + " " + "Wert: " + g.depotwert + " Price: " + g.pricetype + " " + g.pricequalifier + " " + g.price);
 				continue;
 			}
-			Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, g.saldo.getValue().doubleValue(), g.price.getValue().doubleValue(), 
+			BigDecimal anzahl = g.saldo.getValue();
+			if(g.getEntries().length == 1) {
+				SubSaldo sub = g.getEntries()[0];
+				if("TAVI".equals(sub.qualifier)) { // TAVI = Total Available. Dies ist die eigentlich verfügbare Anzahl, falls g.saldo gerundet angegeben ist, zB. bei Depots der DKB 
+					anzahl = sub.saldo.getValue();
+				}
+			}
+			Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, anzahl.doubleValue(), g.price.getValue().doubleValue(), 
 					g.price.getCurr(), g.depotwert.getValue().doubleValue(),  g.depotwert.getCurr(), depot.timestamp, g.timestamp_price);
 		}
 		if (simulateOrders) {

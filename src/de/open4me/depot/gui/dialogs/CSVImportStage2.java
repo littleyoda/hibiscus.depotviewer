@@ -78,17 +78,17 @@ public class CSVImportStage2 extends AbstractDialog
 		ScrolledContainer left = new ScrolledContainer(columns.getComposite());
 		SimpleContainer right = new SimpleContainer(columns.getComposite());
 
-		left.addText("Bitte ordnen sie die einzelnen Spalten zu:", false);
+		left.addText("Bitte ordnen Sie die einzelnen Spalten zu:", false);
 
-		ArrayList<Currency> currencies = new ArrayList<Currency>(Currency.getAvailableCurrencies());
-		Collections.sort(currencies, new Comparator<Currency>() {
-
-			@Override
-			public int compare(Currency o1, Currency o2) {
-				return o1.toString().compareTo(o2.toString());
-			}
-
-		});
+//		ArrayList<Currency> currencies = new ArrayList<Currency>(Currency.getAvailableCurrencies());
+//		Collections.sort(currencies, new Comparator<Currency>() {
+//
+//			@Override
+//			public int compare(Currency o1, Currency o2) {
+//				return o1.toString().compareTo(o2.toString());
+//			}
+//
+//		});
 
 		left.addSeparator();
 		for (FeldDefinitionen x : feldDefinitionen) {
@@ -112,7 +112,7 @@ public class CSVImportStage2 extends AbstractDialog
 				if (opt instanceof FeldConverterAuswahl) {
 					FeldConverterAuswahl aca = (FeldConverterAuswahl) opt;
 
-					final AbstractInput c = new SelectInput(aca.getListe(), aca.getListe().get(0));
+					final AbstractInput c = new SelectInput(aca.getListe(), aca.getAuswahl());
 					c.addListener(new Listener() {
 
 						@Override
