@@ -36,6 +36,7 @@ public class UmsatzEditorView extends AbstractView {
 		left.addLabelPair("Datum", control.getDate());
 		left.addLabelPair("Konto", control.getKonto());
 		left.addLabelPair("Aktion", control.getAktionAuswahl());
+		left.addLabelPair("Kommentar", control.getKommentar());
 
 		Container right = new SimpleContainer(columns.getComposite());
 

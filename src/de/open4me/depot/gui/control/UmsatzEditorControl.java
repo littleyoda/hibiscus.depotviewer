@@ -27,6 +27,7 @@ import de.willuhn.jameica.gui.input.DateInput;
 import de.willuhn.jameica.gui.input.DecimalInput;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.SelectInput;
+import de.willuhn.jameica.gui.input.TextAreaInput;
 import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.util.ApplicationException;
@@ -47,6 +48,7 @@ public class UmsatzEditorControl extends AbstractControl
 	private AbstractInput transaktionskosten;
 	private DecimalInput steuern;
 	private Umsatz umsatz = null;
+	private Input kommentar;
 
 	public UmsatzEditorControl(AbstractView view) throws Exception {
 		super(view);
@@ -63,6 +65,7 @@ public class UmsatzEditorControl extends AbstractControl
 		getSteuern().setValue((umsatz.getSteuern() != null) ? umsatz.getSteuern() : 0.0d);
 		getTransaktionskosten().setValue((umsatz.getTransaktionsgebuehren() != null) ? umsatz.getTransaktionsgebuehren()  : 0.0d);
 		getKurswert().setValue(Math.abs(umsatz.getKosten().doubleValue()));
+		getKommentar().setValue(umsatz.getKommentar());
 		
 		String id = umsatz.getWPid().toString();
 		boolean found = false;
@@ -105,7 +108,7 @@ public class UmsatzEditorControl extends AbstractControl
 		if (betrag != null)
 			return betrag;
 		double d = Double.NaN;
-		betrag = new DecimalInput(d, new VarDecimalFormat(5));
+		betrag = new DecimalInput(d, new VarDecimalFormat(2, 3));
 		betrag.setMandatory(true);
 		betrag.addListener(new Listener() {
 
@@ -168,7 +171,7 @@ public class UmsatzEditorControl extends AbstractControl
 		if (einzelkurs != null)
 			return einzelkurs;
 		double d = Double.NaN;
-		einzelkurs = new DecimalInput(d, new VarDecimalFormat(5));
+		einzelkurs = new DecimalInput(d, new VarDecimalFormat(2, 3));
 		einzelkurs.setMandatory(true);
 		einzelkurs.addListener(new Listener() {
 
@@ -241,7 +244,6 @@ public class UmsatzEditorControl extends AbstractControl
 		}
 		if (umsatz == null) {
 			umsatz = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
-			umsatz.setKommentar("");
 			umsatz.setBuchungsinformationen("");
 			umsatz.setOrderid("" + (((GenericObjectSQL) getWertpapiere().getValue()).getID() + getAktionAuswahl().getValue().toString() +
 						getAnzahl().getValue().toString() + getEinzelkurs().getValue().toString() + "EUR" + getDate().getValue()
@@ -261,6 +263,7 @@ public class UmsatzEditorControl extends AbstractControl
 		umsatz.setBuchungsdatum((Date) getDate().getValue());
 		umsatz.setSteuern(new BigDecimal((Double) getSteuern().getValue()));
 		umsatz.setTransaktionsgebuehren(new BigDecimal((Double) getTransaktionskosten().getValue()));
+		umsatz.setKommentar((String)getKommentar().getValue());
 		umsatz.store();
 
 	}
@@ -286,17 +289,26 @@ public class UmsatzEditorControl extends AbstractControl
 		if (gesamt != null)
 			return gesamt;
 		double d = Double.NaN;
-		gesamt = new DecimalInput(d, new VarDecimalFormat(5));
+		gesamt = new DecimalInput(d, new VarDecimalFormat(2));
 		gesamt.setMandatory(true);
 		gesamt.setEnabled(false);
 		return gesamt;
+	}
+	
+	public Input getKommentar() {
+		if (kommentar != null)
+			return kommentar;
+		kommentar = new TextAreaInput(null, 2000);
+		((TextAreaInput)kommentar).setHeight(50);
+		kommentar.setMandatory(false);
+		return kommentar;
 	}
 
 	public Input getKurswert() {
 		if (kurswert != null)
 			return kurswert;
 		double d = Double.NaN;
-		kurswert = new DecimalInput(d, new VarDecimalFormat(5));
+		kurswert = new DecimalInput(d, new VarDecimalFormat(2, 3));
 		kurswert.setMandatory(true);
 		return kurswert;
 	}
@@ -305,7 +317,7 @@ public class UmsatzEditorControl extends AbstractControl
 		if (transaktionskosten != null)
 			return transaktionskosten;
 		double d = Double.valueOf("0");
-		transaktionskosten = new DecimalInput(d, new VarDecimalFormat(5));
+		transaktionskosten = new DecimalInput(d, new VarDecimalFormat(2, 3));
 		transaktionskosten.setMandatory(true);
 		transaktionskosten.addListener(new Listener() {
 
@@ -336,7 +348,7 @@ public class UmsatzEditorControl extends AbstractControl
 		if (steuern != null)
 			return steuern;
 		double d = Double.valueOf("0");
-		steuern = new DecimalInput(d, new VarDecimalFormat(5));
+		steuern = new DecimalInput(d, new VarDecimalFormat(2, 3));
 		steuern.setMandatory(true);
 		steuern.addListener(new Listener() {
 
