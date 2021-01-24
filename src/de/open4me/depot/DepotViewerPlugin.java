@@ -4,9 +4,10 @@ package de.open4me.depot;
 import java.io.File;
 
 import jsq.fetch.factory.Factory;
+import jsq.fetcher.history.BaseFetcher;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.sql.SQLUtils;
-import de.open4me.depot.tools.io.KurseViaCSV;
+import de.open4me.depot.tools.io.KurseViaFileCSV;
 import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.plugin.Version;
 import de.willuhn.jameica.system.Application;
@@ -37,7 +38,9 @@ public class DepotViewerPlugin extends AbstractPlugin
 
 		checkJavaStockQuotesDirectory();
 		SQLUtils.checkforupdates();
-		Factory.addJavaFetcher(new KurseViaCSV());
+		Factory.getHistoryFetcher().removeIf(n -> (n.getName().equals("Yahoo Finance!")));
+		Factory.addJavaFetcher(new KurseViaFileCSV(0));
+		Factory.addJavaFetcher(new KurseViaFileCSV(1));
 	}
 
 	/**

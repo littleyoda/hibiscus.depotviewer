@@ -12,11 +12,22 @@ import jsq.config.Config;
 import jsq.datastructes.Datacontainer;
 import jsq.fetcher.history.BaseFetcher;
 
-public class KurseViaCSV extends BaseFetcher {
+public class KurseViaFileCSV extends BaseFetcher {
 
+	
+	private int modus;
+
+	public KurseViaFileCSV(int modus) {
+		this.modus = modus;
+	}
+	
 	@Override
 	public String getName() {
-		return "CSV Import";
+		if (modus == 0) {
+			return "CSV Import (via Datei)";
+		} else {
+			return "CSV Import (via Url)";
+		}
 	}
 
 	@Override
@@ -36,14 +47,15 @@ public class KurseViaCSV extends BaseFetcher {
 			fd.add(new FeldDefinitionen("Kurs", BigDecimalWithCurrency.class, "tmp", true));
 
 			final List<GenericObjectHashMap> daten = new ArrayList<GenericObjectHashMap>();
-			final CSVImportHelper csv = new CSVImportHelper("kurse." + search);
+			final CSVImportHelper csv = new CSVImportHelper("kurse." + search, modus);
 			GUI.getDisplay().syncExec(new Runnable() {
 				public void run()
 				{
 					try {
 						List<GenericObjectHashMap> l = csv.run(fd, false);
-						if(l != null)
+						if (l != null) {
 							daten.addAll(l);
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

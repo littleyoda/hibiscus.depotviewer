@@ -3,6 +3,7 @@ package de.open4me.depot.tools.io;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
@@ -19,7 +20,6 @@ import de.open4me.depot.tools.io.feldConverter.options.FeldConverterAuswahl;
 
 public class CSVImportTool {
 
-	private File file;
 	private List<GenericObjectHashMap> list = new ArrayList<GenericObjectHashMap>();
 	private List<String> header = new ArrayList<String>();
 	private boolean isIgnoredLinesr;
@@ -28,14 +28,18 @@ public class CSVImportTool {
 	private FeldConverterAuswahl<String> charset = new FeldConverterAuswahl<String>("charset", "Charset", Arrays.asList(new String[] { "WINDOWS-1252", "ISO-8859-1", "ISO-8859-15", "US-ASCII", "UTF-8", "UTF-16BE", "UTF-16LE", "UTF-16" }));
 	private FeldConverterAuswahl<String> trennzeichen = new FeldConverterAuswahl<String>("separator", "Trennzeichen", Arrays.asList(new String[] { ";", ",", "|", "\t" }));
 	private FeldConverterAuswahl<Integer> skipLines = new FeldConverterAuswahl<Integer>("rowheader", "Zeile mit den Spaltennamen", Arrays.asList(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9,10 }));
+	private File file;
 			
-	public CSVImportTool(File file, ArrayList<FeldDefinitionen> fd) {
-		this.file = file;
+	public CSVImportTool(ArrayList<FeldDefinitionen> fd) {
 		this.feldDefinitionen = fd;
 		csvOptions = new ArrayList<FeldConverterAuswahl<?>>();
 		csvOptions.add(charset);
 		csvOptions.add(trennzeichen);
 		csvOptions.add(skipLines);
+	}
+	
+	public void setFile(File file) {
+		this.file = file;
 	}
 
 	public void load() throws IOException {

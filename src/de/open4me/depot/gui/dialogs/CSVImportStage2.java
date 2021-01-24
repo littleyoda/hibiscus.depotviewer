@@ -6,11 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Currency;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;

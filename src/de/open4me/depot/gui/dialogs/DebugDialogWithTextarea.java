@@ -35,7 +35,7 @@ public class DebugDialogWithTextarea extends AbstractDialog
 	/**
 	 * @see de.willuhn.jameica.gui.dialogs.AbstractDialog#getData()
 	 */
-	protected Object getData() throws Exception
+	public Object getData() throws Exception
 	{
 		return null;
 	}
