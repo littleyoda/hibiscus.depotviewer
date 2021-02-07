@@ -1,5 +1,7 @@
 package de.open4me.depot.gui.control;
 
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.rmi.RemoteException;
@@ -273,7 +275,21 @@ public class WertpapiereDatenControl {
 						"",  "Datum",
 						"Kurs", data, true, true, false);
 				renderer = chart.getXYPlot().getRenderer();
-				new ChartComposite(getComposite(), SWT.NONE, chart, true);
+				Rectangle maxSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+				new ChartComposite(getComposite(), SWT.NONE, chart, 
+						ChartComposite.DEFAULT_WIDTH,
+						ChartComposite.DEFAULT_HEIGHT,
+						ChartComposite.DEFAULT_MINIMUM_DRAW_WIDTH,
+						ChartComposite.DEFAULT_MINIMUM_DRAW_HEIGHT,
+						maxSize.width, // ChartComposite.DEFAULT_MAXIMUM_DRAW_WIDTH,
+						maxSize.height, // ChartComposite.DEFAULT_MAXIMUM_DRAW_HEIGHT,
+		                true,  // useBuffer
+		                true,  // properties
+		                true,  // save
+		                true,  // print
+		                true,  // zoom
+		                true   // tooltips
+	                );
 			}
 			
 			String lastSelection = "";
