@@ -55,7 +55,9 @@ public class UmsatzHelper {
 			hu.setKommentar("Automatisch erzeugt von DepotViewer");
 			hu.setSaldo(0);
 		}
-	    hu.setBetrag(-u.getKosten().doubleValue());
+		
+		BigDecimal gegenwert = u.getKosten().negate();
+		hu.setBetrag(gegenwert.doubleValue());
 	    hu.setDatum(u.getBuchungsdatum());
 	    hu.setValuta(u.getBuchungsdatum());
 	    
@@ -63,22 +65,18 @@ public class UmsatzHelper {
 	    hu.setZweck(u.getAktion().toString() + " " + kf.format(u.getAnzahl()) + " STK");
 	    hu.setZweck2("WKN: " + w.getWkn() + " ISIN: " + w.getIsin());
 	    
-	    BigDecimal gegenwert = u.getKosten();
+	    gegenwert = gegenwert.add(u.getTransaktionsgebuehren()).add(u.getSteuern()); // gegenwert hat passendes Vorzeichen, daher kann man hier addieren
 	    String ertragsart = "Kosten";
-	    if(u.getAktion().equals(DepotAktion.KAUF)) {
-	    	gegenwert = gegenwert.negate().add(u.getTransaktionsgebuehren()).add(u.getSteuern());
-	    } else if(u.getAktion().equals(DepotAktion.VERKAUF)){
-	    	gegenwert = gegenwert.subtract(u.getTransaktionsgebuehren()).subtract(u.getSteuern());
+	    if(u.getAktion().equals(DepotAktion.VERKAUF) || u.getAktion().equals(DepotAktion.AUSBUCHUNG)){
 	    	ertragsart = "Erlös";
 	    }
-	    
 	    
 	    hu.setWeitereVerwendungszwecke(VerwendungszweckUtil.parse(w.getWertpapiername() + "\n"
 	    		+ "Kurs: " + kf.format(u.getKurs()) + " " + u.getKursW() + "\n" 
 	    		+ "Betrag: " + df.format(u.getKosten().abs()) + " " + u.getKostenW() + "\n"
 	    		+ "Steuern: " + df.format(u.getSteuern()) + " " + u.getSteuernW() + "\n"
 	    		+ "Gebühren: " + df.format(u.getTransaktionsgebuehren()) + " " + u.getTransaktionsgebuehrenW() + "\n"
-	    		+ ertragsart + ": " + df.format(gegenwert)  + " " + u.getKostenW() + "\n"));	    
+	    		+ ertragsart + ": " + df.format(gegenwert.abs())  + " " + u.getKostenW() + "\n"));	    
 	    
 	    // Saldo berechnen, falls möglich
 	    Bestandsabfragen abfragen = new Bestandsabfragen();

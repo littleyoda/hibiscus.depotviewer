@@ -142,7 +142,7 @@ public class UmsatzEditorControl extends AbstractControl
 			}
 			
 			int faktor = -1;
-			if (getAktionAuswahl().getValue().equals(DepotAktion.VERKAUF)) {
+			if (getAktionAuswahl().getValue().equals(DepotAktion.VERKAUF) || getAktionAuswahl().getValue().equals(DepotAktion.AUSBUCHUNG)) {
 				faktor = 1;
 			}
 			Double d = faktor * (Double) getKurswert().getValue();
@@ -231,11 +231,11 @@ public class UmsatzEditorControl extends AbstractControl
 
 	public void handleStore() throws RemoteException, ApplicationException {
 		int faktor = -1;
-		if (getAktionAuswahl().getValue().equals(DepotAktion.VERKAUF)) {
+		if (getAktionAuswahl().getValue().equals(DepotAktion.VERKAUF) || getAktionAuswahl().getValue().equals(DepotAktion.AUSBUCHUNG)) {
 			faktor = 1;
 		}
 		if (getEinzelkurs().getValue() == null || getAnzahl().getValue() == null || getDate().getValue() ==null) {
-			throw new ApplicationException("Bitte vervollständigen sie die Eingabe.");
+			throw new ApplicationException("Bitte vervollständigen Sie die Eingabe.");
 		}
 		if ((Double) getAnzahl().getValue() <=0 || ((Double) getEinzelkurs().getValue() < 0)) {
 			throw new ApplicationException("Die Anzahl und der Kurs müssen positiv sein.");
