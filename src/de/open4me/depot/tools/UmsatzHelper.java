@@ -10,6 +10,9 @@ import de.open4me.depot.datenobj.DepotAktion;
 import de.open4me.depot.datenobj.rmi.Umsatz;
 import de.open4me.depot.datenobj.rmi.Wertpapier;
 import de.willuhn.datasource.rmi.DBIterator;
+import de.willuhn.datasource.rmi.DBService;
+import de.willuhn.jameica.hbci.rmi.DBProperty;
+import de.willuhn.jameica.hbci.server.DBPropertyUtil.Prefix;
 import de.willuhn.jameica.hbci.server.Value;
 import de.willuhn.jameica.hbci.server.VerwendungszweckUtil;
 import de.willuhn.util.ApplicationException;
@@ -98,12 +101,23 @@ public class UmsatzHelper {
 	 * @throws RemoteException
 	 */
 	public static de.willuhn.jameica.hbci.rmi.Umsatz getHibiscusUmsatzByDepotViewerId(String depotViewerId) throws RemoteException{
-		DBIterator<de.willuhn.jameica.hbci.rmi.Umsatz> liste = Settings.getDBService().createList(de.willuhn.jameica.hbci.rmi.Umsatz.class);	
-		while(liste.hasNext()) {
-			de.willuhn.jameica.hbci.rmi.Umsatz hu = liste.next();
-			String dvId = hu.getMeta("depotviewer_id", null);
-			if(depotViewerId.equals(dvId))
-				return hu;
+		String query = Prefix.META.value() + ".umsatz.%.depotviewer_id";
+		DBService service = Settings.getDBService();
+		DBIterator<DBProperty> i = service.createList(DBProperty.class);
+		i.addFilter("name like ?", query);
+		i.addFilter("content=?", depotViewerId);
+		
+		if (i.hasNext())
+		{
+			DBProperty p = i.next();
+			// p ist der passende Meta-Datensatz mit der ID des Depot-Umsatzes.
+			// Name sieht typischerweise so aus: "meta.umsatz.1234.depoviewer_id"
+			// "1234" ist die ID des Hibiscus-Umsatzes.
+			String[] parts = org.apache.commons.lang.StringUtils.split(p.getName(), '.');
+			if (parts.length == 4) {
+				String id = parts[2];
+				return service.createObject(de.willuhn.jameica.hbci.rmi.Umsatz.class, id);
+			}
 		}
 		return null;
 	}
