@@ -128,6 +128,7 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 		for (FinancialInstrument i : entries.instruments) {
 			for (Transaction t : i.transactions) {
 				// Einlage Betrag = null; transaction_indicator: 2: Kapitalmassnahme; richtung: 2 Erhalt; bezahlung 2: frei
+				// Auslieferung Betrag = null; transaction_indicator: 2: Corporate Action; richtung: 1 Lieferung; bezahlung 2: frei
 				// Kauf Betrag = -9999, transaction_indicator: : 1: Settlement/Clearing; richtung: 2 Erhalt; bezahlung 2: frei
 				// Verkauf Betrag = 9999, transaction_indicator :1: Settlement/Clearing; richtung 1: Lieferung bezahlung 2: frei
 
@@ -143,6 +144,9 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 				if (t.transaction_indicator == Transaction.INDICATOR_CORPORATE_ACTION 
 						&& t.richtung == Transaction.RICHTUNG_ERHALT) {
 					aktion = DepotAktion.EINBUCHUNG.internal();
+				} else if (t.transaction_indicator == Transaction.INDICATOR_CORPORATE_ACTION 
+						&& t.richtung == Transaction.RICHTUNG_LIEFERUNG) {
+					aktion = DepotAktion.AUSBUCHUNG.internal();
 				} else if (t.transaction_indicator == Transaction.INDICATOR_SETTLEMENT_CLEARING 
 						&& t.richtung == Transaction.RICHTUNG_ERHALT) {
 					aktion = DepotAktion.KAUF.internal();

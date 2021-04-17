@@ -1,10 +1,12 @@
 package de.open4me.depot.hbcijobs;
 
+import java.math.BigDecimal;
 import java.rmi.RemoteException;
 
 import org.kapott.hbci.GV_Result.GVRWPDepotList;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry.Gattung;
+import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry.Gattung.SubSaldo;
 
 import de.open4me.depot.abruf.impl.BasisDepotAbruf;
 import de.open4me.depot.abruf.utils.Utils;
@@ -101,19 +103,19 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 		if (!result.isOK()) {
 			throw new ApplicationException(result.getJobStatus().getErrorString());
 		}
-		if (result.getEntries().length > 1) {
-			String out = "";
-			for (int idx = 0; idx < result.getEntries().length; idx++) {
-				Entry depot = result.getEntries()[idx];
-				if (depot.depot != null && depot.depot.iban != null) {
-					out = out + " " + depot.depot.iban;
-				} else {
-					out = out + " NULL";
-				}
-			}
-			Logger.error("Folgende Depots wurden zurückgeliefert:" + out);
-			throw new ApplicationException("Zuviele Depots wurden zurückgeliefert (Besand)");
-		}
+//		if (result.getEntries().length > 1) {
+//			String out = "";
+//			for (int idx = 0; idx < result.getEntries().length; idx++) {
+//				Entry depot = result.getEntries()[idx];
+//				if (depot.depot != null && depot.depot.iban != null) {
+//					out = out + " " + depot.depot.iban;
+//				} else {
+//					out = out + " NULL";
+//				}
+//			}
+//			Logger.error("Folgende Depots wurden zurückgeliefert:" + out);
+//			throw new ApplicationException("Zuviele Depots wurden zurückgeliefert (Besand)");
+//		}
 
 		UmsatzeAusBestandsAenderung umsaetzeAusBestaenden = null;
 		
@@ -121,25 +123,33 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 			umsaetzeAusBestaenden = new UmsatzeAusBestandsAenderung(konto);
 		}
 
-
-
 		Utils.clearBestand(konto);
-		Entry depot = result.getEntries()[0];
-		konto.setSaldo((depot.total != null) ? depot.total.getValue().doubleValue() : 0); // Bei der DKB ist depot.total == null, wenn das Depot leer ist
-		konto.store();
-		Utils.clearBestand(konto);
-		for (Gattung  g : depot.getEntries()) {
-			if (g == null) {
-				Logger.error("Null Entry in depot.getEntries");
-				continue;
-			}
-			if (g.saldo == null || g.price == null || g.depotwert == null) {
-				Logger.error("Eintrag ohne Saldo oder Wert. Saldo: " + g.saldo_type + " " + g.saldo + " " + "Wert: " + g.depotwert + " Price: " + g.pricetype + " " + g.pricequalifier + " " + g.price);
-				continue;
-			}
-			Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, g.saldo.getValue().doubleValue(), g.price.getValue().doubleValue(), 
-					g.price.getCurr(), g.depotwert.getValue().doubleValue(),  g.depotwert.getCurr(), depot.timestamp, g.timestamp_price);
+		BigDecimal total = BigDecimal.ZERO;
+		for(Entry depot : result.getEntries()) {
+  		for (Gattung  g : depot.getEntries()) {
+  			if (g == null) {
+  				Logger.error("Null Entry in depot.getEntries");
+  				continue;
+  			}
+  			if (g.saldo == null || g.price == null || g.depotwert == null) {
+  				Logger.error("Eintrag ohne Saldo oder Wert. Saldo: " + g.saldo_type + " " + g.saldo + " " + "Wert: " + g.depotwert + " Price: " + g.pricetype + " " + g.pricequalifier + " " + g.price);
+  				continue;
+  			}
+  			BigDecimal anzahl = g.saldo.getValue();
+  			if(g.getEntries().length == 1) {
+  				SubSaldo sub = g.getEntries()[0];
+  				if("TAVI".equals(sub.qualifier)) { // TAVI = Total Available. Dies ist die eigentlich verfügbare Anzahl, falls g.saldo gerundet angegeben ist, zB. bei Depots der DKB 
+  					anzahl = sub.saldo.getValue();
+  				}
+  			}
+  			Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, anzahl.doubleValue(), g.price.getValue().doubleValue(), 
+  					g.price.getCurr(), g.depotwert.getValue().doubleValue(),  g.depotwert.getCurr(), depot.timestamp, g.timestamp_price);
+  		}
+  		total = total.add((depot.total != null) ? depot.total.getValue() : BigDecimal.ZERO); // Bei der DKB ist depot.total == null, wenn das Depot leer ist
 		}
+		konto.setSaldo(total.doubleValue());
+		konto.store(); 
+		
 		if (simulateOrders) {
 			umsaetzeAusBestaenden.erzeugeUmsaetze();
 		}

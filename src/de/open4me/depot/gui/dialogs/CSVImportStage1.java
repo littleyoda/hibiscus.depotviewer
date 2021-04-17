@@ -46,6 +46,7 @@ public class CSVImportStage1 extends AbstractDialog
 	{
 		super(POSITION_CENTER);
 		setTitle("CSV Einstellungen");
+		setSize(SWT.DEFAULT, 500);
 		this.tool = tool;
 	}
 
@@ -56,13 +57,13 @@ public class CSVImportStage1 extends AbstractDialog
 	protected void paint(Composite parent) throws Exception
 	{
 		Container group = new SimpleContainer(parent);
-		group.addText("Bitte nehmen sie die notwendigen Einstellungen so vor, dass alle Daten der CSV-Datei inkl. korrekter Spaltennamen in der Tabelle unten angezeigt werden.", true);
+		group.addText("Bitte nehmen Sie die notwendigen Einstellungen so vor, dass alle Daten der CSV-Datei inkl. korrekter Spaltennamen in der Tabelle unten angezeigt werden.", true);
 		group.addText("Notwendige Einstellungen:", false);
 		
 		for (FeldConverterOption opt: tool.getCsvOptions()) {
 				FeldConverterAuswahl aca = (FeldConverterAuswahl) opt;
 				
-				final AbstractInput c = new SelectInput(aca.getListe(), aca.getListe().get(0));
+				final AbstractInput c = new SelectInput(aca.getListe(), aca.getAuswahl());
 				c.addListener(new Listener() {
 
 					@Override

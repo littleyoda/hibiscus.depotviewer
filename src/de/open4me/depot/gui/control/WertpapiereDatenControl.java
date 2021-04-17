@@ -1,5 +1,8 @@
 package de.open4me.depot.gui.control;
 
+import java.awt.Color;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.rmi.RemoteException;
@@ -24,6 +27,7 @@ import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.experimental.chart.swt.ChartComposite;
 import org.jfree.ui.Layer;
+import org.jfree.ui.RectangleInsets;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
@@ -272,8 +276,27 @@ public class WertpapiereDatenControl {
 				chart = ChartFactory.createTimeSeriesChart(
 						"",  "Datum",
 						"Kurs", data, true, true, false);
+				chart.getXYPlot().setBackgroundPaint(Color.WHITE);
+				chart.getXYPlot().setOutlineVisible(false);
+				chart.getXYPlot().setAxisOffset(RectangleInsets.ZERO_INSETS);
+				chart.getXYPlot().setDomainGridlinePaint(Color.LIGHT_GRAY);
+				chart.getXYPlot().setRangeGridlinePaint(Color.LIGHT_GRAY);
 				renderer = chart.getXYPlot().getRenderer();
-				new ChartComposite(getComposite(), SWT.NONE, chart, true);
+				Rectangle maxSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+				new ChartComposite(getComposite(), SWT.NONE, chart, 
+						ChartComposite.DEFAULT_WIDTH,
+						ChartComposite.DEFAULT_HEIGHT,
+						ChartComposite.DEFAULT_MINIMUM_DRAW_WIDTH,
+						ChartComposite.DEFAULT_MINIMUM_DRAW_HEIGHT,
+						maxSize.width, // ChartComposite.DEFAULT_MAXIMUM_DRAW_WIDTH,
+						maxSize.height, // ChartComposite.DEFAULT_MAXIMUM_DRAW_HEIGHT,
+		                true,  // useBuffer
+		                true,  // properties
+		                true,  // save
+		                true,  // print
+		                true,  // zoom
+		                true   // tooltips
+	                );
 			}
 			
 			String lastSelection = "";

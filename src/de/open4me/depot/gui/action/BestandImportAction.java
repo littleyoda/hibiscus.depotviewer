@@ -54,7 +54,7 @@ public class BestandImportAction implements Action {
 		
 		List<GenericObjectHashMap> daten;
 		try {
-			CSVImportHelper csv = new CSVImportHelper("bestandsimport." + kontoid);
+			CSVImportHelper csv = new CSVImportHelper("bestandsimport." + kontoid, 0);
 			daten = csv.run(fd, false);
 		} catch (Exception e) {
 			Logger.error("Fehler beim CSV-Import", e);

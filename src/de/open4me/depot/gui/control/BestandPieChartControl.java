@@ -19,6 +19,7 @@ import org.jfree.data.general.PieDataset;
 import org.jfree.experimental.chart.swt.ChartComposite;
 import org.jfree.experimental.swt.SWTUtils;
 import org.jfree.util.Rotation;
+import org.jfree.util.SortOrder;
 
 import de.open4me.depot.gui.DatumsSlider;
 import de.open4me.depot.sql.GenericObjectSQL;
@@ -50,7 +51,7 @@ public class BestandPieChartControl implements Listener
 		chart.getLegend().setItemFont(font.deriveFont(9.0f));
 		PiePlot3D plot = (PiePlot3D) chart.getPlot();
 		plot.setBackgroundAlpha(0);
-		plot.setStartAngle(290);
+		plot.setStartAngle(270);
 		plot.setDirection(Rotation.CLOCKWISE);
 		plot.setForegroundAlpha(0.8f);
 		plot.setOutlineVisible(false);
@@ -103,6 +104,7 @@ public class BestandPieChartControl implements Listener
 					
 					dataset.setValue((String) x.getAttribute("wertpapiername"), wert);
 				}
+				dataset.sortByValues(SortOrder.DESCENDING);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

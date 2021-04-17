@@ -46,13 +46,13 @@ public class KursAktualisierenAnbieterAuswahlDialog extends AbstractDialog
 		
 		final CheckboxInput erlaubnis = new CheckboxInput(false);
 		group.addCheckbox(erlaubnis, 
-				  "Hiermit bestätigen sie, dass sie die\n"
+				  "Hiermit bestätigen Sie, dass Sie die \n"
 				+ "Nutzungsbedingungen des Anbieters gelesen haben \n"
-				+ "und sie zu einer Nutzung berechtigt sind!\n\n");
+				+ "und Sie zu einer Nutzung berechtigt sind!\n\n");
 		
 		final CheckboxInput speichern = new CheckboxInput(false);
 		group.addCheckbox(speichern, 
-				  "Aktualisierungseinstellungen speichern und\nbeim nächsten Abruf automatisch nutzen\n");
+				  "Aktualisierungseinstellungen speichern und \nbeim nächsten Abruf automatisch nutzen\n");
 		
 		ButtonArea buttons1 = new ButtonArea();
 		buttons1.addButton(i18n.tr("Weitere Datenquellen installieren"), new Action() {

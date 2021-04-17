@@ -36,13 +36,14 @@ public class UmsatzEditorView extends AbstractView {
 		left.addLabelPair("Datum", control.getDate());
 		left.addLabelPair("Konto", control.getKonto());
 		left.addLabelPair("Aktion", control.getAktionAuswahl());
+		left.addLabelPair("Kommentar", control.getKommentar());
 
 		Container right = new SimpleContainer(columns.getComposite());
 
 		right.addLabelPair("Anzahl", control.getAnzahl());
 		right.addLabelPair("Einzelkurs", control.getEinzelkurs());
 		right.addLabelPair("Kurswert", control.getKurswert());
-		right.addCheckbox(control.getCBKurswertBerechnen(), "Kurswert automtaisch berechnen?");
+		right.addCheckbox(control.getCBKurswertBerechnen(), "Kurswert automatisch berechnen?");
 		right.addLabelPair("Transaktionskosten", control.getTransaktionskosten());
 		right.addLabelPair("Steuern", control.getSteuern());
 		right.addLabelPair("Gesamt Kosten/Erlöse", control.getGesamtSumme());

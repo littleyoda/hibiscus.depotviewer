@@ -24,7 +24,7 @@ public class CortalConsorsMitHBCIJSONWrapper {
 
 	public boolean check() {
 			return  orderinfo.get("30").equals("ACTIVE")
-					&& orderinfo.get("39").equals("piece")
+					&& (orderinfo.get("39").equals("piece") || orderinfo.get("39").equals("percent")) 
 					&& orderinfo.get("0").equals("")
 					&& (orderinfo.get("2").equals("") || orderinfo.get("2").equals("LIMIT_BASED") || orderinfo.get("2").equals("QUOTE_BASED"))
 					&& orderinfo.get("12").equals("E")
@@ -33,7 +33,7 @@ public class CortalConsorsMitHBCIJSONWrapper {
 //					&& orderinfo.get("7").equals(orderinfo.get("28"))
 //					&& orderinfo.get("7").equals(orderinfo.get("29"))
 					&& !orderinfo.get("3").equals("")
-					&& (orderinfo.get("6").equals("B") || orderinfo.get("6").equals("S"))
+					&& (orderinfo.get("6").equals("B") || orderinfo.get("6").equals("S") || orderinfo.get("6").equals("O"))
 					;
 	}
 

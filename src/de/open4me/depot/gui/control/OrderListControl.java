@@ -1,10 +1,14 @@
 package de.open4me.depot.gui.control;
 
+import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import org.eclipse.swt.widgets.TableItem;
+
 import de.open4me.depot.Settings;
 import de.open4me.depot.gui.action.OrderList;
+import de.open4me.depot.gui.action.UmsatzEditorAction;
 import de.open4me.depot.gui.menu.OrderListMenu;
 import de.open4me.depot.gui.parts.PrintfColumn;
 import de.open4me.depot.sql.GenericObjectSQL;
@@ -13,7 +17,11 @@ import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Part;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
+import de.willuhn.jameica.gui.formatter.TableFormatter;
 import de.willuhn.jameica.gui.parts.TablePart;
+import de.willuhn.jameica.gui.util.Color;
+import de.willuhn.jameica.hbci.gui.ColorUtil;
+import de.willuhn.logging.Logger;
 
 
 public class OrderListControl extends AbstractControl
@@ -44,7 +52,7 @@ public class OrderListControl extends AbstractControl
 				, 
 				"depotviewer_umsaetze", "id");
 
-		orderList = new TablePart(list,new OrderList());
+		orderList = new TablePart(list, new UmsatzEditorAction(false));
 		orderList.setRememberColWidths(true);
 		orderList.setRememberOrder(true);
 		orderList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
@@ -60,6 +68,20 @@ public class OrderListControl extends AbstractControl
 		orderList.addColumn(Settings.i18n().tr("Kommentar"), "kommentar"); 
 		orderList.setContextMenu(new OrderListMenu(orderList));
 
+		orderList.setFormatter(new TableFormatter()
+	    {
+			public void format(TableItem item) {
+				GenericObjectSQL wp = (GenericObjectSQL) item.getData();
+				final int absChangeColumn = 5;
+				try {
+					BigDecimal abs = (BigDecimal) wp.getAttribute("kosten");
+					item.setForeground(absChangeColumn, ColorUtil.getColor(abs.doubleValue(), Color.ERROR,Color.SUCCESS,Color.FOREGROUND).getSWTColor());
+				} catch (RemoteException e) {
+					Logger.error("error while formatting abs value", e);
+				}
+			}
+		});
+		
 		return orderList;
 	}
 

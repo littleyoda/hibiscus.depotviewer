@@ -4,22 +4,32 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.FieldPosition;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.willuhn.jameica.system.Application;
 
 public class VarDecimalFormat extends DecimalFormat
 {
 	
 	public static String nullen(int nachkommastellen) {
-		String out = "";
-		for (int i = 0;  i < nachkommastellen; i++) {
-			out += "0";
-		}
-		return out;
+		return StringUtils.repeat('0', nachkommastellen);
 	}
+	
 	int nachkommastellen;
 	public VarDecimalFormat(int nachkommastellen)
 	{
-		super("###,###,##0." + nullen(nachkommastellen),new DecimalFormatSymbols(Application.getConfig().getLocale()));
+		this(nachkommastellen, 0);
+	}
+	
+	/**
+	 * Formatiert einen Wert mit x fixen Nachkommastellen, die Notfalls durch Nullen aufgefüllt werden.
+	 * Sollte der Wert genauer sein und mehr Nachkommastellen enthalten, so werden bis zu {@code extranachkommastellen} viele zusätzlich angezeigt. 
+	 * @param nachkommastellen
+	 * @param extranachkommastellen
+	 */
+	public VarDecimalFormat(int nachkommastellen, int extranachkommastellen)
+	{
+		super("###,###,##0." + nullen(nachkommastellen) + StringUtils.repeat('#', extranachkommastellen),new DecimalFormatSymbols(Application.getConfig().getLocale()));
 		this.nachkommastellen = nachkommastellen;
 		setGroupingUsed(true);
 	}
