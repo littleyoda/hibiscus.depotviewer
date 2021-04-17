@@ -109,7 +109,7 @@ public class WertpapierSuche {
 				HashMap<String, String> h = new HashMap<String, String>();
 				h.put("Name", record.get("Instrument"));
 				h.put("Isin", record.get("ISIN"));
-				h.put("Typ", record.get("Instrument Group Description"));
+				h.put("Typ", "");
 				String wkn = record.get("WKN");
 				while (wkn.length() > 0 && wkn.charAt(0) == '0') {
 					wkn = wkn.substring(1);
