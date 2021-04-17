@@ -158,8 +158,6 @@ public class UpdateStock implements BackgroundTask {
 				return null;
 			}
 			List<Config> cfgs = base.getConfigs();
-			monitor.setPercentComplete((int) (monitor.getPercentComplete() + babysteps));
-			monitor.setStatusText(cfgs.toString());
 			
 			Logger.debug("Notwendige Configs: " + cfgs);
 			for (Config cfg : cfgs) {
@@ -185,6 +183,8 @@ public class UpdateStock implements BackgroundTask {
 				}
 				cfg.addSelectedOptions(selected);
 			}
+			monitor.setPercentComplete((int) (monitor.getPercentComplete() + babysteps));
+			monitor.setStatusText(cfgs.toString());
 			base.process(cfgs);
 		}
 		return base;
@@ -235,25 +235,35 @@ public class UpdateStock implements BackgroundTask {
 	private static void saveStockData(GenericObjectSQL wertpapier, BaseFetcher base) throws Exception {
 		// Kurse
 		Connection conn = SQLUtils.getConnection();	
-		PreparedStatement del = conn.prepareStatement("delete from depotviewer_kurse where wpid = ? ");
-		del.setString(1, wertpapier.getID());
-		del.executeUpdate();
 
+		PreparedStatement del = conn.prepareStatement("delete from depotviewer_kurse where wpid = ? and kursdatum = ?");
+		for (Datacontainer dc : base.getHistQuotes()) {
+			del.setString(1, wertpapier.getID());
+			del.setDate(2, SQLUtils.getSQLDate((Date) dc.data.get("date")));
+			del.addBatch();
+		}
+		del.executeBatch();
+		
 		PreparedStatement insert = conn.prepareStatement("insert into depotviewer_kurse (wpid, kurs, kursw, kursdatum) values (?,?,?,?)");
 		for (Datacontainer dc : base.getHistQuotes()) {
 			insert.setString(1, wertpapier.getID());
 			insert.setBigDecimal(2, (BigDecimal) dc.data.get("last")); 
 			insert.setString(3, (String) dc.data.get("currency")); 
-			insert.setDate(4,  new java.sql.Date(((Date) dc.data.get("date")).getTime()));
+			insert.setDate(4, SQLUtils.getSQLDate((Date) dc.data.get("date")));
 			insert.addBatch();
 		}
 		insert.executeBatch();
 
 		// Events
-		del = conn.prepareStatement("delete from depotviewer_kursevent where wpid = ? ");
-		del.setString(1, wertpapier.getID());
-		del.executeUpdate();
 		if (base.getHistEvents() != null) {
+			del = conn.prepareStatement("delete from depotviewer_kursevent where wpid = ? and datum = ?");
+			for (Datacontainer dc : base.getHistEvents()) {
+				del.setString(1, wertpapier.getID());
+				del.setDate(2, SQLUtils.getSQLDate((Date) dc.data.get("date")));
+				del.addBatch();
+			}
+			del.executeBatch();
+		
 			insert = conn.prepareStatement("insert into depotviewer_kursevent (wpid, ratio, value, aktion, datum, waehrung) values (?,?,?,?,?,?)");
 			for (Datacontainer dc : base.getHistEvents()) {
 				String action = (String) dc.data.get("action");
@@ -263,6 +273,8 @@ public class UpdateStock implements BackgroundTask {
 					action = "G";
 				} else if (action.equals(Const.STOCKSPLIT)) {
 					action = "S";
+				} else if (action.equals(Const.STOCKREVERSESPLIT)) {
+					action = "R";
 				} else if (action.equals(Const.SUBSCRIPTIONRIGHTS)) {
 					action = "B";
 				} else {
@@ -349,7 +361,7 @@ public class UpdateStock implements BackgroundTask {
 					String action = currentEvt.getAttribute("aktion").toString(); 
 					if (action.equals("D")) {
 						korrektur = korrektur.subtract(faktor.multiply((BigDecimal) currentEvt.getAttribute("value")));
-					}  else if (action.equals("S")) {
+					}  else if (action.equals("S") || action.equals("R")) { // split or reverse split
 						String[] s = ((String) currentEvt.getAttribute("ratio")).split(":");
 						BigDecimal splitfaktor = (new BigDecimal(s[0])).divide(new BigDecimal(s[1]), 10, RoundingMode.HALF_UP);
 						faktor = faktor.multiply(splitfaktor);
