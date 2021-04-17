@@ -11,7 +11,7 @@
   <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
 
   <requires jameica="2.6.0+">
-    <import plugin="hibiscus" version="2.6.12+" />
+    <import plugin="hibiscus" version="2.10.1+" />
     <import plugin="hibiscus.scripting.htmlunit" version="2.30+" />
     <import plugin="hibiscus.ly.toolkit" version="1.00+" />
   </requires>
