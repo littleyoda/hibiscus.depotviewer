@@ -38,11 +38,13 @@ public interface Umsatz extends DBObject
 	public void setKurs(BigDecimal name) throws RemoteException;
 
 	
-	public void setKurzW(String kursW) throws RemoteException;
+	public void setKursW(String kursW) throws RemoteException;
+	public String getKursW() throws RemoteException;
 
 	public void setKosten(BigDecimal kosten) throws RemoteException;
 
 	public void setKostenW(String kostenW) throws RemoteException;
+	public String getKostenW() throws RemoteException;
 
 	public void setBuchungsdatum(Date date) throws RemoteException;
 	

@@ -171,7 +171,7 @@ public class UmsatzImportAction implements Action {
 				p.setWPid(Utils.getORcreateWKN(x.getAttribute("wkn").toString(), x.getAttribute("isin").toString(), x.getAttribute("name").toString()));
 				p.setAnzahl((BigDecimal) x.getAttribute("anzahl"));
 				p.setKurs((BigDecimal) x.getAttribute("kurs"));
-				p.setKurzW(x.getAttribute("kursW").toString());
+				p.setKursW(x.getAttribute("kursW").toString());
 				p.setKosten((BigDecimal) x.getAttribute("kosten"));
 				p.setKostenW(x.getAttribute("kostenW").toString());
 				p.setBuchungsdatum((Date) x.getAttribute("date"));

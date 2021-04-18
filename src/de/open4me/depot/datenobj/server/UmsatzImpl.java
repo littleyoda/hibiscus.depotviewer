@@ -108,11 +108,12 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 	}
 
 	@Override
-	public void setKurzW(String kursW) throws RemoteException {
+	public void setKursW(String kursW) throws RemoteException {
 		setAttribute("kursw", kursW);
 	}
 
-	public String getKurzW() throws RemoteException
+	@Override
+	public String getKursW() throws RemoteException
 	{
 		return (String) getAttribute("kursw");
 	}
@@ -133,6 +134,11 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 		return (BigDecimal) getAttribute("kosten");
 	}
 	
+	@Override
+	public String getKostenW() throws RemoteException
+	{
+		return (String) getAttribute("kostenw");
+	}
 	
 	@Override
 	public void setBuchungsdatum(Date date) throws RemoteException {
@@ -249,7 +255,7 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 
 	@Override
 	public String generateOrderId() throws RemoteException {
-		Integer hash = ("" + getKontoid() + getWPid() + getAktion() + getBuchungsdatum() +  getAnzahl() + getKurs() + getKurzW()).hashCode();
+		Integer hash = ("" + getKontoid() + getWPid() + getAktion() + getBuchungsdatum() +  getAnzahl() + getKurs() + getKursW()).hashCode();
 		return hash.toString();
 	}
 

@@ -94,7 +94,7 @@ public class Utils {
 	}
 
 	/**
-	 * 
+	 * Speichert einen Wertpapier-Umsatz in der Datenbanktabelle DEPOTVIEWER_UMSATZ und liefert das erzeugte Umsatz-Objekt zurück.
 	 * TODO Umsatzbuilder implementieren
 	 * 
 	 * @param kontoid
@@ -111,7 +111,7 @@ public class Utils {
 	 * @param kommentar
 	 * @throws ApplicationException
 	 */
-	public static void addUmsatz(String kontoid, String wpid, String aktion, String info, Double anzahl, 
+	public static Umsatz addUmsatz(String kontoid, String wpid, String aktion, String info, Double anzahl, 
 			Double kurs, String kursW, Double kosten, String kostenW, Date date, String orderid, String kommentar,
 			Double gebuehren, String gebuehrenW, Double steuern, String steuernW) throws ApplicationException {
 		try {
@@ -119,16 +119,16 @@ public class Utils {
 				orderid = "" + ("" + kontoid + wpid + aktion + date + anzahl + kurs + kursW).hashCode();
 				Logger.info("Setting id to " + orderid);
 			}
-			DBIterator liste = Settings.getDBService().createList(Umsatz.class);
+			DBIterator<Umsatz> liste = Settings.getDBService().createList(Umsatz.class);
 			liste.addFilter("orderid=?", orderid);
 			if (liste.hasNext()) {
 				Logger.info("Skipping Buchung");
-				return;
+				return liste.next();
 			}
 			DepotAktion a = checkTransaktionsBezeichnung(aktion.toUpperCase());
 			if (a == null) {
 				Logger.error("Unbekannte Buchungsart: " + aktion);
-				return;
+				return null;
 			}
 			if ((a.equals(DepotAktion.KAUF) && (kosten >= 0.0f))
 					|| (a.equals(DepotAktion.VERKAUF) && (kosten <= 0.0f))) {
@@ -150,7 +150,7 @@ public class Utils {
 			p.setWPid(wpid);
 			p.setAnzahl(new BigDecimal(anzahl));
 			p.setKurs(new BigDecimal(kurs));
-			p.setKurzW(kursW);
+			p.setKursW(kursW);
 			p.setKosten(new BigDecimal(kosten));
 			p.setKostenW(kostenW);
 			p.setBuchungsdatum(date);
@@ -161,6 +161,8 @@ public class Utils {
 			p.setTransaktionsgebuehren(new BigDecimal(gebuehren));
 			p.setTransaktionsgebuehrenW(gebuehrenW);
 			p.store();
+			
+			return p;
 			// Liste der Objekte aus der Datenbank laden
 		}
 		catch (RemoteException e)
@@ -477,5 +479,17 @@ public class Utils {
 	@SuppressWarnings("deprecation")
 	public static Date getDatum(int year, int month, int day) {
 		return new Date(year - 1900, month - 1, day);
+	}
+	
+	/**
+	 * Berechnet die Anzahl an Tagen zwischen zwei Daten. 
+	 * @param d1
+	 * @param d2
+	 * @return
+	 */
+	public static long getDifferenceDays(Date d1, Date d2) {
+		java.time.LocalDate date1 = d1.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+		java.time.LocalDate date2 = d2.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+		return java.time.temporal.ChronoUnit.DAYS.between(date1, date2);
 	}
 }
