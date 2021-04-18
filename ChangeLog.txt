@@ -1,3 +1,35 @@
+0.6.0 -- 2021-04-18
+      Anzeige von Salden im Verlauf für Depots, siehe https://homebanking-hilfe.de/forum/topic.php?t=24133
+      Namespace für AccountBalanceProvider geändert
+      Fehlende Icons mit eingecheckt
+      Positive/negative Werte in Tabellen werden grün/rot dargestellt
+      Tippfehler korrigiert
+      Kommentar in UmsatzEditorControl bearbeitbar. Wertfelder so formatiert, dass nur noch 2 Nachkommastellen angezeigt werden, falls sie Nullen sind.
+      Fix editor action
+      Letzter Kurswert in Wertpapierübersicht eingefügt
+      Fix editor action
+      Importer lädt Einstellungen korrekt. Tippfehler korrigiert.
+      GenericJSFetcher liefert nun auch Reverse Split Ereignisse von Ariva zurück. Diese werden mit der Aktion "R" in der Datenbank gespeichert und ausgewertet. Zudem werden Kursdaten und Events nun per SQL MERGE eingefügt, statt über DELETE+INSERT. Dadurch bleiben alte Daten erhalten, falls der Kurs-Provider nicht mehr alles liefern kann.
+      Inkonsistenzen / Rundungsfehler zwischen Bestand und Orderbuch behoben.
+      Depot-Umsätze beim Import durch Jobs und beim manuellen Ändern mit Hibiscus-Umsätzen synchronisieren.
+      Differenz von Tagen wird nun mit java.time berechnet, um Fehler bei Sommerzeit zu vermeiden.
+      Bei dem Wertpapier-Chart maximumDrawWidth und maximumDrawHeight auf Bildschirmgröße gesetzt. Dadurch wird eine Verzerrung des Textes verhindert.
+      Chart Farben an Hibiscus angepasst
+      Bestands-Chart nach Wert sortiert
+      Abruf von (DKB-)Depots mit vielen Gattungen ermöglicht.
+      Verknüfung zwischen DepotViewer-Umsatz und Hibiscus-Umsatz erfolgt nun über Metadaten (depotviewer_id), statt der EndToEndID.
+      Berücksichtigung von Auslieferungen bei parseDepotUmsatz
+      Aktualisierung von Kursen umgestellt von MERGE auf DELETE+INSERT. Es werden nur noch diejenigen Kurse gelöscht, für die es neue Werte gibt. Damit gehen historische Daten nicht mehr verloren.
+      Ausbuchung mit richtigem Vorzeichen bei der Kostenberechnung berücksichtigt
+      Hibiscus-ID wird über DB-Abfrage ermittelt, statt über Iteration.
+      Erfordert mindestens Hibiscus 2.10.1
+      [Impl] Cortals: Anleihe + Ausbuchungen
+      Aktion-Kursimport über URL
+      [etc] Build.properties an die neueren Versionen von Hibiscus angepasst
+      [etc] nicht funktionierende Lösungen (ffbdepot und fondsdepotbank) entfernen
+      [Fix] Download der Xetra-Aktienliste korrigiert
+      [fix] URL für JavaStockQuotes geändert
+
 0.5.10 -- 2020-08-08
 0.5.9 -- 2020-04-15
 0.5.8 -- 2020-03-06
