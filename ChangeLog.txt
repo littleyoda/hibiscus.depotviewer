@@ -1,4 +1,5 @@
 0.6.0 -- 2021-04-18
+0.6.0 -- 2021-04-18
       Anzeige von Salden im Verlauf für Depots, siehe https://homebanking-hilfe.de/forum/topic.php?t=24133
       Namespace für AccountBalanceProvider geändert
       Fehlende Icons mit eingecheckt
