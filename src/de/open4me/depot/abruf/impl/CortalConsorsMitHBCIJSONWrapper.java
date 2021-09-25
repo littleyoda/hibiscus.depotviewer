@@ -33,7 +33,7 @@ public class CortalConsorsMitHBCIJSONWrapper {
 //					&& orderinfo.get("7").equals(orderinfo.get("28"))
 //					&& orderinfo.get("7").equals(orderinfo.get("29"))
 					&& !orderinfo.get("3").equals("")
-					&& (orderinfo.get("6").equals("B") || orderinfo.get("6").equals("S") || orderinfo.get("6").equals("O"))
+					&& (orderinfo.get("6").equals("B") || orderinfo.get("6").equals("S") || orderinfo.get("6").equals("O") || orderinfo.get("6").equals("BZ"))
 					;
 	}
 
@@ -43,7 +43,10 @@ public class CortalConsorsMitHBCIJSONWrapper {
 			setGrund("Check fehlgeschlagen");
 			return false;
 		}
-
+		// Order mit Limit&Zeit
+		if (getOrderArt().equals("BZ")) {
+			return true;
+		}
 		try {
 			Utils.addUmsatz(
 					kontoID,  // kontoid 
