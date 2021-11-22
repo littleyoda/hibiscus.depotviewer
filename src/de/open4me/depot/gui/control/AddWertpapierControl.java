@@ -10,7 +10,11 @@ import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.datenobj.rmi.Wertpapier;
+import de.open4me.depot.gui.view.ModifyWertpapierView;
+import de.open4me.depot.gui.view.WertpapierView;
 import de.open4me.depot.sql.GenericObjectHashMap;
+import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.tools.WertpapierSuche;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
@@ -97,7 +101,24 @@ public class AddWertpapierControl  extends AbstractControl {
 
 	public ButtonArea getAddButton() {
 		ButtonArea buttons = new ButtonArea();
-		buttons.addButton("Hinzufügen",new Action() {
+		buttons.addButton("Manuell hinzufügen",new Action() {
+
+			@Override
+			public void handleAction(Object context)
+					throws ApplicationException {
+				Wertpapier wp;
+				try {
+					wp = (Wertpapier) Settings.getDBService().createObject(Wertpapier.class, null);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+					throw new ApplicationException(e);
+				}
+			  	GUI.startView(ModifyWertpapierView.class, wp);
+			}
+
+		}, null, false, "edit-copy.png");
+		
+		buttons.addButton("Übernehmen",new Action() {
 
 			@Override
 			public void handleAction(Object context)
@@ -107,13 +128,15 @@ public class AddWertpapierControl  extends AbstractControl {
 					return;
 				}
 				GenericObjectHashMap sel = (GenericObjectHashMap) selection;
+				Wertpapier wp;
 				try {
-					Utils.getORcreateWKN((String) sel.getAttribute("Wkn"), (String) sel.getAttribute("Isin"), (String) sel.getAttribute("Name"));
+					String wpid = Utils.getORcreateWKN((String) sel.getAttribute("Wkn"), (String) sel.getAttribute("Isin"), (String) sel.getAttribute("Name"));
+					wp = Utils.getWertPapierByID(wpid);
 				} catch (RemoteException e) {
 					e.printStackTrace();
 					throw new ApplicationException(e);
 				}
-			  	GUI.startView(de.open4me.depot.gui.view.WertpapierView.class.getName(),null);
+			  	GUI.startView(WertpapierView.class, wp);
 			}
 
 		},null ,false,"edit-copy.png");

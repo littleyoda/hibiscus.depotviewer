@@ -5,28 +5,28 @@
 
 
 
-  <target name="init" description="inits the build">
+	<target name="init" description="inits the build">
 
-    <property environment="env" />
-    <property name="build.dir" value="build" />
-    <buildnumber file="${build.dir}/BUILD" />
-    <xmlproperty file="plugin.xml" collapseattributes="true"/>
+		<property environment="env" />
+		<property name="build.dir" value="build" />
+		<buildnumber file="${build.dir}/BUILD" />
+		<xmlproperty file="plugin.xml" collapseattributes="true"/>
 
-    <!-- create cvs tag -->
-    <propertyfile file="${build.dir}/TAG">
-      <entry key="mytag" value="${plugin.version}" />
-    </propertyfile>
-    <replaceregexp flags="g" file="${build.dir}/TAG" match="\." replace="_" />
-    <loadproperties srcFile="${build.dir}/TAG"/>
-    <delete file="${build.dir}/TAG" />
-    <property name="tag" value="V_${mytag}_BUILD_${build.number}" />
+		<!-- create cvs tag -->
+		<propertyfile file="${build.dir}/TAG">
+			<entry key="mytag" value="${plugin.version}" />
+		</propertyfile>
+		<replaceregexp flags="g" file="${build.dir}/TAG" match="\." replace="_" />
+		<loadproperties srcFile="${build.dir}/TAG"/>
+		<delete file="${build.dir}/TAG" />
+		<property name="tag" value="V_${mytag}_BUILD_${build.number}" />
 
-    <loadproperties srcFile="${build.dir}/build.properties"/>
+		<loadproperties srcFile="${build.dir}/build.properties"/>
 
-    <echo message="VERSION: ${plugin.version}" />
-    <echo message="CVS-Tag: ${tag}" />
-    <echo message="BUILD  : ${build.number}" />
-    <echo message="JAVA   : ${java.version}" />
+		<echo message="VERSION: ${plugin.version}" />
+		<echo message="CVS-Tag: ${tag}" />
+		<echo message="BUILD  : ${build.number}" />
+		<echo message="JAVA   : ${java.version}" />
 
 		<property name="define.jarfilename" 		value="${plugin.name}.jar" />
 		<property name="define.zipfilename" 		value="${plugin.name}.zip" />
@@ -44,22 +44,22 @@
 		<property name="lib.dir" 					      value="lib" />
 		<property name="class.dir" 					    value="${project.tmp}/bin" />
 		<property name="help.dir"		value="${src.dir}/help" />
-		
+
 
 		<available file="${lib.dir}"     type="dir" property="havelib" />
 
 		<path id="compilepath">
 			<pathelement path="${define.compilepath}" />
-			      <fileset dir="." >
-		        <include name="${lib.dir}/**/*.jar" if="havelib"/>
-		      </fileset>
-      		      <fileset dir="${define.htmlunit.dir}/lib" >
-       			 <include name="**/*.jar" />
-      		      </fileset>
-      		      <fileset dir="${define.jameica.dir}/lib/" >
-       			 <include name="**/*.jar" />
-      		      </fileset>
-      		      
+			<fileset dir="." >
+				<include name="${lib.dir}/**/*.jar" if="havelib"/>
+			</fileset>
+			<fileset dir="${define.htmlunit.dir}/lib" >
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${define.jameica.dir}/lib/" >
+				<include name="**/*.jar" />
+			</fileset>
+
 
 		</path>
 
@@ -89,15 +89,18 @@
 
 		<copy todir="${class.dir}">
 			<fileset dir="${src.dir}">
-        			<include name="META-INF/**" />
-	      		</fileset>
+				<include name="META-INF/**" />
+			</fileset>
 		</copy>
-		
-		    <copy todir="${class.dir}/help">
-      <fileset dir="${help.dir}" />
-    </copy>
 
-  </target>
+		<copy todir="${class.dir}/help">
+			<fileset dir="${help.dir}" />
+		</copy>
+		<copy todir="${class.dir}/img">
+			<fileset dir="${img.dir}" />
+		</copy>
+
+	</target>
 
 
 
@@ -125,14 +128,14 @@
 				<attribute name="Implementation-Title" value="${plugin.name}" />
 				<attribute name="Implementation-Version" value="${plugin.version}" />
 				<attribute name="Implementation-Buildnumber" value="${build.number}" />
-			        <attribute name="Class-Path" value="lang help lib" />
-		      </manifest>
+				<attribute name="Class-Path" value="lang help lib" />
+			</manifest>
 			<fileset dir="${class.dir}" />
 		</jar>
 
-	  <antcall target="addlib"/>
+		<antcall target="addlib"/>
 
-    <copy file="plugin.xml" todir="${project.zipdir}" />
+		<copy file="plugin.xml" todir="${project.zipdir}" />
 
 		<!-- create zip file -->
 		<zip destfile="${project.release}/${define.zipfilename}">
@@ -152,7 +155,7 @@
 			<fileset dir=".">
 				<include name=".project" />
 				<include name=".classpath" />
-        <include name="plugin.xml" />
+				<include name="plugin.xml" />
 				<include name="${lib.dir}/**" />
 				<include name="${src.dir}/**" />
 				<include name="${build.dir}/**" />
