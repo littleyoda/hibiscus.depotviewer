@@ -354,7 +354,7 @@ public class Utils {
 		} catch (RemoteException e) {
 			System.out.println(e.toString());
 			e.printStackTrace();
-			throw new ApplicationException(Settings.i18n().tr("error while creating new Umsatz"),e);
+			throw new ApplicationException(Settings.i18n().tr("error while creating new Wertpapier"),e);
 		}
 	}
 

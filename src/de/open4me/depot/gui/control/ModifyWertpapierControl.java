@@ -3,10 +3,8 @@ package de.open4me.depot.gui.control;
 import java.rmi.RemoteException;
 
 import de.open4me.depot.Settings;
-import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.datenobj.rmi.Wertpapier;
 import de.open4me.depot.gui.view.WertpapierView;
-import de.open4me.depot.sql.GenericObjectSQL;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
@@ -27,8 +25,7 @@ public class ModifyWertpapierControl extends AbstractControl {
 
 	public ModifyWertpapierControl(AbstractView view) throws RemoteException {
 		super(view);
-		GenericObjectSQL obj = (GenericObjectSQL) view.getCurrentObject();
-		wp = Utils.getWertPapierByID(obj.getAttribute("id").toString());
+		wp = (Wertpapier) view.getCurrentObject();
 		wertpapiername = new TextInput(wp.getWertpapiername());
 		isin = new TextInput(wp.getIsin());
 		wkn = new TextInput(wp.getWkn());
