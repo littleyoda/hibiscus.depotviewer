@@ -300,7 +300,7 @@ public class Utils {
 		BufferedWriter out = new BufferedWriter(new FileWriter("/tmp/" + s + ".txt"));
 		out.write(page.getUrl() + "\n");
 		out.write("===============================================\n");
-		out.write(page.asText() + "\n");
+		out.write(page.asNormalizedText() + "\n");
 		out.write("===============================================\n");
 		out.close();
 

@@ -12,7 +12,7 @@
 
   <requires jameica="2.6.0+">
     <import plugin="hibiscus" version="2.10.1+" />
-    <import plugin="hibiscus.scripting.htmlunit" version="2.30+" />
+    <import plugin="hibiscus.scripting.htmlunit" version="2.55+" />
     <import plugin="hibiscus.ly.toolkit" version="1.00+" />
   </requires>
 

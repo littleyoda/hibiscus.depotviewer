@@ -62,7 +62,7 @@ public class HtmlUtils {
 
 	public static HtmlAnchor getLinksByLinkText(HtmlPage page, String search) {
 		for (HtmlAnchor x : page.getAnchors()) {
-			if (x.asText().contains(search)) {
+			if (x.asNormalizedText().contains(search)) {
 				return x;
 			}
 		}
@@ -74,10 +74,10 @@ public class HtmlUtils {
 		for (HtmlTableRow row :tab.getRows()) {
 			List<HtmlTableCell> cells = row.getCells();
 			if (cells.size() < Math.max(idxname, idxvalue)) {
-				Logger.info("Warnung. Ungültige Anzahl an Zellen: " + cells.size() + " " + row.asText());
+				Logger.info("Warnung. Ungültige Anzahl an Zellen: " + cells.size() + " " + row.asNormalizedText());
 				continue;
 			}
-			infos.put(cells.get(idxname).asText().toLowerCase(), cells.get(idxvalue).asText().trim());
+			infos.put(cells.get(idxname).asNormalizedText().toLowerCase(), cells.get(idxvalue).asNormalizedText().trim());
 		}
 	}
 
@@ -95,12 +95,12 @@ public class HtmlUtils {
 			}
 			int missing=0;
 			for (int i = 0; i < r1.size(); i++) {
-				String header = r1.get(i).asText().toLowerCase();
+				String header = r1.get(i).asNormalizedText().toLowerCase();
 				if ("".equals(header)) {
 					header = "Missing" + missing;
 					missing++;
 				}
-				infos.put(header, r2.get(i).asText().trim());
+				infos.put(header, r2.get(i).asNormalizedText().trim());
 			}
 		}
 	}
