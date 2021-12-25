@@ -38,7 +38,7 @@ public class BestandTableControl extends AbstractControl implements Listener
 		this.datumsSlider = datumsSlider;
 		datumsSlider.addListener(this);
 	}
-	
+
 	public void showForDate(Date d) throws RemoteException {
 		try {
 			List<GenericObjectSQL> list = Bestandsabfragen.getBestand(d);
@@ -77,7 +77,7 @@ public class BestandTableControl extends AbstractControl implements Listener
 							sum += ((BigDecimal) k.getAttribute("wert")).doubleValue();
 						} else {
 							sum += (Double) k.getAttribute("wert");
-							
+
 						}
 					}
 
@@ -97,11 +97,11 @@ public class BestandTableControl extends AbstractControl implements Listener
 		bestandsList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
 		bestandsList.addColumn(Settings.i18n().tr("WKN"),"wkn");
 		bestandsList.addColumn(Settings.i18n().tr("Name"),"wertpapiername");
-		bestandsList.addColumn(Settings.i18n().tr("Anzahl"),"anzahl"); 
-		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Kurs"), "kurs", "%.6f %s", "kurs", "kursw"));
-		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Wert"), "wert", "%.2f %s", "wert", "wertw"));
-		bestandsList.addColumn(Settings.i18n().tr("Bewertungsdatum"),"bewertungszeitpunkt", new DateFormatter(Settings.DATEFORMAT)); 
-		bestandsList.addColumn(Settings.i18n().tr("Abrufdatum"),"datum", new DateFormatter(Settings.DATEFORMAT)); 
+		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.5f", "anzahl"));
+		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Kurs"), "kurs", "%,.6f %s", "kurs", "kursw"));
+		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Wert"), "wert", "%,.2f %s", "wert", "wertw"));
+		bestandsList.addColumn(Settings.i18n().tr("Bewertungsdatum"),"bewertungszeitpunkt", new DateFormatter(Settings.DATEFORMAT));
+		bestandsList.addColumn(Settings.i18n().tr("Abrufdatum"),"datum", new DateFormatter(Settings.DATEFORMAT));
 		bestandsList.setContextMenu(new BestandsListMenu(bestandsList));
 		showForDate(null);
 		return bestandsList;
@@ -121,4 +121,3 @@ public class BestandTableControl extends AbstractControl implements Listener
 	}
 
 }
-

@@ -37,17 +37,17 @@ public class BewertungsControl extends AbstractControl {
 		wertList.setRememberColWidths(true);
 		wertList.setRememberOrder(true);
 		wertList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
-		wertList.addColumn(Settings.i18n().tr("Name"),"wertpapiername"); 
+		wertList.addColumn(Settings.i18n().tr("Name"),"wertpapiername");
 		wertList.addColumn(Settings.i18n().tr("ISIN"),"isin");
 		wertList.addColumn(Settings.i18n().tr("WKN"),"wkn");
-		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%.5f", "anzahl"));
-		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Einstandspreis"), "einstand", "%.2f %s", "einstand", "währung"));
-		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Verkaufserlöse"), "erloese", "%.2f %s", "erloese", "währung"));
-		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Aktueller Wert"), "wert", "%.2f %s", "wert", "währung"));
-		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Veränderung abs."), "abs", "%.2f %s", "abs", "währung"));
-		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Veränderung %"), "absproz", "%.2f %%", "absproz"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.5f", "anzahl"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Einstandspreis"), "einstand", "%,.2f %s", "einstand", "währung"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Verkaufserlöse"), "erloese", "%,.2f %s", "erloese", "währung"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Aktueller Wert"), "wert", "%,.2f %s", "wert", "währung"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Veränderung abs."), "abs", "%,.2f %s", "abs", "währung"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Veränderung %"), "absproz", "%,.2f %%", "absproz"));
 		wertList.addColumn(Settings.i18n().tr("Bewertungs-/Verkaufsdatum"),"datum", new DateFormatter(Settings.DATEFORMAT));
-		
+
 		wertList.setFormatter(new TableFormatter() {
 			public void format(TableItem item) {
 				GenericObjectHashMap wp = (GenericObjectHashMap) item.getData();
@@ -61,7 +61,7 @@ public class BewertungsControl extends AbstractControl {
 				}
 			}
 		});
-		
+
 		return wertList;
 	}
 }

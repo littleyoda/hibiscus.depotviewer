@@ -49,7 +49,7 @@ public class OrderListControl extends AbstractControl
 				+ "from depotviewer_umsaetze "
 				+ "	left join depotviewer_wertpapier on  depotviewer_umsaetze.wpid = depotviewer_wertpapier.id"
 				+ "	left join konto on  konto.id = depotviewer_umsaetze.kontoid order by buchungsdatum desc"
-				, 
+				,
 				"depotviewer_umsaetze", "id");
 
 		orderList = new TablePart(list, new UmsatzEditorAction(false));
@@ -57,15 +57,15 @@ public class OrderListControl extends AbstractControl
 		orderList.setRememberOrder(true);
 		orderList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
 		orderList.addColumn(Settings.i18n().tr("WKN"),"wkn");
-		orderList.addColumn(Settings.i18n().tr("Wertpapiername"),"wertpapiername"); 
-		orderList.addColumn(Settings.i18n().tr("Anzahl"),"anzahl"); 
-		orderList.addColumn(Settings.i18n().tr("Kurs"),"kurs"); 
-		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Kosten"), "kosten", "%.2f %s", "kosten", "kostenw"));
-		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Gebühren"), "transaktionskosten", "%.2f %s", "transaktionskosten", "transaktionskostenw"));
-		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Steuern"), "steuern", "%.2f %s", "steuern", "steuernw"));
-		orderList.addColumn(Settings.i18n().tr("Aktion"),"aktion"); 
-		orderList.addColumn(Settings.i18n().tr("Datum"),"buchungsdatum", new DateFormatter(Settings.DATEFORMAT)); 
-		orderList.addColumn(Settings.i18n().tr("Kommentar"), "kommentar"); 
+		orderList.addColumn(Settings.i18n().tr("Wertpapiername"),"wertpapiername");
+		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.5f", "anzahl"));
+		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Kurs"), "kurs", "%,.6f %s", "kurs", "kursw"));
+		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Kosten"), "kosten", "%,.2f %s", "kosten", "kostenw"));
+		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Gebühren"), "transaktionskosten", "%,.2f %s", "transaktionskosten", "transaktionskostenw"));
+		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Steuern"), "steuern", "%,.2f %s", "steuern", "steuernw"));
+		orderList.addColumn(Settings.i18n().tr("Aktion"),"aktion");
+		orderList.addColumn(Settings.i18n().tr("Datum"),"buchungsdatum", new DateFormatter(Settings.DATEFORMAT));
+		orderList.addColumn(Settings.i18n().tr("Kommentar"), "kommentar");
 		orderList.setContextMenu(new OrderListMenu(orderList));
 
 		orderList.setFormatter(new TableFormatter()
@@ -81,7 +81,7 @@ public class OrderListControl extends AbstractControl
 				}
 			}
 		});
-		
+
 		return orderList;
 	}
 
