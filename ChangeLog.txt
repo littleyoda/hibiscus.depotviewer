@@ -1,5 +1,10 @@
+      #110 Rechtschreibfehler in den Readmes
+      #108 Zusammenfassung in der Statuszeile von Gewinn / Verlust
+      #105 URL für Liste aller handelbaren Instrumente auf Xetra hat sich geändert
+      #102 NPE bei fehlenden optionalen Werten im Orderbuch
+			#99 Formatierung Zahlen in Tabellen Bestand und Gewinn/Verlust
 0.6.2 -- 2021-11-29
-	[etc] Anpassung an HTMLUnit 2.55
+      [etc] Anpassung an HTMLUnit 2.55
 0.6.1 -- 2021-09-25
 0.6.0 -- 2021-04-18
 0.6.0 -- 2021-04-18
@@ -21,7 +26,7 @@
       Chart Farben an Hibiscus angepasst
       Bestands-Chart nach Wert sortiert
       Abruf von (DKB-)Depots mit vielen Gattungen ermöglicht.
-      Verknüfung zwischen DepotViewer-Umsatz und Hibiscus-Umsatz erfolgt nun über Metadaten (depotviewer_id), statt der EndToEndID.
+      Verknüpfung zwischen DepotViewer-Umsatz und Hibiscus-Umsatz erfolgt nun über Metadaten (depotviewer_id), statt der EndToEndID.
       Berücksichtigung von Auslieferungen bei parseDepotUmsatz
       Aktualisierung von Kursen umgestellt von MERGE auf DELETE+INSERT. Es werden nur noch diejenigen Kurse gelöscht, für die es neue Werte gibt. Damit gehen historische Daten nicht mehr verloren.
       Ausbuchung mit richtigem Vorzeichen bei der Kostenberechnung berücksichtigt
@@ -59,7 +64,7 @@
 	Bugfix für Order CC
 
 0.4.3 -- 2016-12-07
-	Bugfix für Fondsdepotbank	
+	Bugfix für Fondsdepotbank
 
 0.4.2 -- 2016-12-07
 	Bugfix für geändertes JSON-Format
@@ -140,7 +145,7 @@ Komplette Überarbeitung des Consorsbank-Zugang.
 
 0.3.18 -- 2015-02-01
 	Performance-Verbesserung im Zusammenhang mit Mysql (fixes #41)
-	Import Umsätzen: Bessere Rückmeldung bei unbekannten Aktionen 
+	Import Umsätzen: Bessere Rückmeldung bei unbekannten Aktionen
 
 0.3.17 -- 2015-01-31
 	Wertpapieraktualisierungen erfolgen im Hintergrund
@@ -149,7 +154,7 @@ Komplette Überarbeitung des Consorsbank-Zugang.
 0.3.16 -- 2015-01-26
 	Bestands-Import für Offline-Deports
 	Verbesserter CSV-Import
-	
+
 0.3.15 -- 2015-01-25
 	Umsatz-Import um Ein- und Ausbuchungen ergänzt
 
@@ -165,14 +170,14 @@ Komplette Überarbeitung des Consorsbank-Zugang.
 
 0.3.11 -- 2015-01-09
 	Properties für Consors anpassen (closes #35)
-	
+
 0.3.10 -- 2015-01-09
 	Properties für Consors anpassen (closes #35)
 	Kennzahlen von Wertpapieren vergleichen (closes #12)
 	Performance von Wertpapieren auf Jahresbasis (close #32)
 	Import von Kursdaten via CSV-Datei möglich
 	Steuern und Transaktionskosten können bei den Umsätzen verwaltet werden (closes #29)
-	
+
 0.3.9 -- 2015-01-01
 	Aktualisierungen: Speicherung der Einstellungen (close #17)
 	Spalte Kursdatum wird aktualisiert (close #25)
@@ -199,4 +204,3 @@ v0.3.5
 v0.3.4
 
 v0.3.3
-

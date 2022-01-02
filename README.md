@@ -10,10 +10,10 @@ weitere Informationen im [Wiki](https://github.com/littleyoda/hibiscus.depotview
 # Features
 * Unterstützung von Depots, die via HBCI abrufbar sind [Mehr Informationen](banken.md)
 * Gewinn/Verlust Berechnung bei den einzelnen Depot-Bestandteilen
-* Offline-Depots, die manuelll gepflegt werden können
+* Offline-Depots, die manuell gepflegt werden können
 * Abruf von Kursinformationen über verschiedene Anbieter
 
-# Was Depoitviewer _nicht_ ist:
+# Was Depot-Viewer _nicht_ ist:
 * Handelssoftware für Wertpapieren
 
 
@@ -37,7 +37,7 @@ Voraussetzung ist Hibiscus in Version 2.6.12 oder neuer
 [Einrichtungen von Depots](banken.md)
 
 # Lizenz
-Die Anfänge des Programmes basiert von dem Beispiel Plugin für Jameica und Hibiscus von Olaf Willuhn.
+Die Anfänge des Programms basiert von dem Beispiel Plugin für Jameica und Hibiscus von Olaf Willuhn.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
