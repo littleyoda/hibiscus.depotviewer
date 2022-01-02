@@ -36,7 +36,7 @@ public class DownloadXetraListeAction implements Action
 
 				TransportService ts = Application.getBootLoader().getBootable(TransportService.class);
 				try {
-					t = ts.getTransport(new URL("https://www.xetra.com/resource/blob/1528/64593cf4fad0659bd6063a50ea753328/data/t7-xetr-allTradableInstruments.csv"));
+					t = ts.getTransport(new URL("https://www.xetra.com/resource/blob/1528/b8f218a6e16fde13a537c355c4dec3c3/data/t7-xetr-allTradableInstruments.csv"));
 					if (!t.exists()) {
 						Application.getMessagingFactory().sendMessage(new StatusBarMessage(Application.getI18n().tr("Datei nicht gefunden! Keine Internetverbindung?"),StatusBarMessage.TYPE_ERROR));
 						return;
