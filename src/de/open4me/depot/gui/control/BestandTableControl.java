@@ -21,6 +21,9 @@ import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Part;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
 import de.willuhn.jameica.gui.parts.TablePart;
+import de.willuhn.jameica.gui.parts.table.Feature;
+import de.willuhn.jameica.gui.parts.table.Feature.Context;
+import de.willuhn.jameica.gui.parts.table.FeatureSummary;
 import de.willuhn.logging.Logger;
 
 
@@ -62,12 +65,19 @@ public class BestandTableControl extends AbstractControl implements Listener
 
 		bestandsList = new TablePart(Bestandsabfragen.getBestand(null),new OrderList()) {
 
-			@SuppressWarnings("unchecked")
+			/** Wenn die Tabelle eine Zusammenfassung hat, dann bestimme den Text. */
 			@Override
-			protected String getSummary() {
-				try {
+			protected Context createFeatureEventContext(Feature.Event e, Object data) {
+	    	Context ctx = super.createFeatureEventContext(e, data);
+	      if (this.hasEvent(FeatureSummary.class,e))
+	        ctx.addon.put(FeatureSummary.CTX_KEY_TEXT, gesamtDepotWert());
+	      return ctx;
+	    }
 
-					double sum = 0.0d;
+			@SuppressWarnings("unchecked")
+			private String gesamtDepotWert() {
+				double sum = 0.0d;
+				try {
 					for (GenericObjectSQL k: (List<GenericObjectSQL>) getItems())
 					{
 						if (k.getAttribute("wert") == null) {
@@ -80,14 +90,11 @@ public class BestandTableControl extends AbstractControl implements Listener
 
 						}
 					}
-
-					return String.format("Gesamt-Saldo: %.2f", sum);
+				} catch (Exception e) {
+					Logger.error("Kann Gesamtdepotwert nicht berechnen",e);
 				}
-				catch (Exception e)
-				{
-					Logger.error("Kann Gesamt-Saldo nicht berechnen",e);
-				}
-				return super.getSummary();
+				// FIXME: assumes currency EUR for now, even though the values can be for multiple currencies
+				return String.format("Gesamtdepotwert: %,.2f EUR", sum);
 			}
 
 		};
