@@ -49,8 +49,8 @@ public class BewertungsControl extends AbstractControl {
 	    }
 
 			/**
-			Only get the performance of current instruments. Everything that is sold
-			(e.g. has a "erloese" but not a "wert") is ignored.
+			Berechne den Gesamtdepotwert, den gesamten Gewinn / Verlust absolut und
+			prozentual, und die Gesamtverkaufserlöse.
 			*/
 			@SuppressWarnings("unchecked")
 			private String totalWinLoss() {
