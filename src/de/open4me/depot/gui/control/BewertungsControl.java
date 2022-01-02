@@ -1,7 +1,9 @@
 package de.open4me.depot.gui.control;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.eclipse.swt.widgets.TableItem;
 
@@ -16,6 +18,9 @@ import de.willuhn.jameica.gui.Part;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
 import de.willuhn.jameica.gui.formatter.TableFormatter;
 import de.willuhn.jameica.gui.parts.TablePart;
+import de.willuhn.jameica.gui.parts.table.Feature;
+import de.willuhn.jameica.gui.parts.table.Feature.Context;
+import de.willuhn.jameica.gui.parts.table.FeatureSummary;
 import de.willuhn.jameica.gui.util.Color;
 import de.willuhn.jameica.hbci.gui.ColorUtil;
 import de.willuhn.logging.Logger;
@@ -33,7 +38,61 @@ public class BewertungsControl extends AbstractControl {
 			return wertList;
 		}
 
-		wertList = new TablePart(WertBerechnung.getWertBerechnung(), new OrderList());
+		wertList = new TablePart(WertBerechnung.getWertBerechnung(), new OrderList()) {
+			/** Wenn die Tabelle eine Zusammenfassung hat, dann bestimme den Text. */
+			@Override
+			protected Context createFeatureEventContext(Feature.Event e, Object data) {
+	    	Context ctx = super.createFeatureEventContext(e, data);
+	      if (this.hasEvent(FeatureSummary.class,e))
+	        ctx.addon.put(FeatureSummary.CTX_KEY_TEXT, totalWinLoss());
+	      return ctx;
+	    }
+
+			/**
+			Only get the performance of current instruments. Everything that is sold
+			(e.g. has a "erloese" but not a "wert") is ignored.
+			*/
+			@SuppressWarnings("unchecked")
+			private String totalWinLoss() {
+				BigDecimal einstandSumme = BigDecimal.ZERO;
+				BigDecimal gewinnSumme = BigDecimal.ZERO;
+				BigDecimal erloeseSumme = BigDecimal.ZERO;
+				try {
+					for (GenericObjectHashMap k: (List<GenericObjectHashMap>) getItems())
+					{
+						BigDecimal einstand = ((BigDecimal) k.getAttribute("einstand")).negate();
+						BigDecimal wert = (BigDecimal) k.getAttribute("wert");
+						BigDecimal erloese = (BigDecimal) k.getAttribute("erloese");
+						BigDecimal abs = (BigDecimal) k.getAttribute("abs");
+
+						// wenn Einstand und Wert vorhanden, dann noch nicht verkauft.
+						if (wert != null) {
+								einstandSumme = einstandSumme.add(einstand);
+								gewinnSumme = gewinnSumme.add(abs);
+						}
+						// wenn Einstand und Erlöse vorhanden, dann verkauft. Nur Erlöse summieren.
+						if (erloese != null) {
+								erloeseSumme = erloeseSumme.add(abs);
+						}
+					}
+				} catch (Exception e) {
+					Logger.error("Kann Gewinn / Verlust gesamt nicht berechnen",e);
+				}
+
+				// FIXME: assumes currency EUR for now, even though the values can be for multiple currencies
+				BigDecimal gewinnPercent = BigDecimal.ZERO;
+				if (einstandSumme.compareTo(BigDecimal.ZERO) != 0) {
+					gewinnPercent = gewinnSumme.multiply(new BigDecimal("100.0")).divide(einstandSumme, 2, RoundingMode.HALF_UP);
+				}
+				return String.format("Gesamtdepotwert: %,.2f EUR, Gewinn / Verlust: %,.2f EUR, %,.2f %%, Gesamtverkaufserlöse: %,.2f EUR",
+					gewinnSumme.add(einstandSumme).doubleValue(),
+					gewinnSumme.doubleValue(),
+					gewinnPercent.doubleValue(),
+					erloeseSumme.doubleValue());
+			}
+
+		};
+
 		wertList.setRememberColWidths(true);
 		wertList.setRememberOrder(true);
 		wertList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
@@ -44,8 +103,8 @@ public class BewertungsControl extends AbstractControl {
 		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Einstandspreis"), "einstand", "%,.2f %s", "einstand", "währung"));
 		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Verkaufserlöse"), "erloese", "%,.2f %s", "erloese", "währung"));
 		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Aktueller Wert"), "wert", "%,.2f %s", "wert", "währung"));
-		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Veränderung abs."), "abs", "%,.2f %s", "abs", "währung"));
-		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Veränderung %"), "absproz", "%,.2f %%", "absproz"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Gewinn / Verlust abs."), "abs", "%,.2f %s", "abs", "währung"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Gewinn / Verlust %"), "absproz", "%,.2f %%", "absproz"));
 		wertList.addColumn(Settings.i18n().tr("Bewertungs-/Verkaufsdatum"),"datum", new DateFormatter(Settings.DATEFORMAT));
 
 		wertList.setFormatter(new TableFormatter() {
