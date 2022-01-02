@@ -1,6 +1,7 @@
 package de.open4me.depot.gui.formater;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import de.willuhn.jameica.gui.formatter.Formatter;
 
@@ -19,7 +20,7 @@ public class BigDecimalFormater implements Formatter
 	{
 		if (o == null || !(o instanceof BigDecimal))
 			return "";
-		return 	  ((BigDecimal) o).setScale(nachkommastellen, BigDecimal.ROUND_HALF_UP).toPlainString();
+		return 	  ((BigDecimal) o).setScale(nachkommastellen, RoundingMode.HALF_UP).toPlainString();
 	}
 
 }
