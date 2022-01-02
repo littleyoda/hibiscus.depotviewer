@@ -35,23 +35,25 @@ public class BestandImportAction implements Action {
 			e1.printStackTrace();
 			Logger.error("Kontoauswahl beim CSV-Import", e1);
 			return;
-		}			
-		// FeldDefinitionen anwenden 
+		}
+		// FeldDefinitionen anwenden
 		ArrayList<FeldDefinitionen> fd = new ArrayList<FeldDefinitionen>();
 		fd.add(new FeldDefinitionen("Bewertungszeitpunkt", java.util.Date.class, "date", true));
 		fd.add(new FeldDefinitionen("Wertpapiername", String.class, "name", false));
 		fd.add(new FeldDefinitionen("ISIN", String.class, "isin", false));
 		fd.add(new FeldDefinitionen("WKN", String.class, "wkn", false));
-		
+
 		fd.add(new FeldDefinitionen("Anzahl", BigDecimal.class, "anzahl", true));
-		
+
 		fd.add(new FeldDefinitionen("Kurs", BigDecimalWithCurrency.class, "kurs", false));
 		fd.add(new FeldDefinitionen("Kurs (Währung)", Currency.class, "kursW", false));
 
 		fd.add(new FeldDefinitionen("Gesamtwert (Anzahl x Kurs)", BigDecimalWithCurrency.class, "wert", false));
 		fd.add(new FeldDefinitionen("Gesamtwert (Währung)", Currency.class, "wertW", false));
 
-		
+		final Currency _depotviewer_default_curr = Currency.getInstance("EUR");
+
+
 		List<GenericObjectHashMap> daten;
 		try {
 			CSVImportHelper csv = new CSVImportHelper("bestandsimport." + kontoid, 0);
@@ -89,19 +91,19 @@ public class BestandImportAction implements Action {
 				}
 
 				if (x.getAttribute("kursW").toString().isEmpty()) {
-					x.setAttribute("kursW", x.getAttribute("_depotviewer_default_curr")); 
+					x.setAttribute("kursW", _depotviewer_default_curr);
 				}
 				if (x.getAttribute("wertW").toString().isEmpty()) {
-					x.setAttribute("wertW", x.getAttribute("_depotviewer_default_curr")); 
+					x.setAttribute("wertW", _depotviewer_default_curr);
 				}
 
 				if (x.getAttribute("kurs").toString().isEmpty()  && !x.getAttribute("wert").toString().isEmpty()) {
 					BigDecimal d = ((BigDecimal) x.getAttribute("wert")).divide((BigDecimal) x.getAttribute("anzahl"),5, RoundingMode.HALF_UP);
-					x.setAttribute("kurs", d); 
+					x.setAttribute("kurs", d);
 				}
 				if (!x.getAttribute("kurs").toString().isEmpty()  && x.getAttribute("wert").toString().isEmpty()) {
 					BigDecimal d = ((BigDecimal) x.getAttribute("kurs")).multiply((BigDecimal) x.getAttribute("anzahl"));
-					x.setAttribute("wert", d); 
+					x.setAttribute("wert", d);
 				}
 
 				// Nochmal prüfen. Evtl. haben wir ja etwas übersehen
@@ -115,7 +117,8 @@ public class BestandImportAction implements Action {
 					if (f.getAttr().equals("orderid")) {
 						continue;
 					}
-					if (x.getAttribute(f.getAttr()).toString().isEmpty()) {
+					Object value = x.getAttribute(f.getAttr());
+					if (value == null || value.toString().isEmpty()) {
 						fehlt += ", " + f.getBeschreibung();
 					}
 
@@ -126,7 +129,7 @@ public class BestandImportAction implements Action {
 				}
 			}
 			Konto konto = Utils.getKontoByID(kontoid);
-			
+
 			UmsatzeAusBestandsAenderung umsaetzeAusBestaenden = new UmsatzeAusBestandsAenderung(konto);
 			Utils.clearBestand(konto);
 			for (GenericObjectHashMap x : daten) {

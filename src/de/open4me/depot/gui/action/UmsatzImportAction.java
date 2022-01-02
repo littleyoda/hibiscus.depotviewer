@@ -39,8 +39,8 @@ public class UmsatzImportAction implements Action {
 			e1.printStackTrace();
 			Logger.error("Kontoauswahl beim CSV-Import", e1);
 			return;
-		}			
-		// FeldDefinitionen anwenden 
+		}
+		// FeldDefinitionen anwenden
 		ArrayList<FeldDefinitionen> fd = new ArrayList<FeldDefinitionen>();
 //		fd.add(new FeldDefinitionen("Währung (global)", Currency.class, "waehrung", false));
 		fd.add(new FeldDefinitionen("Datum/Valuta", java.util.Date.class, "date", true));
@@ -51,16 +51,18 @@ public class UmsatzImportAction implements Action {
 		fd.add(new FeldDefinitionen("Anzahl", BigDecimal.class, "anzahl", true));
 		fd.add(new FeldDefinitionen("Einzelkosten", BigDecimalWithCurrency.class, "kurs", false));
 		fd.add(new FeldDefinitionen("Einzelkosten (Währung)", Currency.class, "kursW", false));
-		
+
 		fd.add(new FeldDefinitionen("Gesamtkosten (Anzahl x E.kosten)", BigDecimalWithCurrency.class, "kosten", false));
 		fd.add(new FeldDefinitionen("Gesamtkosten (Währung)", Currency.class, "kostenW", false));
-		
+
 		fd.add(new FeldDefinitionen("Steuern", BigDecimalWithCurrency.class, "steuern", false));
 		fd.add(new FeldDefinitionen("Steuern (Währung)", Currency.class, "steuernW", false));
-		
+
 		fd.add(new FeldDefinitionen("Gebühren", BigDecimalWithCurrency.class, "gebuehren", false));
 		fd.add(new FeldDefinitionen("Gebühren (Währung)", Currency.class, "gebuehrenW", false));
 		fd.add(new FeldDefinitionen("Ordernummer", String.class, "orderid", false));
+
+		final Currency _depotviewer_default_curr = Currency.getInstance("EUR");
 
 		List<GenericObjectHashMap> daten;
 		try {
@@ -88,7 +90,7 @@ public class UmsatzImportAction implements Action {
 						x.setAttribute(f.getAttr(), b.getZahl());
 						x.setAttribute(f.getAttr() + "W", b.getWaehrung());
 					}
-					
+
 				}
 				if (x.getAttribute("isin").toString().isEmpty() && x.getAttribute("wkn").toString().isEmpty()) {
 					fehlt += ", ISIN oder WKN";
@@ -96,7 +98,7 @@ public class UmsatzImportAction implements Action {
 				if (x.getAttribute("kurs").toString().isEmpty() && x.getAttribute("kosten").toString().isEmpty()) {
 					fehlt += ", Einzelkosten oder Gesamtkosten";
 				}
-				
+
 				if (x.getAttribute("gebuehren").toString().isEmpty()) {
 					x.setAttribute("gebuehren", BigDecimal.ZERO);
 				}
@@ -104,36 +106,36 @@ public class UmsatzImportAction implements Action {
 					x.setAttribute("steuern", BigDecimal.ZERO);
 				}
 				if (x.getAttribute("gebuehrenW").toString().isEmpty()) {
-					x.setAttribute("gebuehrenW", x.getAttribute("_depotviewer_default_curr")); 
+					x.setAttribute("gebuehrenW", _depotviewer_default_curr);
 				}
 				if (x.getAttribute("kursW").toString().isEmpty()) {
-					x.setAttribute("kursW", x.getAttribute("_depotviewer_default_curr")); 
+					x.setAttribute("kursW", _depotviewer_default_curr);
 				}
 				if (x.getAttribute("steuernW").toString().isEmpty()) {
-					x.setAttribute("steuernW", x.getAttribute("_depotviewer_default_curr"));
+					x.setAttribute("steuernW", _depotviewer_default_curr);
 				}
 				if (x.getAttribute("kostenW").toString().isEmpty()) {
-					x.setAttribute("kostenW", x.getAttribute("_depotviewer_default_curr")); 
+					x.setAttribute("kostenW", _depotviewer_default_curr);
 				}
 				if (((BigDecimal) x.getAttribute("anzahl")).signum() == -1) {
-					x.setAttribute("anzahl", ((BigDecimal) x.getAttribute("anzahl")).abs()); 
+					x.setAttribute("anzahl", ((BigDecimal) x.getAttribute("anzahl")).abs());
 				}
 				if (x.getAttribute("kurs").toString().isEmpty()  && !x.getAttribute("kosten").toString().isEmpty()) {
 					BigDecimal d = ((BigDecimal) x.getAttribute("kosten")).divide((BigDecimal) x.getAttribute("anzahl"),5, RoundingMode.HALF_UP);
-					x.setAttribute("kurs", d); 
+					x.setAttribute("kurs", d);
 				}
 				if (!x.getAttribute("kurs").toString().isEmpty()  && x.getAttribute("kosten").toString().isEmpty()) {
 					BigDecimal d = ((BigDecimal) x.getAttribute("kurs")).multiply((BigDecimal) x.getAttribute("anzahl"));
-					x.setAttribute("kosten", d); 
+					x.setAttribute("kosten", d);
 				}
 				DepotAktion aktion = Utils.checkTransaktionsBezeichnung(x.getAttribute("aktion").toString().toUpperCase());
-				if (aktion.equals(DepotAktion.KAUF)) {
+				if (aktion.equals(DepotAktion.KAUF) || aktion.equals(DepotAktion.EINBUCHUNG)) {
 					x.setAttribute("kosten", ((BigDecimal) x.getAttribute("kosten")).abs().negate());
 				}
-				if (aktion.equals(DepotAktion.VERKAUF)) {
+				if (aktion.equals(DepotAktion.VERKAUF) || aktion.equals(DepotAktion.AUSBUCHUNG)) {
 					x.setAttribute("kosten", ((BigDecimal) x.getAttribute("kosten")).abs());
 				}
-				
+
 				// Nochmal prüfen. Evtl. haben wir ja etwas übersehen
 				for (FeldDefinitionen f : fd) {
 					if (f.getAttr().equals("isin")) {
@@ -145,17 +147,18 @@ public class UmsatzImportAction implements Action {
 					if (f.getAttr().equals("orderid")) {
 						continue;
 					}
-					if (x.getAttribute(f.getAttr()).toString().isEmpty()) {
+					Object value = x.getAttribute(f.getAttr());
+					if (value == null || value.toString().isEmpty()) {
 						fehlt += ", " + f.getBeschreibung();
 					}
-					
+
 				}
 				if (!fehlt.isEmpty()) {
 					Logger.error("Fehler beim CSV-Import. Es fehlt der Inhalft für folgende Felder: " + fehlt);
 					throw new ApplicationException("Es fehlt Werte für die folgenden Felder: " + fehlt.substring(1));
 				}
 			}
-			
+
 			for (GenericObjectHashMap x : daten) {
 				if (UmsatzHelper.existsOrder((String) x.getAttribute("orderid"))) {
 					Log.warn("Überspringe Buchung, da sie bereits existiert");
