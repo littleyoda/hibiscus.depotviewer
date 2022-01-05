@@ -1,8 +1,11 @@
+0.6.3 -- 2022-01-05
+      Consors: Orderstreichung überspringen
+      Url für Xetra-Liste angepasst
       #110 Rechtschreibfehler in den Readmes
       #108 Zusammenfassung in der Statuszeile von Gewinn / Verlust
       #105 URL für Liste aller handelbaren Instrumente auf Xetra hat sich geändert
       #102 NPE bei fehlenden optionalen Werten im Orderbuch
-			#99 Formatierung Zahlen in Tabellen Bestand und Gewinn/Verlust
+      #99 Formatierung Zahlen in Tabellen Bestand und Gewinn/Verlust
 0.6.2 -- 2021-11-29
       [etc] Anpassung an HTMLUnit 2.55
 0.6.1 -- 2021-09-25
