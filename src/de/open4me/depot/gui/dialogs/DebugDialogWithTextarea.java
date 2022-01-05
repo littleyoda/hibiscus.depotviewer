@@ -22,7 +22,7 @@ public class DebugDialogWithTextarea extends AbstractDialog
 	/**
 	 * ct
 	 * @param position
-	 * @param fehlerhafteOrder 
+	 * @param fehlerhafteOrder
 	 */
 	public DebugDialogWithTextarea(int position, List<String> fehlerhafteOrder)
 	{
@@ -57,12 +57,12 @@ public class DebugDialogWithTextarea extends AbstractDialog
 		Container container = new SimpleContainer(parent);
 		 FormTextPart text = new FormTextPart();
 		    text.setText("<form>" +
-		       "<p>Die folgenden Umsätze konnten von der Sofware nicht analyisiert werden.<br/>"
+		       "<p>Die folgenden Umsätze konnten von der Software nicht analysiert werden.<br/>"
 		     + "Um die Software zu verbessern, bitte ich sie, mir die Umsätze<br/>"
 		     + "per E-Mail an depotviewer@open4me.de zuzusenden. (Verschlüsselung auf Anfrage)</p>"
 		     + "<p>In den unten aufgeführten Umsätzen sind relevante Informationen<br/>"
-		     + "(Aktienname, Kurs, Depotnummer, Auftragsnummer) bereits teilweise(!) annoymisiert worden.<br/>"
-		     + "Je nach Fehler ist eine Annoymisierung jedoch nicht möglich.</p>"
+		     + "(Aktienname, Kurs, Depotnummer, Auftragsnummer) bereits teilweise(!) anonymisiert worden.<br/>"
+		     + "Je nach Fehler ist eine Anonymisierung jedoch nicht möglich.</p>"
 		     + "</form>");
 
 		    container.addPart(text);

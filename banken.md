@@ -23,7 +23,7 @@ Die Zugangsart ist auf HBCI zusetzen, nicht auf "Depot Viewer".
 Nicht unterstützte Banken
 
 | Bank | Stand | Anmerkungen |
-| ---- | --------------------- | -------------------- | 
+| ---- | --------------------- | -------------------- |
 | Wüstenrot | 4Q 2014 | |
 
 Sollte die Bank Umsätze via HBCI nicht unterstützen, äußert sich dieses in der Regel in der Fehlermeldung "Geschäftsvorfall WPDepotUms wird nicht unterstützt". In diesem Fall ist in den Einstellung die Option "Nur Bestand via HBCI abrufen" zu aktivieren!
@@ -42,7 +42,7 @@ Für Fondsdepot Bank
 | --------- | ------ |
 | Bezeichnung des Kontos | frei wählbar |
 | Kontoart | Wertpapierdepot
-| Kontoinhalber | frei wählbar |
+| Kontoinhaber | frei wählbar |
 | Kundenkennung | Zugangsnummer, wie auf der Webseite genutzt wird |
 | IBAN | leer lassen |
 | Kontonummer | 0
@@ -51,6 +51,3 @@ Für Fondsdepot Bank
 | Offline-Konto | muss deaktiviert(!) sein |
 | Unterkontonummer | Depot Fondsdepot Bank |
 | Zugangsverfahren | Depot Viewer |
-
-
-
