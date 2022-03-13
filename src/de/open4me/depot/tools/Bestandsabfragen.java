@@ -41,7 +41,7 @@ public class Bestandsabfragen implements AccountBalanceProvider {
 				  "select "
 				+ "		kontoid, "
 				+ "		wpid, " 
-				+ "		round(sum( case when aktion='VERKAUF' then -anzahl else anzahl end),6) as anzahl, "
+				+ "		round(sum( case when aktion='VERKAUF' or aktion='AUSLIEFERUNG' then -anzahl else anzahl end),6) as anzahl, "
 				+ "   (" + SQLUtils.addTop(1, "select kurs from depotviewer_kurse where wpid=depotviewer_umsaetze.wpid and kursdatum <= ? order by kursdatum desc") + ") as kurs ,"
 				+ "   (" + SQLUtils.addTop(1, "select kursw from depotviewer_kurse where wpid=depotviewer_umsaetze.wpid and kursdatum <= ? order by kursdatum desc") + ") as kursw ,"
 				+ "   (" + SQLUtils.addTop(1, "select kursdatum from depotviewer_kurse where wpid=depotviewer_umsaetze.wpid and kursdatum <= ? order by kursdatum desc") + ") as bewertungszeitpunkt "
@@ -205,7 +205,7 @@ public class Bestandsabfragen implements AccountBalanceProvider {
 		Connection conn = SQLUtils.getConnection();
 		String sqlBuchungen = "select "
 				+ "	wpid"
-				+ "	, (case when aktion='VERKAUF' then -anzahl else anzahl end) as anzahl"
+				+ "	, (case when aktion='VERKAUF' or aktion='AUSLIEFERUNG' then -anzahl else anzahl end) as anzahl"
 				+ "	, buchungsdatum"
 				+ " from depotviewer_umsaetze"
 				+ " where kontoid=? and buchungsdatum <= ?"
