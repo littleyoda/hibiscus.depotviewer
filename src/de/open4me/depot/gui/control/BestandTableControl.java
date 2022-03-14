@@ -49,6 +49,7 @@ public class BestandTableControl extends AbstractControl implements Listener
 			for (GenericObjectSQL x : list) {
 				bestandsList.addItem(x);
 			}
+			bestandsList.sort();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
