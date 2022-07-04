@@ -32,22 +32,3 @@ Sollte die Bank Umsätze via HBCI nicht unterstützen, äußert sich dieses in d
 
 Ergänzungen bitte an depotviewer@open4me.de. Auch Banken, die HBCI nicht unterstützen, dokumentiere ich gerne.
 
-Sonstige nicht HBCI-Banken
---------------------------
-Hierzu ist innerhalb von Hibiscus manuell ein Konto anzulegen.
-
-Für Fondsdepot Bank
-
-| Feld | Inhalt |
-| --------- | ------ |
-| Bezeichnung des Kontos | frei wählbar |
-| Kontoart | Wertpapierdepot
-| Kontoinhaber | frei wählbar |
-| Kundenkennung | Zugangsnummer, wie auf der Webseite genutzt wird |
-| IBAN | leer lassen |
-| Kontonummer | 0
-| BIC | FODBDE77XXX |
-| Bankleitzahl | 77322200
-| Offline-Konto | muss deaktiviert(!) sein |
-| Unterkontonummer | Depot Fondsdepot Bank |
-| Zugangsverfahren | Depot Viewer |
