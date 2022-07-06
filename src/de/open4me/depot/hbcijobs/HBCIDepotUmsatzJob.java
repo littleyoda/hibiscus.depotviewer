@@ -169,12 +169,15 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 					// Auslieferung Betrag = null; transaction_indicator: 2: Corporate Action; richtung: 1 Lieferung; bezahlung 2: frei
 					// Kauf Betrag = -9999, transaction_indicator: : 1: Settlement/Clearing; richtung: 2 Erhalt; bezahlung 2: frei
 					// Verkauf Betrag = 9999, transaction_indicator :1: Settlement/Clearing; richtung 1: Lieferung bezahlung 2: frei
-
+					if (t.storno) {
+						de.willuhn.logging.Logger.error("Storno Buchung wird ignoriert und nicht berücksichtigt!\n"
+								+ t.toString());
+						continue;
+					}
 					if (t.bezahlung != Transaction.BEZAHLUNG_FREI
-							|| t.anzahl.getType() != TypedValue.TYPE_STCK
-							|| t.storno) {
+							|| t.anzahl.getType() != TypedValue.TYPE_STCK) {
 						unbekannte.add(t);
-						de.willuhn.logging.Logger.error("Unbekannte Transaktion. Bitte nehmen sie Kontakt zum Author auf.\n"
+						de.willuhn.logging.Logger.error("[1] Unbekannte Transaktion. Bitte nehmen sie Kontakt zum Author auf.\n"
 								+ t.toString());
 						continue;
 					}
