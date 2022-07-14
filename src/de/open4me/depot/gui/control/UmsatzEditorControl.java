@@ -268,6 +268,7 @@ public class UmsatzEditorControl extends AbstractControl
 		umsatz.store();
 		
 		UmsatzHelper.storeUmsatzInHibiscus(umsatz);
+		Utils.setUmsatzBetsandTest(false);
 	}
 
 	public Part getBuchungen() throws RemoteException {

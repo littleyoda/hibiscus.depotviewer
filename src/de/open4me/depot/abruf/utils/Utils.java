@@ -195,8 +195,14 @@ public class Utils {
 
 	}
 
+	/**
+	 * Speichert, ob ein Abgleich des Bestandes mit dem Umsatz stattgefunden hat.
+	 * Wird auf false gesetzt, wenn neue Order der Datenbank hinzugefügt wreden
+	 * @param value true or false
+	 * @throws ApplicationException
+	 */
 	public static void setUmsatzBetsandTest(Boolean value) throws ApplicationException {
-		// TODO true oder false wird Datenbank spezifisch gespeichert 
+		// TODO true oder false wird Depot spezifisch gespeichert 
 		SQLUtils.exec("update depotviewer_cfg set value = " + ((value == null) ? "NULL" : value.toString()) + " where `key`='status_bestand_order'");
 	}
 
@@ -205,7 +211,7 @@ public class Utils {
 		try {
 			Object ret = rs.get(0).getAttribute("value");
 			if (ret == null) {
-				return null;
+				return false;
 			}
 			if (ret.toString().equals("1")) {
 				return true;

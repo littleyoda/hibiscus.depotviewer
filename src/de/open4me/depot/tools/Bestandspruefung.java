@@ -29,7 +29,7 @@ public class Bestandspruefung {
 	 */
 	public static Boolean isOK() {
 		Boolean ret = Utils.getUmsatzBestandTest();
-		if (ret != null) {
+		if (ret == null) {
 			return ret;
 		}
 		try {
