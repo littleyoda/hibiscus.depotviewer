@@ -175,12 +175,12 @@ public class Utils {
 	}
 	
 	public static Umsatz getUmsatzByID(String id) throws RemoteException {
-		DBIterator liste = Settings.getDBService().createList(Umsatz.class);
+		DBIterator<Umsatz> liste = Settings.getDBService().createList(Umsatz.class);
 		liste.addFilter("id=?", id);
 		if (!liste.hasNext()) {
 			return null; // Unbekannter Umsatz
 		}
-		return ((Umsatz) liste.next());
+		return liste.next();
 	}
 
 
@@ -324,36 +324,36 @@ public class Utils {
 	}
 
 	public static String getWertPapierByWkn(String suche) throws RemoteException {
-		DBIterator liste = Settings.getDBService().createList(Wertpapier.class);
+		DBIterator<Wertpapier> liste = Settings.getDBService().createList(Wertpapier.class);
 		liste.addFilter("wkn=?", suche.toUpperCase());
 		if (!liste.hasNext()) {
 			return null; // Unbekanntes Wertpapier
 		}
-		return ((Wertpapier) liste.next()).getWpid();
+		return liste.next().getWpid();
 	}
 
 	public static String getWertPapierByIsin(String suche) throws RemoteException {
-		DBIterator liste = Settings.getDBService().createList(Wertpapier.class);
+		DBIterator<Wertpapier> liste = Settings.getDBService().createList(Wertpapier.class);
 		liste.addFilter("isin=?", suche.toUpperCase());
 		if (!liste.hasNext()) {
 			return null; // Unbekanntes Wertpapier
 		}
-		return ((Wertpapier) liste.next()).getWpid();
+		return liste.next().getWpid();
 	}
 
 	public static Wertpapier getWertPapierByID(String id) throws RemoteException {
-		DBIterator liste = Settings.getDBService().createList(Wertpapier.class);
+		DBIterator<Wertpapier> liste = Settings.getDBService().createList(Wertpapier.class);
 		liste.addFilter("id=?", id);
 		if (!liste.hasNext()) {
 			return null; // Unbekanntes Wertpapier
 		}
-		return ((Wertpapier) liste.next());
+		return liste.next();
 	}
 
 	public static void addWertPapier(String wkn, String isin,
 			String name) throws ApplicationException {
 		try {
-			Wertpapier p = (Wertpapier) Settings.getDBService().createObject(Wertpapier.class,null);
+			Wertpapier p = Settings.getDBService().createObject(Wertpapier.class,null);
 			p.setWkn(wkn.toUpperCase());
 			p.setIsin(isin.toUpperCase());
 			p.setWertpapiername(name);
@@ -422,10 +422,10 @@ public class Utils {
 	}
 
 	public static Konto getKontoByID(String id) throws RemoteException {
-		DBIterator liste = Settings.getDBService().createList(Konto.class);
+		DBIterator<Konto> liste = Settings.getDBService().createList(Konto.class);
 		liste.addFilter("id=" + id);
 		if (liste.hasNext()) {
-			return (Konto) liste.next();
+			return liste.next();
 		}
 		return null;
 	}
@@ -438,9 +438,9 @@ public class Utils {
 		DVHBCISynchronizeJobProviderDepotKontoauszug hbciBackend = new DVHBCISynchronizeJobProviderDepotKontoauszug();
 		DVSynchronizeBackend screenScrapingBackend = new DVSynchronizeBackend();
 		List<GenericObjectHashMap> list = new ArrayList<GenericObjectHashMap>();
-		DBIterator liste = Settings.getDBService().createList(Konto.class);
+		DBIterator<Konto> liste = Settings.getDBService().createList(Konto.class);
 		while (liste.hasNext()) {
-			Konto k = (Konto) liste.next();
+			Konto k = liste.next();
 
 			if (k.hasFlag(Konto.FLAG_DISABLED) || !Utils.hasRightKontoType(k)) {
 				continue;

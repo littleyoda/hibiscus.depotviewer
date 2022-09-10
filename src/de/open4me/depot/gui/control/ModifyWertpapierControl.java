@@ -74,7 +74,7 @@ public class ModifyWertpapierControl extends AbstractControl {
 			Application.getMessagingFactory().sendMessage(new StatusBarMessage("Wertpapiername fehlt.",StatusBarMessage.TYPE_ERROR));
 			return false;
 		}
-		DBIterator liste = Settings.getDBService().createList(Wertpapier.class);
+		DBIterator<Wertpapier> liste = Settings.getDBService().createList(Wertpapier.class);
 		liste.addFilter("(isin=? OR wkn=?) AND id <> ? ", isin, wkn, wp.getID());
 		if (liste.hasNext()) {
 			Application.getMessagingFactory().sendMessage(new StatusBarMessage("Die WKN oder ISIN wird bereits bei einem anderen Eintrag genutzt.",StatusBarMessage.TYPE_ERROR));
