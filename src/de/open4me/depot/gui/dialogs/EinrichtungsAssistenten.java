@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.Stack;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import de.open4me.depot.gui.parts.FormTextPartExt;
@@ -15,8 +14,6 @@ import de.willuhn.jameica.gui.dialogs.AbstractDialog;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.util.Container;
-import de.willuhn.jameica.gui.util.LabelGroup;
-import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.jameica.services.BeanService;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.util.ApplicationException;

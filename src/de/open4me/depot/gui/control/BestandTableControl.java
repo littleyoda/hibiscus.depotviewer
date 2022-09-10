@@ -2,7 +2,6 @@ package de.open4me.depot.gui.control;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 

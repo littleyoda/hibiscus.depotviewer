@@ -2,7 +2,6 @@ package de.open4me.depot.gui.parts;
 
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 
 import de.willuhn.jameica.gui.util.TabGroup;
 

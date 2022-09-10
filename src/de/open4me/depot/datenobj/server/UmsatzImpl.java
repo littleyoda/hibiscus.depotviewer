@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.Date;
 
-import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.datenobj.DepotAktion;
 import de.open4me.depot.datenobj.rmi.Umsatz;
 import de.willuhn.datasource.db.AbstractDBObject;

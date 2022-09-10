@@ -4,7 +4,6 @@ package de.open4me.depot;
 import java.io.File;
 
 import jsq.fetch.factory.Factory;
-import jsq.fetcher.history.BaseFetcher;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.sql.SQLUtils;
 import de.open4me.depot.tools.io.KurseViaFileCSV;

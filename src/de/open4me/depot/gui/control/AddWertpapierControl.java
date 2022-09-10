@@ -15,7 +15,6 @@ import de.open4me.depot.datenobj.rmi.Wertpapier;
 import de.open4me.depot.gui.view.ModifyWertpapierView;
 import de.open4me.depot.gui.view.WertpapierView;
 import de.open4me.depot.sql.GenericObjectHashMap;
-import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.tools.WertpapierSuche;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;

@@ -1,14 +1,6 @@
 package Tools;
 
-import java.rmi.RemoteException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.Scanner;
-
-import de.open4me.depot.datenobj.rmi.Umsatz;
-import de.willuhn.datasource.db.AbstractDBObject;
-import de.willuhn.datasource.rmi.DBObject;
 
 public class createClassesFromSQL {
 
