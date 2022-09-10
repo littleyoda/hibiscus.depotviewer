@@ -59,7 +59,7 @@ public class AddWertpapierControl  extends AbstractControl {
 	}
 	
 	public List<GenericObjectHashMap> getDummy() {
-		HashMap<String, String> h = new HashMap<String, String>();
+		HashMap<String, Object> h = new HashMap<String, Object>();
 		h.put("Name", "                           ");
 		h.put("Isin", "                           ");
 		h.put("Typ", "                           ");
@@ -85,7 +85,7 @@ public class AddWertpapierControl  extends AbstractControl {
 						if (map.get("Isin") == null) {
 							continue;
 						}
-						GenericObjectHashMap obj = new GenericObjectHashMap(map);
+						GenericObjectHashMap obj = new GenericObjectHashMap(new HashMap<String, Object>(map));
 						ziel.addItem(obj);
 					}
 				} catch (FailingHttpStatusCodeException | IOException e) {

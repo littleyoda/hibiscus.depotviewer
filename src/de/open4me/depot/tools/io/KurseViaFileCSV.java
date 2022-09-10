@@ -2,7 +2,6 @@ package de.open4me.depot.tools.io;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import de.open4me.depot.datenobj.rmi.BigDecimalWithCurrency;
 import de.open4me.depot.sql.GenericObjectHashMap;
@@ -68,7 +67,7 @@ public class KurseViaFileCSV extends BaseFetcher {
 			// Und die letzte Umwandlung
 			List<Datacontainer> dc = new ArrayList<Datacontainer>();
 			for (GenericObjectHashMap x : daten) {
-				Datacontainer obj = new Datacontainer((Map<String, Object>) x.getMap());
+				Datacontainer obj = new Datacontainer(x.getMap());
 				BigDecimalWithCurrency tmp = (BigDecimalWithCurrency) obj.getMap().get("tmp");
 				obj.getMap().put("last", tmp.getZahl());
 				obj.getMap().put("currency", tmp.getWaehrung().toString());
