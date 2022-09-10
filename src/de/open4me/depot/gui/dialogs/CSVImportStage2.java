@@ -243,13 +243,7 @@ public class CSVImportStage2 extends AbstractDialog
 		this.save = save;
 	}
 
-	private String getName(AbstractInput inp) {
-		return inp.getName().toLowerCase().trim().replace(" ", "");
-	}
-
 	public ArrayList<FeldDefinitionen> getFeldDefinitionen() {
 		return feldDefinitionen;
 	}
-
-
 }

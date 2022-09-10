@@ -16,7 +16,6 @@ public class createClassesFromSQL {
  
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(inpt);
-		String header[] = null;
 		String  impl = "public class UmsatzImpl extends AbstractDBObject implements Umsatz\n" + 
 				"{\n" + 
 				"\n" + 
@@ -101,6 +100,7 @@ public class createClassesFromSQL {
 
 		System.out.println("=======================impl");
 		System.out.println(impl);
+		scanner.close();
 	}
 
 }
