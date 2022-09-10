@@ -26,7 +26,7 @@ import de.willuhn.util.ApplicationException;
  *
  */
 public class SQLXYDataset extends AbstractXYDataset
-implements XYDataset, TableXYDataset, RangeInfo {
+implements TableXYDataset, RangeInfo {
 
 	/** The database connection. */
 	private transient Connection connection;
@@ -35,7 +35,7 @@ implements XYDataset, TableXYDataset, RangeInfo {
 	private String[] columnNames = {};
 
 	/** Rows. */
-	private ArrayList rows;
+	private ArrayList<ArrayList<Object>> rows;
 
 	/** The maximum y value of the returned result set */
 	private double maxValue = 0.0;
@@ -49,7 +49,7 @@ implements XYDataset, TableXYDataset, RangeInfo {
 	 * connection.
 	 */
 	private SQLXYDataset() {
-		this.rows = new ArrayList();
+		this.rows = new ArrayList<ArrayList<Object>>();
 	}
 
 	/**
@@ -174,7 +174,7 @@ implements XYDataset, TableXYDataset, RangeInfo {
 			// Might need to add, to free memory from any previous result sets
 			if (this.rows != null) {
 				for (int column = 0; column < this.rows.size(); column++) {
-					ArrayList row = (ArrayList) this.rows.get(column);
+					ArrayList<Object> row = this.rows.get(column);
 					row.clear();
 				}
 				this.rows.clear();
@@ -193,7 +193,7 @@ implements XYDataset, TableXYDataset, RangeInfo {
 			// Get all rows.
 			// rows = new ArrayList();
 			while (resultSet.next()) {
-				ArrayList newRow = new ArrayList();
+				ArrayList<Object> newRow = new ArrayList<Object>();
 				for (int column = 0; column < numberOfColumns; column++) {
 					Object xObject = resultSet.getObject(column + 1);
 					switch (columnTypes[column]) {
@@ -224,7 +224,7 @@ implements XYDataset, TableXYDataset, RangeInfo {
 
 			/// a kludge to make everything work when no rows returned
 			if (this.rows.isEmpty()) {
-				ArrayList newRow = new ArrayList();
+				ArrayList<Object> newRow = new ArrayList<Object>();
 				for (int column = 0; column < numberOfColumns; column++) {
 					if (columnTypes[column] != Types.NULL) {
 						newRow.add(new Integer(0));
@@ -242,7 +242,7 @@ implements XYDataset, TableXYDataset, RangeInfo {
 				this.maxValue = Double.NEGATIVE_INFINITY;
 				this.minValue = Double.POSITIVE_INFINITY;
 				for (int rowNum = 0; rowNum < this.rows.size(); ++rowNum) {
-					ArrayList row = (ArrayList) this.rows.get(rowNum);
+					ArrayList<Object> row = this.rows.get(rowNum);
 					for (int column = 1; column < numberOfColumns; column++) {
 						Object testValue = row.get(column);
 						if (testValue != null) {
@@ -296,7 +296,7 @@ implements XYDataset, TableXYDataset, RangeInfo {
 	 */
 	@Override
 	public Number getX(int seriesIndex, int itemIndex) {
-		ArrayList row = (ArrayList) this.rows.get(itemIndex);
+		ArrayList<Object> row = this.rows.get(itemIndex);
 		return (Number) row.get(0);
 	}
 
@@ -312,7 +312,7 @@ implements XYDataset, TableXYDataset, RangeInfo {
 	 */
 	@Override
 	public Number getY(int seriesIndex, int itemIndex) {
-		ArrayList row = (ArrayList) this.rows.get(itemIndex);
+		ArrayList<Object> row = this.rows.get(itemIndex);
 		return (Number) row.get(seriesIndex + 1);
 	}
 
