@@ -35,7 +35,7 @@ public class WertpapierView extends AbstractView
 		controller = new WertpapiereControl(unten, oben);
 		oben.setController(controller);
 		unten.setController(controller);
-		oben.getWepierControl(sashForm);
+		oben.getWertpapierControl(sashForm);
 		unten.getKursChart(sashForm);
 
 	}
