@@ -28,14 +28,14 @@ public class JSQweitereAnbieterView extends AbstractView
 				
 				
 		group.addText("Webseite für weitere Datenquellen:", false);				
-		TextInput web = new TextInput("https://rawcdn.githack.com/faiteanu/JavaStockQuotes/6a0c98e639cdf307b02a35948170963c282cc06f/js/overview.html");
+		TextInput web = new TextInput("https://faiteanu.github.io/JavaStockQuotes/");
 		web.setName("Verzeichnis");
 		Button button = new Button("Webseite öffnen", new Action() {
 
 			@Override
 			public void handleAction(Object context)
 					throws ApplicationException {
-				Program.launch("https://rawcdn.githack.com/faiteanu/JavaStockQuotes/6a0c98e639cdf307b02a35948170963c282cc06f/js/overview.html");
+				Program.launch("https://faiteanu.github.io/JavaStockQuotes/");
 			}
 
 		}
