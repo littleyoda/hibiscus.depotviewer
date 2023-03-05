@@ -76,7 +76,7 @@ public class WertpapiereTableControl
 		return d;
 	}
 	
-	public Composite getWepierControl(Composite comp) throws RemoteException
+	public Composite getWertpapierControl(Composite comp) throws RemoteException
 	{
 
 		Composite rest = new Composite(comp ,SWT.BORDER);

@@ -31,6 +31,7 @@ import org.jfree.ui.RectangleInsets;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.datenobj.KursEventAktion;
 import de.open4me.depot.gui.parts.PrintfColumn;
 import de.open4me.depot.gui.parts.TabFolderExt;
 import de.open4me.depot.gui.parts.TabGroupExt;
@@ -200,7 +201,7 @@ public class WertpapiereDatenControl {
 
 		};
 
-		new TabGroupExt(folder, "Performance/Jahr") {
+		final TabGroup performanceTab = new TabGroupExt(folder, "Performance/Jahr") {
 
 			String lastSelection = "";
 			@Override
@@ -268,7 +269,7 @@ public class WertpapiereDatenControl {
 			}
 		};
 
-		final TabGroup graphischTab = new TabGroupExt(folder, "Graphisch", false) {
+		final TabGroup graphischTab = new TabGroupExt(folder, "Chart", false) {
 			
 			{
 				getComposite().setLayout(new FillLayout());
@@ -317,13 +318,54 @@ public class WertpapiereDatenControl {
 			}
 		};
 		
+		final TabGroup eventTab = new TabGroupExt(folder, "Ereignisse") {
+			String lastSelection = "";
+			@Override
+			public void active() {
+				String newSelection = Arrays.toString(currentSelection);
+				if (currentSelection == null || newSelection.equals(lastSelection)) {
+					return;
+				}
+				lastSelection = newSelection;
+				try {
+					String sql = "";
+					String ids = "";
+					for (GenericObjectSQL d : currentSelection) {
+						if (!ids.isEmpty()) {
+							ids += ",";
+						}
+						String id = d.getAttribute("id").toString();
+						ids += id;
+					}
+					sql = "SELECT datum, wertpapiername, aktion, ratio, value, waehrung " +
+						  "FROM depotviewer_kursevent e INNER JOIN depotviewer_wertpapier w ON e.wpid = w.id " +
+						  "where wpid in (" + ids + ") order by e.datum desc, w.wertpapiername asc \n";
+
+					List<GenericObjectSQL> liste = SQLUtils.getResultSet(sql, "depotviewer_kursevent", "", "");
+					
+					// Aktion übersetzen
+					for(GenericObjectSQL event : liste) {
+						event.setAttribute("aktionname", KursEventAktion.getName((String)event.getAttribute("aktion")));
+					}
+					
+					TablePart tab = new TablePart(liste, null);
+					tab.addColumn(Settings.i18n().tr("Datum"), "datum");
+					tab.addColumn(Settings.i18n().tr("Wertpapier"), "wertpapiername");
+					tab.addColumn(Settings.i18n().tr("Aktion"), "aktionname");
+					tab.addColumn(Settings.i18n().tr("Verhältnis"), "ratio");
+					tab.addColumn(Settings.i18n().tr("Betrag"), "value");
+					tab.addColumn(Settings.i18n().tr("Währung"), "waehrung");
+
+					getReplaceableComposite().replace(tab);
+				} catch (Exception e) {
+					e.printStackTrace();
+					Logger.error("Fehler beim Laden der Ereignisse", e);
+				} 
+			}
+		};
+
+
 	}
-
-
-
-
-
-
 
 	private List<GenericObjectHashMap> calcKennzahlen(GenericObjectSQL[] selection) {
 		List<GenericObjectHashMap> zeilen = new ArrayList<GenericObjectHashMap>();
@@ -355,7 +397,7 @@ public class WertpapiereDatenControl {
 							zeilen.get(i).setAttribute(wpid,  "Keine (aktuellen) Kursdaten");
 							continue;
 						}
-						String out = getPerforamnceZahl(i, refKurs, wpid);
+						String out = getPerformanceZahl(i, refKurs, wpid);
 						zeilen.get(i).setAttribute(wpid,  out);
 				} // For Zeitraum
 			} // For WP
@@ -455,7 +497,7 @@ public class WertpapiereDatenControl {
 		return refKurs;
 	}
 
-	public String getPerforamnceZahl(int i, BigDecimal refKurs, String wpid) throws Exception {
+	public String getPerformanceZahl(int i, BigDecimal refKurs, String wpid) throws Exception {
 		Calendar calendar = Calendar.getInstance(); 
 		calendar.setTime(new Date());
 		switch (i) {
