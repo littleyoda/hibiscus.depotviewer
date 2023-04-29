@@ -211,7 +211,7 @@ implements TableXYDataset, RangeInfo {
 					case Types.DATE:
 					case Types.TIME:
 					case Types.TIMESTAMP:
-						newRow.add(new Long(((Date) xObject).getTime()));
+						newRow.add(Long.valueOf(((Date) xObject).getTime()));
 						break;
 					case Types.NULL:
 						break;
@@ -227,7 +227,7 @@ implements TableXYDataset, RangeInfo {
 				ArrayList<Object> newRow = new ArrayList<Object>();
 				for (int column = 0; column < numberOfColumns; column++) {
 					if (columnTypes[column] != Types.NULL) {
-						newRow.add(new Integer(0));
+						newRow.add(Integer.valueOf(0));
 					}
 				}
 				this.rows.add(newRow);
