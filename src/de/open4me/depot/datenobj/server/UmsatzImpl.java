@@ -3,6 +3,7 @@ package de.open4me.depot.datenobj.server;
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import de.open4me.depot.datenobj.DepotAktion;
 import de.open4me.depot.datenobj.rmi.Umsatz;
@@ -146,7 +147,7 @@ public class UmsatzImpl extends AbstractDBObject implements Umsatz
 
 	@Override
 	public void setBuchungsdatum(int jahr, int month, int tag) throws RemoteException {
-		setAttribute("buchungsdatum", new Date(jahr-1900, month-1, tag));
+		setAttribute("buchungsdatum", new GregorianCalendar(jahr, month-1, tag).getTime());
 	}
 
 	@Override
