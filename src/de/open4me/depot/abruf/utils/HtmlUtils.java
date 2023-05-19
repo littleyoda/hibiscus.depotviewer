@@ -1,6 +1,7 @@
 package de.open4me.depot.abruf.utils;
 
 import java.net.InetSocketAddress;
+
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.URI;
@@ -8,13 +9,13 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 
-import com.gargoylesoftware.htmlunit.ProxyConfig;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlTable;
-import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
-import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
+import org.htmlunit.ProxyConfig;
+import org.htmlunit.WebClient;
+import org.htmlunit.html.HtmlAnchor;
+import org.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlTable;
+import org.htmlunit.html.HtmlTableCell;
+import org.htmlunit.html.HtmlTableRow;
 
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;

@@ -1,6 +1,7 @@
 package de.open4me.depot.tools;
 
 import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,11 +14,11 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
-import com.gargoylesoftware.htmlunit.ThreadedRefreshHandler;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlTable;
+import org.htmlunit.SilentCssErrorHandler;
+import org.htmlunit.ThreadedRefreshHandler;
+import org.htmlunit.WebClient;
+import org.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlTable;
 
 import de.open4me.depot.DepotViewerPlugin;
 import de.open4me.depot.abruf.utils.HtmlUtils;
@@ -60,7 +61,7 @@ public class WertpapierSuche {
 		webClient.setRefreshHandler(new ThreadedRefreshHandler());
 		webClient.getOptions().setJavaScriptEnabled(false);
 		webClient.getOptions().setThrowExceptionOnScriptError(false);
-		java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(java.util.logging.Level.OFF);
+		java.util.logging.Logger.getLogger("org.htmlunit").setLevel(java.util.logging.Level.OFF);
 		HtmlPage page = webClient.getPage("https://de.finance.yahoo.com/lookup/all?s=" + search +  "&t=A&m=ALL&r=");
 		HtmlTable tab = (HtmlTable) HtmlUnitTools.getElementByPartContent(page, "Ticker", "table");
 		if (tab == null) {
