@@ -11,10 +11,10 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 
-import com.gargoylesoftware.htmlunit.HttpMethod;
-import com.gargoylesoftware.htmlunit.UnexpectedPage;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.WebRequest;
+import org.htmlunit.HttpMethod;
+import org.htmlunit.UnexpectedPage;
+import org.htmlunit.WebClient;
+import org.htmlunit.WebRequest;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 

@@ -1,6 +1,7 @@
 package de.open4me.depot.abruf.utils;
 
 import java.io.BufferedWriter;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -17,8 +18,8 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlElement;
+import org.htmlunit.html.HtmlPage;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.hbci.DVHBCISynchronizeJobProviderDepotKontoauszug;

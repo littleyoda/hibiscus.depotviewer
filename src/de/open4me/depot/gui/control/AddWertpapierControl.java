@@ -1,12 +1,13 @@
 package de.open4me.depot.gui.control;
 
 import java.io.IOException;
+
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import org.htmlunit.FailingHttpStatusCodeException;
 
 import de.open4me.depot.Settings;
 import de.open4me.depot.abruf.utils.Utils;
