@@ -2,9 +2,6 @@ package de.open4me.depot.gui.dialogs;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Currency;
 import java.util.Date;
 import java.util.List;
 
@@ -246,13 +243,7 @@ public class CSVImportStage2 extends AbstractDialog
 		this.save = save;
 	}
 
-	private String getName(AbstractInput inp) {
-		return inp.getName().toLowerCase().trim().replace(" ", "");
-	}
-
 	public ArrayList<FeldDefinitionen> getFeldDefinitionen() {
 		return feldDefinitionen;
 	}
-
-
 }

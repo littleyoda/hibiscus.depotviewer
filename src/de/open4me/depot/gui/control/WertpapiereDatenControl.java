@@ -67,11 +67,11 @@ public class WertpapiereDatenControl {
 			        for (int i = 0; i < getItemCount(); i++) {
 			        //	ArrayList row = (ArrayList) rows.get(i);
 			        }
-			        	
+
 	//		        return (Number) row.get(seriesIndex + 1);
 
 			    }
-				
+
 				@Override
 				public Number getX(int seriesIndex, int itemIndex) {
 					// TODO Auto-generated method stub
@@ -99,11 +99,11 @@ public class WertpapiereDatenControl {
 					// TODO Auto-generated method stub
 					return x;
 				}
-				
+
 			};
 		} catch (Exception e) {
 			e.printStackTrace();
-		}	
+		}
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class WertpapiereDatenControl {
 				if (!ids.isEmpty()) {
 					ids += ",";
 				}
-				String id = d.getAttribute("id").toString(); 
+				String id = d.getAttribute("id").toString();
 				ids += id;
 				spalten += ", A" + id + ".kurs as \"" + StringEscapeUtils.escapeSql(d.getAttribute("wertpapiername").toString()) + "\" ";
 				sql +="left join depotviewer_kurse as A" + id + " on A" + id + ".wpid = " + id + " and A" + id + ".kursdatum = datum.kursdatum\n";
@@ -247,7 +247,7 @@ public class WertpapiereDatenControl {
 						}
 						String id = d.getAttribute("id").toString();
 						ids += id;
-						spalten += ", a" + id + ".kurs as A" + id + "k, a" + id + ".kursw as A" + id + "kw"; 
+						spalten += ", a" + id + ".kurs as A" + id + "k, a" + id + ".kursw as A" + id + "kw";
 						spalten += ", a" + id + ".kursperf as A" + id + "kp, a" + id + ".kursw as A" + id + "kpw";
 						sql +="left join depotviewer_kurse as A" + id + " on A" + id + ".wpid = " + id + " and A" + id + ".kursdatum = datum.kursdatum\n";
 					}
@@ -265,12 +265,12 @@ public class WertpapiereDatenControl {
 				} catch (Exception e) {
 					e.printStackTrace();
 					Logger.error("Fehler bei der Kursdarstellung", e);
-				} 
+				}
 			}
 		};
 
 		final TabGroup graphischTab = new TabGroupExt(folder, "Chart", false) {
-			
+
 			{
 				getComposite().setLayout(new FillLayout());
 
@@ -284,7 +284,7 @@ public class WertpapiereDatenControl {
 				chart.getXYPlot().setRangeGridlinePaint(Color.LIGHT_GRAY);
 				renderer = chart.getXYPlot().getRenderer();
 				Rectangle maxSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-				new ChartComposite(getComposite(), SWT.NONE, chart, 
+				new ChartComposite(getComposite(), SWT.NONE, chart,
 						ChartComposite.DEFAULT_WIDTH,
 						ChartComposite.DEFAULT_HEIGHT,
 						ChartComposite.DEFAULT_MINIMUM_DRAW_WIDTH,
@@ -299,7 +299,7 @@ public class WertpapiereDatenControl {
 		                true   // tooltips
 	                );
 			}
-			
+
 			String lastSelection = "";
 			private XYItemRenderer renderer;
 			@Override
@@ -414,12 +414,12 @@ public class WertpapiereDatenControl {
 
 	private List<GenericObjectHashMap> calcKennzahlen2(GenericObjectSQL[] selection) {
 		List<GenericObjectHashMap> zeilen = new ArrayList<GenericObjectHashMap>();
-		Date now = new Date();
+		Calendar today = Calendar.getInstance();
 		try {
 			// Legende hinzufügen
 			for (int i = 0; i < 10; i++) {
 				GenericObjectHashMap zeile = new GenericObjectHashMap();
-				int jahr = now.getYear() + 1900 - (i);
+				int jahr = today.get(Calendar.YEAR) - (i);
 				zeile.setAttribute("zeitraum", "Jahr " + jahr);
 				zeilen.add(zeile);
 			}
@@ -431,7 +431,7 @@ public class WertpapiereDatenControl {
 				BigDecimal refKurs = getReferenzKurs(wpid, 10);
 
 				for (int i = 0; i < 10; i++) {
-						String out = getPerformanceFuerJahr(now.getYear() + 1900 - (i), wpid);
+						String out = getPerformanceFuerJahr(today.get(Calendar.YEAR) - (i), wpid);
 						zeilen.get(i).setAttribute(wpid,  out);
 				} // For Zeitraum
 			} // For WP
@@ -447,7 +447,7 @@ public class WertpapiereDatenControl {
 	}
 
 	private String getPerformanceFuerJahr(int jahr, String wpid) throws ApplicationException, Exception {
-		// letzter 
+		// letzter
 		PreparedStatement pre = SQLUtils.getPreparedSQL(SQLUtils.addTop(1, "select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff  from depotviewer_kurse where wpid = " + wpid + " and kursdatum <= ? order by kursdatum desc"));
 		pre.setDate(1, Utils.getSQLDate(Utils.getDatum(jahr, 12, 31)));
 		pre.setDate(2, Utils.getSQLDate(Utils.getDatum(jahr, 12, 31)));
@@ -476,7 +476,7 @@ public class WertpapiereDatenControl {
 
 		BigDecimal einprozent = vorjahresEnde.divide(new BigDecimal("100.0"), 10, RoundingMode.HALF_UP);
 		BigDecimal performance = jahresEnde.subtract(vorjahresEnde).divide(einprozent, 10, RoundingMode.HALF_UP);
-		return performance.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "%";
+		return performance.setScale(2, RoundingMode.HALF_UP).toPlainString() + "%";
 	}
 
 
@@ -498,7 +498,7 @@ public class WertpapiereDatenControl {
 	}
 
 	public String getPerformanceZahl(int i, BigDecimal refKurs, String wpid) throws Exception {
-		Calendar calendar = Calendar.getInstance(); 
+		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
 		switch (i) {
 		case 0: calendar.add(Calendar.MONTH, -1); break;
@@ -509,7 +509,7 @@ public class WertpapiereDatenControl {
 		case 5: calendar.add(Calendar.YEAR, -5); break;
 		}
 		PreparedStatement getperf  = SQLUtils.getPreparedSQL(
-				SQLUtils.addTop(1, 
+				SQLUtils.addTop(1,
 						"select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff from depotviewer_kurse where wpid = " + wpid + " order by diff"));
 		getperf.setDate(1, new java.sql.Date(calendar.getTime().getTime()));
 		List<GenericObjectSQL> x = SQLUtils.getResultSet(getperf, "depotviewer_kurse", "", "");
@@ -525,7 +525,7 @@ public class WertpapiereDatenControl {
 		BigDecimal einprozent = kurs.divide(new BigDecimal("100.0"), 10, RoundingMode.HALF_UP);
 		BigDecimal performance = refKurs.subtract(kurs).divide(einprozent, 10, RoundingMode.HALF_UP);
 		//					(refkurs - kurs)/(kurs/100)
-		return performance.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "%";
+		return performance.setScale(2, RoundingMode.HALF_UP).toPlainString() + "%";
 	}
 
 

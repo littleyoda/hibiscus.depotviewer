@@ -8,17 +8,17 @@ import de.willuhn.datasource.GenericObject;
 
 public class GenericObjectHashMap implements GenericObject {
 
-	protected Map<?, ?> map;
+	protected Map<String, Object> map;
 
-	public Map<?, ?> getMap() {
+	public Map<String, Object> getMap() {
 		return map;
 	}
 	
 	public GenericObjectHashMap() {
-		map = new HashMap<Object, Object>();
+		map = new HashMap<String, Object>();
 	}
 
-	public GenericObjectHashMap(Map<?, ?> map) {
+	public GenericObjectHashMap(Map<String, Object> map) {
 		this.map = map;
 	}
 	@Override
@@ -26,9 +26,8 @@ public class GenericObjectHashMap implements GenericObject {
 		return map.get(name);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void setAttribute(String key, Object value)  {
-		((Map<Object, Object>) getMap()).put(key, value);
+		getMap().put(key, value);
 	}
 
 	@Override

@@ -174,9 +174,4 @@ public class CSVImportStage1 extends AbstractDialog
 		}
 		return this.error;
 	}
-
-	private String getSaveKey(SelectInput x) {
-			return x.getName().toLowerCase().trim().replace(" ", "");
-	}
-	
 }

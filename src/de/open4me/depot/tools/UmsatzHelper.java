@@ -20,7 +20,7 @@ import de.willuhn.util.ApplicationException;
 public class UmsatzHelper {
 
 	public static boolean existsOrder(String orderid) throws RemoteException {
-		DBIterator liste = Settings.getDBService().createList(Umsatz.class);
+		DBIterator<Umsatz> liste = Settings.getDBService().createList(Umsatz.class);
 		liste.addFilter("orderid=?", orderid);
 		return liste.hasNext();
 	}

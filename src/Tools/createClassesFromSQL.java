@@ -1,14 +1,6 @@
 package Tools;
 
-import java.rmi.RemoteException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.Scanner;
-
-import de.open4me.depot.datenobj.rmi.Umsatz;
-import de.willuhn.datasource.db.AbstractDBObject;
-import de.willuhn.datasource.rmi.DBObject;
 
 public class createClassesFromSQL {
 
@@ -24,7 +16,6 @@ public class createClassesFromSQL {
  
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(inpt);
-		String header[] = null;
 		String  impl = "public class UmsatzImpl extends AbstractDBObject implements Umsatz\n" + 
 				"{\n" + 
 				"\n" + 
@@ -109,6 +100,7 @@ public class createClassesFromSQL {
 
 		System.out.println("=======================impl");
 		System.out.println(impl);
+		scanner.close();
 	}
 
 }

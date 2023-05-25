@@ -15,7 +15,6 @@ import de.open4me.depot.datenobj.rmi.Wertpapier;
 import de.open4me.depot.gui.view.ModifyWertpapierView;
 import de.open4me.depot.gui.view.WertpapierView;
 import de.open4me.depot.sql.GenericObjectHashMap;
-import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.tools.WertpapierSuche;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
@@ -60,7 +59,7 @@ public class AddWertpapierControl  extends AbstractControl {
 	}
 	
 	public List<GenericObjectHashMap> getDummy() {
-		HashMap<String, String> h = new HashMap<String, String>();
+		HashMap<String, Object> h = new HashMap<String, Object>();
 		h.put("Name", "                           ");
 		h.put("Isin", "                           ");
 		h.put("Typ", "                           ");
@@ -86,7 +85,7 @@ public class AddWertpapierControl  extends AbstractControl {
 						if (map.get("Isin") == null) {
 							continue;
 						}
-						GenericObjectHashMap obj = new GenericObjectHashMap(map);
+						GenericObjectHashMap obj = new GenericObjectHashMap(new HashMap<String, Object>(map));
 						ziel.addItem(obj);
 					}
 				} catch (FailingHttpStatusCodeException | IOException e) {
