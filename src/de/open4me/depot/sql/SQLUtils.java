@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.open4me.depot.abruf.utils.Utils;
 import de.willuhn.jameica.hbci.HBCI;
@@ -98,26 +99,23 @@ public class SQLUtils {
 
 
 	public static void saveCfg(String key, String value) throws Exception {
-		PreparedSQL preparedSQL = getPreparedSQL("insert into depotviewer_cfg (key, value) values (?,?)");
-		try(Connection conn = preparedSQL.conn; PreparedStatement pre = preparedSQL.prest) {
-			pre.setString(1, key);
-			pre.setString(2, value);
-			pre.executeUpdate();
+
+		try(PreparedSQL preparedSQL = getPreparedSQL("insert into depotviewer_cfg (key, value) values (?,?)");) {
+			preparedSQL.prest.setString(1, key);
+			preparedSQL.prest.setString(2, value);
+			preparedSQL.prest.executeUpdate();
 			Logger.info("Speichere " + key + ":" + value);
 		}
 	}
 
 	public static String getCfg(String key) {
-		try {
-			PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("select value from depotviewer_cfg where `key`=?");
-			try(Connection conn = preparedSQL.conn; PreparedStatement pre = preparedSQL.prest) {
-				pre.setString(1, key);
-				try(ResultSet ret =  pre.executeQuery()) {
-					if (!ret.next()) {
-						return null;
-					}
-					return ret.getString(1);
+		try(PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("select value from depotviewer_cfg where `key`=?");) {
+			preparedSQL.prest.setString(1, key);
+			try(ResultSet ret =  preparedSQL.prest.executeQuery()) {
+				if (!ret.next()) {
+					return null;
 				}
+				return ret.getString(1);
 			}
 		} catch (Exception e) {
 			Logger.error("Fehler beim Zugriff auf cfg", e);
@@ -146,7 +144,7 @@ public class SQLUtils {
 	 */
 	public static Object getObject(PreparedStatement statement) {
 		Object obj = null;
-		try(Connection conn = getConnection();ResultSet ret = statement.executeQuery()) {
+		try(ResultSet ret = statement.executeQuery()) {
 			if (!ret.next()) {
 				return null;
 			}
@@ -256,12 +254,33 @@ public class SQLUtils {
 		return ret;
 	}
 
-	public static class PreparedSQL {
+	public static class PreparedSQL implements AutoCloseable {
 		public final Connection conn;
 		public final PreparedStatement prest;
 		protected PreparedSQL(Connection conn, PreparedStatement prest) {
 			this.conn = conn;
 			this.prest = prest;
+		}
+		@Override
+		public void close() throws Exception {
+			Exception e = null;
+			if ( Objects.nonNull(prest)) {
+				try {
+					prest.close();
+				} catch( Exception ee) {
+					e=ee;
+				}
+			}
+			if ( Objects.nonNull(conn)) {
+				try {
+					conn.close();
+				}catch( Exception ee) {
+					e=ee;
+				}
+			}
+			if (Objects.nonNull(e)) {
+				throw e;
+			}
 		}
 
 	}

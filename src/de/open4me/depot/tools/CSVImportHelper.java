@@ -126,28 +126,25 @@ public class CSVImportHelper {
 	}
 
 	public void saveOptions(CSVImportTool tool) {
-		PreparedSQL preparedSQL;
-		try {
-			preparedSQL = SQLUtils.getPreparedSQL("delete from depotviewer_cfg where key like concat(?,'%')");
-			try(Connection conn = preparedSQL.conn; PreparedStatement pre = preparedSQL.prest) {
-				pre.setString(1, optionsPrefix);
-				pre.execute();
+		try(PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("delete from depotviewer_cfg where key like concat(?,'%')");) {
+			PreparedStatement pre = preparedSQL.prest;
+			pre.setString(1, optionsPrefix);
+			pre.execute();
 
-				for (FeldConverterAuswahl<?> x : tool.getCsvOptions()) {
-					String key = optionsPrefix + "csv." + x.getId();
-					String value = x.getAuswahl().toString();
-					SQLUtils.saveCfg(key, value);
-				}
-				for (FeldDefinitionen x : tool.getFeldDefinitionen()) {
-					String prefix = optionsPrefix + x.getAttr() + ".";
-					SQLUtils.saveCfg(prefix + "_spalte", x.getSpalte());
-					for (FeldConverterOption<?> o : x.getConverters().getOptions()) {
-						SQLUtils.saveCfg(prefix + o.getId(), o.getAuswahl().toString());
-					}
-				}
-				String key = optionsPrefix + "base.source";
-				SQLUtils.saveCfg(key, source);
+			for (FeldConverterAuswahl<?> x : tool.getCsvOptions()) {
+				String key = optionsPrefix + "csv." + x.getId();
+				String value = x.getAuswahl().toString();
+				SQLUtils.saveCfg(key, value);
 			}
+			for (FeldDefinitionen x : tool.getFeldDefinitionen()) {
+				String prefix = optionsPrefix + x.getAttr() + ".";
+				SQLUtils.saveCfg(prefix + "_spalte", x.getSpalte());
+				for (FeldConverterOption<?> o : x.getConverters().getOptions()) {
+					SQLUtils.saveCfg(prefix + o.getId(), o.getAuswahl().toString());
+				}
+			}
+			String key = optionsPrefix + "base.source";
+			SQLUtils.saveCfg(key, source);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Logger.error("Error", e);

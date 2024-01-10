@@ -448,10 +448,10 @@ public class WertpapiereDatenControl {
 
 	private String getPerformanceFuerJahr(int jahr, String wpid) throws ApplicationException, Exception {
 		// letzter
-		PreparedSQL preparedSQL = SQLUtils.getPreparedSQL(SQLUtils.addTop(1, "select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff  from depotviewer_kurse where wpid = " + wpid + " and kursdatum <= ? order by kursdatum desc"));
 
-		try( Connection conn = preparedSQL.conn; PreparedStatement pre = preparedSQL.prest){
 
+		try( PreparedSQL preparedSQL = SQLUtils.getPreparedSQL(SQLUtils.addTop(1, "select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff  from depotviewer_kurse where wpid = " + wpid + " and kursdatum <= ? order by kursdatum desc"));){
+			PreparedStatement pre = preparedSQL.prest;
 			pre.setDate(1, Utils.getSQLDate(Utils.getDatum(jahr, 12, 31)));
 			pre.setDate(2, Utils.getSQLDate(Utils.getDatum(jahr, 12, 31)));
 			List<GenericObjectSQL> referenz = SQLUtils.getResultSet(pre, "depotviewer_kurse", "", "");
@@ -488,8 +488,9 @@ public class WertpapiereDatenControl {
 
 	private BigDecimal getReferenzKurs(String wpid, int maximalesAlter) throws Exception,
 	ApplicationException, SQLException, RemoteException {
-		PreparedSQL preparedSQL = SQLUtils.getPreparedSQL(SQLUtils.addTop(1, "select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff  from depotviewer_kurse where wpid = " + wpid + " order by kursdatum desc"));
-		try( Connection conn = preparedSQL.conn; PreparedStatement pre = preparedSQL.prest){
+
+		try( PreparedSQL preparedSQL = SQLUtils.getPreparedSQL(SQLUtils.addTop(1, "select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff  from depotviewer_kurse where wpid = " + wpid + " order by kursdatum desc"));){
+			PreparedStatement pre = preparedSQL.prest;
 			pre.setDate(1, new java.sql.Date((new Date()).getTime()));
 			BigDecimal refKurs = null;
 			List<GenericObjectSQL> referenz = SQLUtils.getResultSet(pre, "depotviewer_kurse", "", "");
@@ -514,10 +515,11 @@ public class WertpapiereDatenControl {
 		case 4: calendar.add(Calendar.YEAR, -4); break;
 		case 5: calendar.add(Calendar.YEAR, -5); break;
 		}
-		PreparedSQL preparedSQL = SQLUtils.getPreparedSQL(
+
+		try( PreparedSQL preparedSQL = SQLUtils.getPreparedSQL(
 				SQLUtils.addTop(1,
-						"select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff from depotviewer_kurse where wpid = " + wpid + " order by diff"));
-		try( Connection conn = preparedSQL.conn; PreparedStatement getperf = preparedSQL.prest){
+						"select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff from depotviewer_kurse where wpid = " + wpid + " order by diff"));){
+			PreparedStatement getperf = preparedSQL.prest;
 			getperf.setDate(1, new java.sql.Date(calendar.getTime().getTime()));
 			List<GenericObjectSQL> x = SQLUtils.getResultSet(getperf, "depotviewer_kurse", "", "");
 			if (x.size() == 0) {

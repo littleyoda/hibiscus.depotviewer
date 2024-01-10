@@ -152,8 +152,8 @@ public class UpdateStock implements BackgroundTask {
 		Logger.debug("Anbieter für Kursaktualisierung: " + base.getName());
 		Date d = new Date();
 		base.prepare(searchterm, 2000, 1, 1, d.getYear() + 1900, d.getMonth() + 1, d.getDate());
-		PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("select value from depotviewer_cfgupdatestock where `wpid`= ? and `key` = ?");
-		try( Connection conn = preparedSQL.conn; PreparedStatement getCfg = preparedSQL.prest) {
+		try( PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("select value from depotviewer_cfgupdatestock where `wpid`= ? and `key` = ?");) {
+			PreparedStatement getCfg = preparedSQL.prest;
 			getCfg.setString(1, wpid);
 			while (base.hasMoreConfig()) {
 				if (abort) {
@@ -304,42 +304,42 @@ public class UpdateStock implements BackgroundTask {
 	}
 
 	private static String getAnbieterName(String wpid) throws Exception {
-		PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("select value from depotviewer_cfgupdatestock where `wpid`= ? and `key` is null");
-		try(Connection conn = preparedSQL.conn; PreparedStatement pre = preparedSQL.prest) {
-			pre.setString(1, wpid);
-			return (String) SQLUtils.getObject(pre);
+
+		try(PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("select value from depotviewer_cfgupdatestock where `wpid`= ? and `key` is null")) {
+			preparedSQL.prest.setString(1, wpid);
+			return (String) SQLUtils.getObject(preparedSQL.prest);
 		}
 	}
 
 	private static void doSaveAnbieter(String string, String name) throws Exception {
 		doCleanSaveSettings(string);
 
-		PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("insert into depotviewer_cfgupdatestock set `wpid`= ?, `key` = ?, `value` = ?");
-		try(Connection conn = preparedSQL.conn; PreparedStatement pre = preparedSQL.prest) {
-			pre.setString(1, string);
-			pre.setString(2, null);
-			pre.setString(3, name);
-			pre.execute();
+
+		try(PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("insert into depotviewer_cfgupdatestock set `wpid`= ?, `key` = ?, `value` = ?");) {
+			preparedSQL.prest.setString(1, string);
+			preparedSQL.prest.setString(2, null);
+			preparedSQL.prest.setString(3, name);
+			preparedSQL.prest.execute();
 		}
 	}
 
 	private static void doCleanSaveSettings(String string) throws Exception {
-		PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("delete from depotviewer_cfgupdatestock where `wpid`= ?");
-		try(Connection conn = preparedSQL.conn; PreparedStatement pre = preparedSQL.prest) {
-			pre.setString(1, string);
-			pre.execute();
+
+		try(PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("delete from depotviewer_cfgupdatestock where `wpid`= ?");) {
+			preparedSQL.prest.setString(1, string);
+			preparedSQL.prest.execute();
 		}
 	}
 
 	private static void doSaveSettings(String wpid, List<Config> cfg) throws Exception {
-		PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("insert into depotviewer_cfgupdatestock set `wpid`= ?, `key` = ?, `value` = ?");
-		try(Connection conn = preparedSQL.conn; PreparedStatement pre = preparedSQL.prest) {
+
+		try(PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("insert into depotviewer_cfgupdatestock set `wpid`= ?, `key` = ?, `value` = ?");) {
 			for (Config c : cfg) {
 				for (ConfigTuple sel : c.getSelected()) {
-					pre.setString(1, wpid);
-					pre.setString(2, c.getBeschreibung());
-					pre.setString(3, sel.getDescription());
-					pre.execute();
+					preparedSQL.prest.setString(1, wpid);
+					preparedSQL.prest.setString(2, c.getBeschreibung());
+					preparedSQL.prest.setString(3, sel.getDescription());
+					preparedSQL.prest.execute();
 				}
 			}
 		}
