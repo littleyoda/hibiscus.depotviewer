@@ -40,35 +40,30 @@ public class SQLUtils {
 
 	public static int delete(GenericObjectSQL obj) {
 		int val = 0;
-		Connection conn = null;
-		try {
+		try(Connection conn = getConnection()) {
 			Utils.markRecalc(null);
-			conn = getConnection();
 			String sql = "DELETE FROM " + obj.getTable() + " WHERE " + obj.getIdfeld() +  "=?";
-			PreparedStatement prest = conn.prepareStatement(sql);
-			prest.setString(1, obj.getID());
-			val = prest.executeUpdate();
-			conn.close();
+			try(PreparedStatement prest = conn.prepareStatement(sql)) {
+				prest.setString(1, obj.getID());
+				val = prest.executeUpdate();
+			}
 		} catch (Exception e) {
 			Logger.error("Fehler beim Löschen", e);
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (SQLException e1) {
-				}
-			}
 		}
 		return val;
 	}
-	
+
 	public static List<GenericObjectSQL> getResultSet(String query, String table, String idfeld) {
 		return getResultSet(query, table, idfeld, idfeld);
 	}
 
+	public static List<GenericObjectSQL> getResultSet(Connection conn, String query, String table, String idfeld) {
+		return getResultSet(conn, query, table, idfeld, idfeld);
+	}
+
 	public static List<GenericObjectSQL> getResultSet(PreparedStatement statement, String table, String idfeld, String pa) {
 		List<GenericObjectSQL> list = new ArrayList<GenericObjectSQL>();
-		try {
-			ResultSet ret = statement.executeQuery();
+		try(ResultSet ret = statement.executeQuery()) {
 			while (ret.next()) {
 				list.add(new GenericObjectSQL(idfeld, pa, table, ret));
 			}
@@ -79,45 +74,51 @@ public class SQLUtils {
 	}
 	public static List<GenericObjectSQL> getResultSet(String query, String table, String idfeld, String pa) {
 		List<GenericObjectSQL> list = new ArrayList<GenericObjectSQL>();
-		Connection conn = null;
-		try {
-			conn = getConnection();
-			Statement statement = conn.createStatement();
-			ResultSet ret = statement.executeQuery(query);
-			while (ret.next()) {
-				list.add(new GenericObjectSQL(idfeld, pa, table, ret));
+		try(Connection conn = getConnection()) {
+			try(Statement statement = conn.createStatement()) {
+				return getResultSet(conn, query, table, idfeld, pa);
 			}
-			conn.close();
 		} catch (Exception e) {
 			Logger.error("Fehler bei der SQL Anweisung: " + query, e);
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (SQLException e1) {
-				}
-			}
 		}
 		return list;
 	}
 
-	
-	public static void saveCfg(String key, String value) throws Exception {
-		PreparedStatement pre = getPreparedSQL("insert into depotviewer_cfg (key, value) values (?,?)");
-		pre.setString(1, key);
-		pre.setString(2, value);
-		pre.executeUpdate();
-		Logger.info("Speichere " + key + ":" + value);
+	public static List<GenericObjectSQL> getResultSet(Connection conn, String query, String table, String idfeld, String pa) {
+		List<GenericObjectSQL> list = new ArrayList<GenericObjectSQL>();
+		try(Statement statement = conn.createStatement(); ResultSet ret = statement.executeQuery(query)) {
+			while (ret.next()) {
+				list.add(new GenericObjectSQL(idfeld, pa, table, ret));
+			}
+		} catch (Exception e) {
+			Logger.error("Fehler bei der SQL Anweisung: " + query, e);
+		}
+		return list;
 	}
-	
+
+
+	public static void saveCfg(String key, String value) throws Exception {
+		PreparedSQL preparedSQL = getPreparedSQL("insert into depotviewer_cfg (key, value) values (?,?)");
+		try(Connection conn = preparedSQL.conn; PreparedStatement pre = preparedSQL.prest) {
+			pre.setString(1, key);
+			pre.setString(2, value);
+			pre.executeUpdate();
+			Logger.info("Speichere " + key + ":" + value);
+		}
+	}
+
 	public static String getCfg(String key) {
 		try {
-			PreparedStatement pre = SQLUtils.getPreparedSQL("select value from depotviewer_cfg where `key`=?");
-			pre.setString(1, key);
-			ResultSet ret =  pre.executeQuery();
-			if (!ret.next()) {
-				return null;
+			PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("select value from depotviewer_cfg where `key`=?");
+			try(Connection conn = preparedSQL.conn; PreparedStatement pre = preparedSQL.prest) {
+				pre.setString(1, key);
+				try(ResultSet ret =  pre.executeQuery()) {
+					if (!ret.next()) {
+						return null;
+					}
+					return ret.getString(1);
+				}
 			}
-			return ret.getString(1);
 		} catch (Exception e) {
 			Logger.error("Fehler beim Zugriff auf cfg", e);
 			e.printStackTrace();
@@ -126,93 +127,71 @@ public class SQLUtils {
 	}
 	private static int getCurrentDBVersion() {
 		int version = -1;
-		Connection conn = null;
-		try {
-			conn = getConnection();
-			Statement statement = conn.createStatement();
-			ResultSet ret = statement.executeQuery("select value from depotviewer_cfg where `key`='dbversion'");
+		try(Connection conn = getConnection();Statement statement = conn.createStatement();ResultSet ret = statement.executeQuery("select value from depotviewer_cfg where `key`='dbversion'");) {
 			ret.next();
 			version = Integer.parseInt(ret.getString(1));
-			conn.close();
 		} catch (Exception e) {
 			Logger.error("Fehler beim der Bestimmung der dbversion des DeportViewers", e);
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (SQLException e1) {
-				}
-			}
 		}
 		return version;
 	}
 
 	/**
 	 * Liefert das erste Objekt der ersten Zeile zurück.
-	 * 
+	 *
 	 * Falls die Query überhaupt kein Ergebnisse zurückliefert hat, wird null zurückgeliefert
-	 * 
+	 *
 	 * @param statement
 	 * @return
 	 */
 	public static Object getObject(PreparedStatement statement) {
-		Connection conn = null;
 		Object obj = null;
-		try {
-			conn = getConnection();
-			ResultSet ret = statement.executeQuery();
+		try(Connection conn = getConnection();ResultSet ret = statement.executeQuery()) {
 			if (!ret.next()) {
 				return null;
 			}
 			obj = ret.getObject(1);
-			conn.close();
 		} catch (Exception e) {
 			Logger.error("Fehler beim Query", e);
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (SQLException e1) {
-				}
-			}
 		}
 		return obj;
 	}
 
-	
+
 	public static void checkforupdates() throws ApplicationException {
 		List<SQLChange> liste = SQLChange.getChangesSinceVersion(getCurrentDBVersion());
-		Connection conn = null;
-		try {
+		try(Connection conn = getConnection();) {
 			for (SQLChange changeset : liste) {
 				Logger.info("Depot-Viewer: Updating DB to " + changeset.getVersion());
-				conn = getConnection();
 				conn.setAutoCommit(false);
-				Statement statement = conn.createStatement();
-				for (String query : changeset.getQuery()) {
-					statement.execute(query);
+				try(Statement statement = conn.createStatement()) {
+					for (String query : changeset.getQuery()) {
+						statement.execute(query);
+					}
+					statement.execute("update depotviewer_cfg set value = " + changeset.getVersion() + " where `key`='dbversion'");
+					conn.commit();
+				} catch (Exception e) {
+					Logger.error("Fehler bei Aktualisierung der Datenbank", e);
+					if (conn != null) {
+						try {
+							conn.rollback();
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						}
+					}
+					throw e;
 				}
-				statement.execute("update depotviewer_cfg set value = " + changeset.getVersion() + " where `key`='dbversion'");
-				conn.commit();
-				conn.close();
 			}
-		} catch (Exception e) {
-			Logger.error("Fehler bei Aktualisierung der Datenbank", e);
-			if (conn != null) {
-				try {
-					conn.rollback();
-					conn.close();
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
-			}
-			throw new ApplicationException(e);
+		} catch (Exception e2) {
+			throw new ApplicationException(e2);
 		}
 	}
-	
+
 	public static String getDateDiff(String value1, String value2) throws ApplicationException {
 		if (driver instanceof DBSupportH2Impl) {
 			return "datediff('day'," + value1 + ", "+value2+")";
 		}
-		
+
 		if (driver instanceof DBSupportMySqlImpl) {
 			return "datediff(" + value1 + ", "+value2+")";
 		}
@@ -223,35 +202,36 @@ public class SQLUtils {
 		try {
 			HBCIDBServiceImpl db = (HBCIDBServiceImpl) Application.getServiceFactory().lookup(HBCI.class,"database");
 			AbstractDBSupportImpl driver = (AbstractDBSupportImpl) db.getDriver();
-			Connection conn = DriverManager.getConnection(driver.getJdbcUrl(), driver.getJdbcUsername(), driver.getJdbcPassword());
-
-			Statement statement = conn.createStatement();
-			statement.execute(sql);
-			conn.close();
+			try( Connection conn = DriverManager.getConnection(driver.getJdbcUrl(), driver.getJdbcUsername(), driver.getJdbcPassword()); Statement statement = conn.createStatement()){
+				statement.execute(sql);
+			}
 		} catch (Exception e) {
 			Logger.error("Fehler beim der Ausführung: " + sql, e);
 			throw new ApplicationException(e);
 		}
 	}
-	
-	public static PreparedStatement getPreparedSQL(String query) throws Exception {
+
+	public static PreparedSQL getPreparedSQL(String query) throws Exception {
 		Connection conn = SQLUtils.getConnection();
-		PreparedStatement prest = conn.prepareStatement(query);
-		return prest;
+		return new PreparedSQL(conn, conn.prepareStatement(query));
+	}
+
+	public static PreparedStatement getPreparedSQL(Connection conn, String query) throws Exception {
+		return conn.prepareStatement(query);
 	}
 
 	public static String addTop(int i, String string) throws ApplicationException {
 		if (driver instanceof DBSupportH2Impl) {
 			return string.replace("select ",  "select top " + i);
 		}
-		
+
 		if (driver instanceof DBSupportMySqlImpl) {
 			return string + " limit " + i;
 		}
 		throw new ApplicationException("Unbekannte Datenbank " + driver.getClass().getName());
 	}
 	public static Date getSQLDate(java.util.Date d) {
-		return new java.sql.Date(d.getTime());		
+		return new java.sql.Date(d.getTime());
 	}
 
 	/**
@@ -274,5 +254,15 @@ public class SQLUtils {
 			ret.get(key).add(item);
 		}
 		return ret;
+	}
+
+	public static class PreparedSQL {
+		public final Connection conn;
+		public final PreparedStatement prest;
+		protected PreparedSQL(Connection conn, PreparedStatement prest) {
+			this.conn = conn;
+			this.prest = prest;
+		}
+
 	}
 }

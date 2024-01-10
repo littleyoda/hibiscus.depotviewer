@@ -18,19 +18,17 @@ import org.jfree.data.xy.TableXYDataset;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.util.Log;
 
+import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.util.ApplicationException;
 
 /**
  * Based on JDBCXYDataset
- * 
+ *
  * @author sven
  *
  */
 public class SQLXYDataset extends AbstractXYDataset
 implements XYDataset, TableXYDataset, RangeInfo {
-
-	/** The database connection. */
-	private transient Connection connection;
 
 	/** Column names. */
 	private String[] columnNames = {};
@@ -49,21 +47,8 @@ implements XYDataset, TableXYDataset, RangeInfo {
 	 * Creates a new JDBCXYDataset (initially empty) with no database
 	 * connection.
 	 */
-	private SQLXYDataset() {
+	public SQLXYDataset() {
 		this.rows = new ArrayList();
-	}
-
-	/**
-	 * Creates a new dataset (initially empty) using the specified database
-	 * connection.
-	 *
-	 * @param  con  the database connection.
-	 *
-	 * @throws SQLException if there is a problem connecting to the database.
-	 */
-	public SQLXYDataset(Connection con) throws SQLException {
-		this();
-		this.connection = con;
 	}
 
 	/**
@@ -77,10 +62,14 @@ implements XYDataset, TableXYDataset, RangeInfo {
 	 * @param  query  the query to be executed.
 	 *
 	 * @throws SQLException if there is a problem executing the query.
-	 * @throws ApplicationException 
+	 * @throws ApplicationException
 	 */
 	public void executeQuery(String query) throws SQLException, ApplicationException {
-		executeQuery(this.connection, query);
+		try(Connection connection = SQLUtils.getConnection()) {
+			executeQuery(connection, query);
+		} catch (Exception e) {
+			new ApplicationException(e);
+		}
 	}
 
 	/**
@@ -95,7 +84,7 @@ implements XYDataset, TableXYDataset, RangeInfo {
 	 * @param  con  the connection the query is to be executed against.
 	 *
 	 * @throws SQLException if there is a problem executing the query.
-	 * @throws ApplicationException 
+	 * @throws ApplicationException
 	 */
 	public void executeQuery(Connection con, String query)
 			throws SQLException, ApplicationException {
@@ -378,20 +367,6 @@ implements XYDataset, TableXYDataset, RangeInfo {
 
 	}
 
-
-	/**
-	 * Close the database connection
-	 */
-	public void close() {
-
-		try {
-			this.connection.close();
-		}
-		catch (Exception e) {
-			System.err.println("JdbcXYDataset: swallowing exception.");
-		}
-
-	}
 
 	/**
 	 * Returns the minimum y-value in the dataset.
