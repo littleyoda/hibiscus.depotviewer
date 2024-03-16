@@ -38,6 +38,7 @@ import de.open4me.depot.gui.parts.TabGroupExt;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
+import de.open4me.depot.sql.SQLUtils.PreparedSQL;
 import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.jameica.gui.util.TabGroup;
 import de.willuhn.logging.Logger;
@@ -49,29 +50,28 @@ public class WertpapiereDatenControl {
 
 	private JFreeChart chart;
 	private de.open4me.depot.jfreechart.SQLXYDataset data = null;
-	private Connection conn;
 	private WertpapiereControl controller;
 	private TabFolderExt folder;
 	private GenericObjectSQL[] currentSelection;
 
 	public WertpapiereDatenControl() {
 		try {
-			conn = SQLUtils.getConnection();
-			data = new de.open4me.depot.jfreechart.SQLXYDataset(conn) {
+
+			data = new de.open4me.depot.jfreechart.SQLXYDataset() {
 
 				@Override
 			    public void executeQuery(String query) throws SQLException, ApplicationException {
-			        super.executeQuery(query);
-			        System.out.println("ItemCount: " + getItemCount());
-			        System.out.println("Seriescount" + getSeriesCount());
-			        for (int i = 0; i < getItemCount(); i++) {
-			        //	ArrayList row = (ArrayList) rows.get(i);
-			        }
-			        	
-	//		        return (Number) row.get(seriesIndex + 1);
+						super.executeQuery(query);
+						System.out.println("ItemCount: " + getItemCount());
+						System.out.println("Seriescount" + getSeriesCount());
+						for (int i = 0; i < getItemCount(); i++) {
+							//	ArrayList row = (ArrayList) rows.get(i);
+						}
+
+						//		        return (Number) row.get(seriesIndex + 1);
 
 			    }
-				
+
 				@Override
 				public Number getX(int seriesIndex, int itemIndex) {
 					// TODO Auto-generated method stub
@@ -99,11 +99,11 @@ public class WertpapiereDatenControl {
 					// TODO Auto-generated method stub
 					return x;
 				}
-				
+
 			};
 		} catch (Exception e) {
 			e.printStackTrace();
-		}	
+		}
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class WertpapiereDatenControl {
 				if (!ids.isEmpty()) {
 					ids += ",";
 				}
-				String id = d.getAttribute("id").toString(); 
+				String id = d.getAttribute("id").toString();
 				ids += id;
 				spalten += ", A" + id + ".kurs as \"" + StringEscapeUtils.escapeSql(d.getAttribute("wertpapiername").toString()) + "\" ";
 				sql +="left join depotviewer_kurse as A" + id + " on A" + id + ".wpid = " + id + " and A" + id + ".kursdatum = datum.kursdatum\n";
@@ -247,7 +247,7 @@ public class WertpapiereDatenControl {
 						}
 						String id = d.getAttribute("id").toString();
 						ids += id;
-						spalten += ", a" + id + ".kurs as A" + id + "k, a" + id + ".kursw as A" + id + "kw"; 
+						spalten += ", a" + id + ".kurs as A" + id + "k, a" + id + ".kursw as A" + id + "kw";
 						spalten += ", a" + id + ".kursperf as A" + id + "kp, a" + id + ".kursw as A" + id + "kpw";
 						sql +="left join depotviewer_kurse as A" + id + " on A" + id + ".wpid = " + id + " and A" + id + ".kursdatum = datum.kursdatum\n";
 					}
@@ -265,12 +265,12 @@ public class WertpapiereDatenControl {
 				} catch (Exception e) {
 					e.printStackTrace();
 					Logger.error("Fehler bei der Kursdarstellung", e);
-				} 
+				}
 			}
 		};
 
 		final TabGroup graphischTab = new TabGroupExt(folder, "Chart", false) {
-			
+
 			{
 				getComposite().setLayout(new FillLayout());
 
@@ -284,7 +284,7 @@ public class WertpapiereDatenControl {
 				chart.getXYPlot().setRangeGridlinePaint(Color.LIGHT_GRAY);
 				renderer = chart.getXYPlot().getRenderer();
 				Rectangle maxSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-				new ChartComposite(getComposite(), SWT.NONE, chart, 
+				new ChartComposite(getComposite(), SWT.NONE, chart,
 						ChartComposite.DEFAULT_WIDTH,
 						ChartComposite.DEFAULT_HEIGHT,
 						ChartComposite.DEFAULT_MINIMUM_DRAW_WIDTH,
@@ -299,7 +299,7 @@ public class WertpapiereDatenControl {
 		                true   // tooltips
 	                );
 			}
-			
+
 			String lastSelection = "";
 			private XYItemRenderer renderer;
 			@Override
@@ -317,7 +317,7 @@ public class WertpapiereDatenControl {
 				}
 			}
 		};
-		
+
 		final TabGroup eventTab = new TabGroupExt(folder, "Ereignisse") {
 			String lastSelection = "";
 			@Override
@@ -342,12 +342,12 @@ public class WertpapiereDatenControl {
 						  "where wpid in (" + ids + ") order by e.datum desc, w.wertpapiername asc \n";
 
 					List<GenericObjectSQL> liste = SQLUtils.getResultSet(sql, "depotviewer_kursevent", "", "");
-					
+
 					// Aktion übersetzen
 					for(GenericObjectSQL event : liste) {
 						event.setAttribute("aktionname", KursEventAktion.getName((String)event.getAttribute("aktion")));
 					}
-					
+
 					TablePart tab = new TablePart(liste, null);
 					tab.addColumn(Settings.i18n().tr("Datum"), "datum");
 					tab.addColumn(Settings.i18n().tr("Wertpapier"), "wertpapiername");
@@ -360,7 +360,7 @@ public class WertpapiereDatenControl {
 				} catch (Exception e) {
 					e.printStackTrace();
 					Logger.error("Fehler beim Laden der Ereignisse", e);
-				} 
+				}
 			}
 		};
 
@@ -447,36 +447,40 @@ public class WertpapiereDatenControl {
 	}
 
 	private String getPerformanceFuerJahr(int jahr, String wpid) throws ApplicationException, Exception {
-		// letzter 
-		PreparedStatement pre = SQLUtils.getPreparedSQL(SQLUtils.addTop(1, "select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff  from depotviewer_kurse where wpid = " + wpid + " and kursdatum <= ? order by kursdatum desc"));
-		pre.setDate(1, Utils.getSQLDate(Utils.getDatum(jahr, 12, 31)));
-		pre.setDate(2, Utils.getSQLDate(Utils.getDatum(jahr, 12, 31)));
-		List<GenericObjectSQL> referenz = SQLUtils.getResultSet(pre, "depotviewer_kurse", "", "");
-		if (referenz.size() == 0) {
-			return "Keine Kursdaten";
-		}
-		Long daysdiff = (Long) referenz.get(0).getAttribute("diff");
-		if (daysdiff > 7 && (jahr !=  Calendar.getInstance().get(Calendar.YEAR))) {
-			return "Keine aktuellen Kursdaten (" + daysdiff + " Tage alt)";
-		}
-		BigDecimal jahresEnde = (BigDecimal) referenz.get(0).getAttribute("kursperf");
+		// letzter
 
-		// Ende des Vorjahr
-		pre.setDate(1, Utils.getSQLDate(Utils.getDatum(jahr - 1, 12, 31)));
-		pre.setDate(2, Utils.getSQLDate(Utils.getDatum(jahr - 1, 12, 31)));
-		referenz = SQLUtils.getResultSet(pre, "depotviewer_kurse", "", "");
-		if (referenz.size() == 0) {
-			return "Keine Kursdaten";
-		}
-		daysdiff = (Long) referenz.get(0).getAttribute("diff");
-		if (daysdiff > 7) {
-			return "Keine Kursdaten des Vorjahres (" + daysdiff + " Tage alt)";
-		}
-		BigDecimal vorjahresEnde = (BigDecimal) referenz.get(0).getAttribute("kursperf");
 
-		BigDecimal einprozent = vorjahresEnde.divide(new BigDecimal("100.0"), 10, RoundingMode.HALF_UP);
-		BigDecimal performance = jahresEnde.subtract(vorjahresEnde).divide(einprozent, 10, RoundingMode.HALF_UP);
-		return performance.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "%";
+		try( PreparedSQL preparedSQL = SQLUtils.getPreparedSQL(SQLUtils.addTop(1, "select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff  from depotviewer_kurse where wpid = " + wpid + " and kursdatum <= ? order by kursdatum desc"));){
+			PreparedStatement pre = preparedSQL.prest;
+			pre.setDate(1, Utils.getSQLDate(Utils.getDatum(jahr, 12, 31)));
+			pre.setDate(2, Utils.getSQLDate(Utils.getDatum(jahr, 12, 31)));
+			List<GenericObjectSQL> referenz = SQLUtils.getResultSet(pre, "depotviewer_kurse", "", "");
+			if (referenz.size() == 0) {
+				return "Keine Kursdaten";
+			}
+			Long daysdiff = (Long) referenz.get(0).getAttribute("diff");
+			if (daysdiff > 7 && (jahr !=  Calendar.getInstance().get(Calendar.YEAR))) {
+				return "Keine aktuellen Kursdaten (" + daysdiff + " Tage alt)";
+			}
+			BigDecimal jahresEnde = (BigDecimal) referenz.get(0).getAttribute("kursperf");
+
+			// Ende des Vorjahr
+			pre.setDate(1, Utils.getSQLDate(Utils.getDatum(jahr - 1, 12, 31)));
+			pre.setDate(2, Utils.getSQLDate(Utils.getDatum(jahr - 1, 12, 31)));
+			referenz = SQLUtils.getResultSet(pre, "depotviewer_kurse", "", "");
+			if (referenz.size() == 0) {
+				return "Keine Kursdaten";
+			}
+			daysdiff = (Long) referenz.get(0).getAttribute("diff");
+			if (daysdiff > 7) {
+				return "Keine Kursdaten des Vorjahres (" + daysdiff + " Tage alt)";
+			}
+			BigDecimal vorjahresEnde = (BigDecimal) referenz.get(0).getAttribute("kursperf");
+
+			BigDecimal einprozent = vorjahresEnde.divide(new BigDecimal("100.0"), 10, RoundingMode.HALF_UP);
+			BigDecimal performance = jahresEnde.subtract(vorjahresEnde).divide(einprozent, 10, RoundingMode.HALF_UP);
+			return performance.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "%";
+		}
 	}
 
 
@@ -484,21 +488,24 @@ public class WertpapiereDatenControl {
 
 	private BigDecimal getReferenzKurs(String wpid, int maximalesAlter) throws Exception,
 	ApplicationException, SQLException, RemoteException {
-		PreparedStatement pre = SQLUtils.getPreparedSQL(SQLUtils.addTop(1, "select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff  from depotviewer_kurse where wpid = " + wpid + " order by kursdatum desc"));
-		pre.setDate(1, new java.sql.Date((new Date()).getTime()));
-		BigDecimal refKurs = null;
-		List<GenericObjectSQL> referenz = SQLUtils.getResultSet(pre, "depotviewer_kurse", "", "");
-		if (referenz.size() > 0) {
-			Long daysdiff = (Long) referenz.get(0).getAttribute("diff");
-			if (daysdiff < maximalesAlter) {
-				refKurs = (BigDecimal) referenz.get(0).getAttribute("kurs");
+
+		try( PreparedSQL preparedSQL = SQLUtils.getPreparedSQL(SQLUtils.addTop(1, "select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff  from depotviewer_kurse where wpid = " + wpid + " order by kursdatum desc"));){
+			PreparedStatement pre = preparedSQL.prest;
+			pre.setDate(1, new java.sql.Date((new Date()).getTime()));
+			BigDecimal refKurs = null;
+			List<GenericObjectSQL> referenz = SQLUtils.getResultSet(pre, "depotviewer_kurse", "", "");
+			if (referenz.size() > 0) {
+				Long daysdiff = (Long) referenz.get(0).getAttribute("diff");
+				if (daysdiff < maximalesAlter) {
+					refKurs = (BigDecimal) referenz.get(0).getAttribute("kurs");
+				}
 			}
+			return refKurs;
 		}
-		return refKurs;
 	}
 
 	public String getPerformanceZahl(int i, BigDecimal refKurs, String wpid) throws Exception {
-		Calendar calendar = Calendar.getInstance(); 
+		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
 		switch (i) {
 		case 0: calendar.add(Calendar.MONTH, -1); break;
@@ -508,24 +515,27 @@ public class WertpapiereDatenControl {
 		case 4: calendar.add(Calendar.YEAR, -4); break;
 		case 5: calendar.add(Calendar.YEAR, -5); break;
 		}
-		PreparedStatement getperf  = SQLUtils.getPreparedSQL(
-				SQLUtils.addTop(1, 
-						"select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff from depotviewer_kurse where wpid = " + wpid + " order by diff"));
-		getperf.setDate(1, new java.sql.Date(calendar.getTime().getTime()));
-		List<GenericObjectSQL> x = SQLUtils.getResultSet(getperf, "depotviewer_kurse", "", "");
-		if (x.size() == 0) {
-			return "Keine Kurse";
+
+		try( PreparedSQL preparedSQL = SQLUtils.getPreparedSQL(
+				SQLUtils.addTop(1,
+						"select *, abs(" + SQLUtils.getDateDiff("kursdatum", "?") + ") as diff from depotviewer_kurse where wpid = " + wpid + " order by diff"));){
+			PreparedStatement getperf = preparedSQL.prest;
+			getperf.setDate(1, new java.sql.Date(calendar.getTime().getTime()));
+			List<GenericObjectSQL> x = SQLUtils.getResultSet(getperf, "depotviewer_kurse", "", "");
+			if (x.size() == 0) {
+				return "Keine Kurse";
+			}
+			GenericObjectSQL v = x.get(0);
+			Long daysdiff = (Long) v.getAttribute("diff");
+			if (daysdiff > 7) {
+				return "Keine aktuellen Kurse";
+			}
+			BigDecimal kurs = (BigDecimal) v.getAttribute("kursperf");
+			BigDecimal einprozent = kurs.divide(new BigDecimal("100.0"), 10, RoundingMode.HALF_UP);
+			BigDecimal performance = refKurs.subtract(kurs).divide(einprozent, 10, RoundingMode.HALF_UP);
+			//					(refkurs - kurs)/(kurs/100)
+			return performance.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "%";
 		}
-		GenericObjectSQL v = x.get(0);
-		Long daysdiff = (Long) v.getAttribute("diff");
-		if (daysdiff > 7) {
-			return "Keine aktuellen Kurse";
-		}
-		BigDecimal kurs = (BigDecimal) v.getAttribute("kursperf");
-		BigDecimal einprozent = kurs.divide(new BigDecimal("100.0"), 10, RoundingMode.HALF_UP);
-		BigDecimal performance = refKurs.subtract(kurs).divide(einprozent, 10, RoundingMode.HALF_UP);
-		//					(refkurs - kurs)/(kurs/100)
-		return performance.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "%";
 	}
 
 

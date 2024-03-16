@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import de.open4me.depot.gui.dialogs.CSVImportStage2;
 import de.open4me.depot.gui.dialogs.WWWLinksDialog;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.SQLUtils;
+import de.open4me.depot.sql.SQLUtils.PreparedSQL;
 import de.open4me.depot.tools.io.CSVImportTool;
 import de.open4me.depot.tools.io.FeldDefinitionen;
 import de.open4me.depot.tools.io.feldConverter.options.FeldConverterAuswahl;
@@ -124,11 +126,10 @@ public class CSVImportHelper {
 	}
 
 	public void saveOptions(CSVImportTool tool) {
-		try {
-			PreparedStatement pre = SQLUtils.getPreparedSQL("delete from depotviewer_cfg where key like concat(?,'%')");
+		try(PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("delete from depotviewer_cfg where key like concat(?,'%')");) {
+			PreparedStatement pre = preparedSQL.prest;
 			pre.setString(1, optionsPrefix);
 			pre.execute();
-
 
 			for (FeldConverterAuswahl<?> x : tool.getCsvOptions()) {
 				String key = optionsPrefix + "csv." + x.getId();
@@ -147,7 +148,7 @@ public class CSVImportHelper {
 		} catch (Exception e) {
 			e.printStackTrace();
 			Logger.error("Error", e);
-		}					
+		}
 	}
 
 	private void loadOptions(CSVImportTool tool) {
