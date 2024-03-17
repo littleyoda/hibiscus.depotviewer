@@ -1,4 +1,7 @@
+0.7.1 -- 2024-03-17
+	[Fix] Libary neu compilert, damit  weiterhin Java 8 ausreicht
 0.7.0 -- 2024-03-16
+	[Fix] Offene Datenbank-Verbindungen verhinderten einen Backup durch Hibiscus
 0.6.9 -- 2023-05-19
 0.6.8 -- 2023-05-19
 0.6.7 -- 2023-03-05
