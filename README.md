@@ -3,7 +3,7 @@ hibiscus.depotviewer
 
 Depot-Viewer-Plugin für Hibiscus
 
-Kontakt via depotviewer@open4me.de
+Kontakt via depotviewer2024 @ open4me.de
 
 weitere Informationen im [Wiki](https://github.com/littleyoda/hibiscus.depotviewer/wiki)
 
