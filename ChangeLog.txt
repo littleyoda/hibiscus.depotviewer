@@ -1,3 +1,5 @@
+0.7.2 -- 2024-08-10
+	[Fix] Changes for Java 17
 0.7.1 -- 2024-03-17
 	[Fix] Libary neu compilert, damit  weiterhin Java 8 ausreicht
 0.7.0 -- 2024-03-16
