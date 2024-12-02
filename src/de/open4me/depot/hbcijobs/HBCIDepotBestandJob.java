@@ -126,26 +126,28 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 		Utils.clearBestand(konto);
 		BigDecimal total = BigDecimal.ZERO;
 		for(Entry depot : result.getEntries()) {
-  		for (Gattung  g : depot.getEntries()) {
-  			if (g == null) {
-  				Logger.error("Null Entry in depot.getEntries");
-  				continue;
-  			}
-  			if (g.saldo == null || g.price == null || g.depotwert == null) {
-  				Logger.error("Eintrag ohne Saldo oder Wert. Saldo: " + g.saldo_type + " " + g.saldo + " " + "Wert: " + g.depotwert + " Price: " + g.pricetype + " " + g.pricequalifier + " " + g.price);
-  				continue;
-  			}
-  			BigDecimal anzahl = g.saldo.getValue();
-  			if(g.getEntries().length == 1) {
-  				SubSaldo sub = g.getEntries()[0];
-  				if("TAVI".equals(sub.qualifier)) { // TAVI = Total Available. Dies ist die eigentlich verfügbare Anzahl, falls g.saldo gerundet angegeben ist, zB. bei Depots der DKB 
-  					anzahl = sub.saldo.getValue();
-  				}
-  			}
-  			Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, anzahl.doubleValue(), g.price.getValue().doubleValue(), 
-  					g.price.getCurr(), g.depotwert.getValue().doubleValue(),  g.depotwert.getCurr(), depot.timestamp, g.timestamp_price);
-  		}
-  		total = total.add((depot.total != null) ? depot.total.getValue() : BigDecimal.ZERO); // Bei der DKB ist depot.total == null, wenn das Depot leer ist
+			BigDecimal subtotal = BigDecimal.ZERO;
+			for (Gattung  g : depot.getEntries()) {
+				if (g == null) {
+					Logger.error("Null Entry in depot.getEntries");
+					continue;
+				}
+				if (g.saldo == null || g.price == null || g.depotwert == null) {
+					Logger.error("Eintrag ohne Saldo oder Wert. Saldo: " + g.saldo_type + " " + g.saldo + " " + "Wert: " + g.depotwert + " Price: " + g.pricetype + " " + g.pricequalifier + " " + g.price);
+					continue;
+				}
+				BigDecimal anzahl = g.saldo.getValue();
+				if(g.getEntries().length == 1) {
+					SubSaldo sub = g.getEntries()[0];
+					if("TAVI".equals(sub.qualifier)) { // TAVI = Total Available. Dies ist die eigentlich verfügbare Anzahl, falls g.saldo gerundet angegeben ist, zB. bei Depots der DKB 
+						anzahl = sub.saldo.getValue();
+					}
+				}
+				subtotal = subtotal.add(g.depotwert.getValue());
+				Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, anzahl.doubleValue(), g.price.getValue().doubleValue(), 
+						g.price.getCurr(), g.depotwert.getValue().doubleValue(),  g.depotwert.getCurr(), depot.timestamp, g.timestamp_price);
+			}
+			total = total.add((depot.total != null) ? depot.total.getValue() : subtotal); // Bei der DKB ist depot.total == null, wenn das Depot leer ist
 		}
 		konto.setSaldo(total.doubleValue());
 		konto.store(); 
