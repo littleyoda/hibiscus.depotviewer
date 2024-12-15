@@ -55,6 +55,7 @@ public class BewertungsControl extends AbstractControl {
 			@SuppressWarnings("unchecked")
 			private String totalWinLoss() {
 				BigDecimal einstandSumme = BigDecimal.ZERO;
+				BigDecimal wertSumme = BigDecimal.ZERO;
 				BigDecimal gewinnSumme = BigDecimal.ZERO;
 				BigDecimal erloeseSumme = BigDecimal.ZERO;
 				try {
@@ -69,6 +70,7 @@ public class BewertungsControl extends AbstractControl {
 						if (wert != null) {
 								einstandSumme = einstandSumme.add(einstand);
 								gewinnSumme = gewinnSumme.add(abs);
+								wertSumme = wertSumme.add(wert);
 						}
 						// wenn Einstand und Erlöse vorhanden, dann verkauft. Nur Erlöse summieren.
 						if (erloese != null) {
@@ -84,11 +86,13 @@ public class BewertungsControl extends AbstractControl {
 				if (einstandSumme.compareTo(BigDecimal.ZERO) != 0) {
 					gewinnPercent = gewinnSumme.multiply(new BigDecimal("100.0")).divide(einstandSumme, 2, RoundingMode.HALF_UP);
 				}
-				return String.format("Gesamtdepotwert: %,.2f EUR, Gewinn / Verlust: %,.2f EUR, %,.2f %%, Gesamtverkaufserlöse: %,.2f EUR",
-					gewinnSumme.add(einstandSumme).doubleValue(),
+				return String.format("Kosten: %,.2f EUR, Wert: %,.2f EUR, Gewinn/Verlust: %,.2f EUR bzw. %,.2f %%, Erlöse: %,.2f EUR",
+					//gewinnSumme.add(einstandSumme).doubleValue(),
+					einstandSumme.doubleValue(),
+					wertSumme.doubleValue(),
 					gewinnSumme.doubleValue(),
-					gewinnPercent.doubleValue(),
-					erloeseSumme.doubleValue());
+						gewinnPercent.doubleValue(),
+						erloeseSumme.doubleValue());
 			}
 
 		};
