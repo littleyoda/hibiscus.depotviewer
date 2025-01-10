@@ -82,6 +82,7 @@ public class OrderListControl extends AbstractControl
 		orderList.addColumn(Settings.i18n().tr("Datum"),"buchungsdatum", new DateFormatter(Settings.DATEFORMAT));
 		orderList.addColumn(Settings.i18n().tr("Kommentar"), "kommentar");
 		orderList.setContextMenu(new OrderListMenu(orderList));
+		orderList.setMulti(true); // macht erstmal nur zum löschen Sinn.
 
 		orderList.setFormatter(new TableFormatter()
 	    {

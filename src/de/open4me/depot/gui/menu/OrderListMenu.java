@@ -3,7 +3,6 @@ package de.open4me.depot.gui.menu;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.action.UmsatzEditorAction;
 import de.open4me.depot.gui.action.UmsatzImportAction;
-import de.open4me.depot.gui.dialogs.Sicherheitsabfrage;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.gui.Action;
@@ -26,17 +25,18 @@ public class OrderListMenu extends ContextMenu
 			@Override
 			public void handleAction(Object context)
 					throws ApplicationException {
-				if (context == null || !(context instanceof GenericObjectSQL))
-					return;
-				GenericObjectSQL b = (GenericObjectSQL) context;
 				Sicherheitsabfrage dialog = new Sicherheitsabfrage();
 				try {
 					boolean ok = dialog.open();
 					if (ok) {
-						SQLUtils.delete(b);
-						tablePart.removeItem(b);
-						Utils.markRecalc(null);
+						if (context instanceof GenericObjectSQL) {
+							GenericObjectSQL b = (GenericObjectSQL) context;
+							deleteOrderItem(b);
+						} else if ( context instanceof GenericObjectSQL[]) {
+							deleteOrderItems((GenericObjectSQL[]) context);
+						}
 					}
+					Utils.markRecalc(null);
 				}
 				catch (Exception e)
 				{
@@ -50,5 +50,16 @@ public class OrderListMenu extends ContextMenu
 		addItem(new CheckedContextMenuItem("Bearbeiten", new UmsatzEditorAction(false)));
 		addItem(new ContextMenuItem("Importieren", new UmsatzImportAction()));
 	}
+
+	private void deleteOrderItem(GenericObjectSQL b) {
+		SQLUtils.delete(b);
+		tablePart.removeItem(b);
+	}
+
+	private void deleteOrderItems(GenericObjectSQL[] a) {
+		Stream.of(a).forEach(this::deleteOrderItem);
+	}
+
+
 }
 
