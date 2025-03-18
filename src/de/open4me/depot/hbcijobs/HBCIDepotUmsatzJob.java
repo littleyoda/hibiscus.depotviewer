@@ -64,6 +64,7 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 			setJobParam("my",Converter.HibiscusKonto2HBCIKonto(konto));
 
 			Date saldoDatum = konto.getSaldoDatum();
+			Logger.info("SaldoDatum: " + saldoDatum);	
 			if (saldoDatum != null)
 			{
 				// Mal schauen, ob wir ein konfiguriertes Offset haben
@@ -106,6 +107,11 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 				// Falls es noch keinen Saldo gibt, 10 Jahre zurück gehen. Banken liefern oft nur Daten der letzten 90 Tage, aber man kann es ja mal versuchen.
 				Calendar cal = Calendar.getInstance();
 				cal.add(Calendar.YEAR, -10);
+				if (konto.getBLZ().equals("12030000")) {
+					Logger.info("Sonderfall DKB: limitiere Abrufszeitraum auf 16 Tage");
+					cal = Calendar.getInstance();
+					cal.add(Calendar.DATE, -16);
+				}
 				saldoDatum = cal.getTime();
 			}
 			saldoDatum = DateUtil.startOfDay(saldoDatum);
