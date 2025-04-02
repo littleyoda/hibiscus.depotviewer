@@ -3,6 +3,7 @@ package de.open4me.depot.gui.menu;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.action.UmsatzEditorAction;
 import de.open4me.depot.gui.action.UmsatzImportAction;
+import de.open4me.depot.gui.dialogs.Sicherheitsabfrage;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.gui.Action;
@@ -28,10 +29,14 @@ public class OrderListMenu extends ContextMenu
 				if (context == null || !(context instanceof GenericObjectSQL))
 					return;
 				GenericObjectSQL b = (GenericObjectSQL) context;
+				Sicherheitsabfrage dialog = new Sicherheitsabfrage();
 				try {
-					SQLUtils.delete(b);
-					tablePart.removeItem(b);
-					Utils.markRecalc(null);
+					boolean ok = dialog.open();
+					if (ok) {
+						SQLUtils.delete(b);
+						tablePart.removeItem(b);
+						Utils.markRecalc(null);
+					}
 				}
 				catch (Exception e)
 				{
