@@ -72,7 +72,18 @@ public class BestandPieChartControl implements Listener
 			 public String generateSectionLabel(final PieDataset dataset, final Comparable key) {
 		            String result = null;    
 		            if (dataset != null) {
-		                    result = key.toString();   
+		                try {
+		                    Number value = dataset.getValue(key);
+		                    if (value != null) {
+		                        long euroValue = Math.round(value.doubleValue());
+		                        result = key.toString() + " (" + euroValue + " €)";
+		                    } else {
+		                        result = key.toString();
+		                    }
+		                } catch (Exception e) {
+		                    // Fallback if key is not found (can happen during dataset updates)
+		                    result = key.toString();
+		                }
 		            }
 		            return result;
 		        }			
@@ -102,7 +113,21 @@ public class BestandPieChartControl implements Listener
 						wert = (Double) anzahl;
 					}
 					
-					dataset.setValue((String) x.getAttribute("wertpapiername"), wert);
+					// Addiere Werte für das gleiche Wertpapier aus verschiedenen Depots
+					String wertpapiername = (String) x.getAttribute("wertpapiername");
+					
+					// Prüfe ob das Wertpapier bereits im Dataset vorhanden ist
+					try {
+						Number existingValue = dataset.getValue(wertpapiername);
+						if (existingValue != null) {
+							// Addiere zum bestehenden Wert
+							wert += existingValue.doubleValue();
+						}
+					} catch (Exception e) {
+						// Key existiert noch nicht, das ist in Ordnung
+					}
+					
+					dataset.setValue(wertpapiername, wert);
 				}
 				dataset.sortByValues(SortOrder.DESCENDING);
 			} catch (Exception e) {
