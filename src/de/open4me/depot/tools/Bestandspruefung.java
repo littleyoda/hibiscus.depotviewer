@@ -2,6 +2,7 @@ package de.open4me.depot.tools;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +49,30 @@ public class Bestandspruefung {
 			output = "Folgende Abweichungen wurden gefunden: <p/>" + output;
 		}
 		return output;
+	}
+	
+	/**
+	 * Liefert strukturierte Inkonsistenz-Daten für die UI
+	 * @return Liste aller gefundenen Inkonsistenzen
+	 * @throws RemoteException
+	 * @throws ApplicationException
+	 */
+	public static List<InconsistencyData> getInconsistencies() throws RemoteException, ApplicationException {
+		List<InconsistencyData> inconsistencies = new ArrayList<>();
+		
+		// Überprüfe alle Konten für die es Umsätze bzw. Bestände gibt
+		List<GenericObjectSQL> konten = SQLUtils.getResultSet("select * from konto where id in (select distinct kontoid from depotviewer_bestand union select distinct kontoid from depotviewer_umsaetze)", null, "id");
+		for (GenericObjectSQL konto : konten) {
+			List<InconsistencyData> kontoInconsistencies = pruefeStructured(konto);
+			if (konto.getAttribute("flags") != null
+					&& (((Integer) konto.getAttribute("flags")) & Konto.FLAG_OFFLINE) == Konto.FLAG_OFFLINE) {
+				createOfflineBestand(konto);
+				kontoInconsistencies = pruefeStructured(konto);
+			}
+			inconsistencies.addAll(kontoInconsistencies);
+		}
+		Utils.setUmsatzBetsandTest(inconsistencies.isEmpty());
+		return inconsistencies;
 	}
 	
 	/**
@@ -144,6 +169,69 @@ public class Bestandspruefung {
 		}
 		return output;
 
+	}
+	
+	/**
+	 * Strukturierte Version von pruefe() - liefert InconsistencyData statt HTML-String
+	 */
+	private static List<InconsistencyData> pruefeStructured(GenericObjectSQL konto) throws RemoteException {
+		List<InconsistencyData> inconsistencies = new ArrayList<>();
+		HashMap<Integer, BigDecimal> bestandLautOrder = getBestandLautOrder(konto);
+		
+		String kontoName = konto.getAttribute("bezeichnung").toString();
+		
+		// Abgleich tatsächlicher Bestand vs. errechneter Bestand
+		List<GenericObjectSQL> bestaende = SQLUtils.getResultSet("select * from depotviewer_bestand  where kontoid = " + konto.getID() , null, null);
+		for (GenericObjectSQL bestand : bestaende) {
+			BigDecimal depotAnzahl = (BigDecimal) bestand.getAttribute("anzahl");
+			BigDecimal x = bestandLautOrder.get(bestand.getAttribute("wpid"));
+			if (x == null) {
+				x = BigDecimal.ZERO;
+			}
+			if (x.compareTo(depotAnzahl) != 0) {
+				InconsistencyData inconsistency = createInconsistencyData(konto, kontoName, (Integer) bestand.getAttribute("wpid"), x, depotAnzahl);
+				if (inconsistency != null) {
+					inconsistencies.add(inconsistency);
+				}
+			}
+			bestandLautOrder.remove(bestand.getAttribute("wpid"));
+		}
+		// Und jetzt noch alles prüfen, was wir jetzt noch in den Umsätzen haben
+		for (Entry<Integer, BigDecimal> set : bestandLautOrder.entrySet()) {
+			if (set.getValue().compareTo(BigDecimal.ZERO) != 0) {
+				InconsistencyData inconsistency = createInconsistencyData(konto, kontoName, set.getKey(), set.getValue(), BigDecimal.ZERO);
+				if (inconsistency != null) {
+					inconsistencies.add(inconsistency);
+				}
+			}
+		}
+		return inconsistencies;
+	}
+	
+	/**
+	 * Erstellt InconsistencyData aus Konto und Wertpapier-Informationen
+	 */
+	private static InconsistencyData createInconsistencyData(GenericObjectSQL konto, String kontoName, Integer wpid, BigDecimal lautUmsaetze, BigDecimal lautBestand) throws RemoteException {
+		List<GenericObjectSQL> wpList = SQLUtils.getResultSet("select * from depotviewer_wertpapier where id = " + wpid, null, null);
+		if (wpList.isEmpty()) {
+			return null; // Wertpapier nicht gefunden
+		}
+		
+		GenericObjectSQL wp = wpList.get(0);
+		String wertpapiername = (String) wp.getAttribute("wertpapiername");
+		String wkn = (String) wp.getAttribute("wkn");
+		String isin = (String) wp.getAttribute("isin");
+		
+		return new InconsistencyData(
+			konto.getID().toString(),
+			kontoName,
+			wpid,
+			wertpapiername,
+			wkn,
+			isin,
+			lautBestand,
+			lautUmsaetze
+		);
 	}
 
 	private static HashMap<Integer, BigDecimal> getBestandLautOrder(GenericObjectSQL konto) throws RemoteException {

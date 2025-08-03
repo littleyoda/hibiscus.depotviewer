@@ -17,6 +17,7 @@ import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLQueries;
 import de.open4me.depot.sql.SQLUtils;
+import de.open4me.depot.tools.InconsistencyData;
 import de.open4me.depot.tools.UmsatzHelper;
 import de.open4me.depot.tools.VarDecimalFormat;
 import de.willuhn.jameica.gui.AbstractControl;
@@ -58,6 +59,14 @@ public class UmsatzEditorControl extends AbstractControl
 			calc();
 			return;
 		}
+		
+		// Prüfe ob es sich um InconsistencyData handelt (neuer Umsatz basierend auf Inkonsistenz)
+		if (view.getCurrentObject() instanceof InconsistencyData) {
+			initializeFromInconsistency((InconsistencyData) view.getCurrentObject());
+			return;
+		}
+		
+		// Bestehender Umsatz wird bearbeitet
 		umsatz = Utils.getUmsatzByID(((GenericObjectSQL) view.getCurrentObject()).getID());
 		getCBKurswertBerechnen().setValue(false);
 		getAnzahl().setValue(umsatz.getAnzahl());
@@ -362,6 +371,49 @@ public class UmsatzEditorControl extends AbstractControl
 
 		});
 		return steuern;
+	}
+	
+	/**
+	 * Initialisiert das Control mit Daten aus einer Inkonsistenz
+	 */
+	private void initializeFromInconsistency(InconsistencyData inconsistency) throws Exception {
+		getCBKurswertBerechnen().setValue(true);
+		
+		// Setze Aktion (Kauf oder Verkauf)
+		String aktion = inconsistency.getRequiredAction();
+		DepotAktion depotAktion = DepotAktion.getByString(aktion);
+		if (depotAktion != null) {
+			getAktionAuswahl().setValue(depotAktion);
+		}
+		
+		// Setze Anzahl
+		getAnzahl().setValue(inconsistency.getRequiredAmount());
+		
+		// Setze Wertpapier
+		String wpId = inconsistency.getWpId().toString();
+		for (Object o : getWertpapiere().getList()) {
+			GenericObjectSQL obj = (GenericObjectSQL) o;
+			if (obj.getID().toString().equals(wpId)) {
+				getWertpapiere().setValue(obj);
+				break;
+			}
+		}
+		
+		// Setze Konto
+		String kontoId = inconsistency.getKontoId();
+		for (Object o : getKonto().getList()) {
+			Konto k = (Konto) ((GenericObjectHashMap) o).getAttribute("kontoobj");
+			if (kontoId.equals(k.getID())) {
+				getKonto().setValue(o);
+				break;
+			}
+		}
+		
+	
+		// Setze Kommentar
+		getKommentar().setValue("Automatisch erstellt zur Behebung von Inkonsistenz");
+		
+		calc();
 	}
 
 }
