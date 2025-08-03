@@ -39,6 +39,10 @@ public class CortalConsorsMitHBCIJSONWrapper {
 
 	public boolean addUmsatz(String kontoID)  {
 		setGrund("");
+		// Stornierte Aufträge stillschweigend ignorieren
+		if (isStorno()) {
+			return true;
+		}
 		if (!check()) {
 			setGrund("Check fehlgeschlagen");
 			return false;
@@ -174,6 +178,10 @@ public class CortalConsorsMitHBCIJSONWrapper {
 
 	public void setGrund(String grund) {
 		this.grund = grund;
+	}
+
+	private boolean isStorno() {
+		return "STORNO".equals(orderinfo.get("30"));
 	}
 
 }
