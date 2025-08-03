@@ -20,6 +20,10 @@ public class OrderView extends AbstractView
 
 		OrderListControl control = new OrderListControl(this);
 
+		// Add filter controls
+		control.getFilterContainer(this.getParent());
+
+		// Add table
 		control.getOrderInfoTable().paint(this.getParent());
 
 

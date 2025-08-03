@@ -28,4 +28,12 @@ public class SQLQueries {
 			"depotviewer_wertpapier", "id", "nicename");
 	}
 
+	public static List<GenericObjectSQL> getOwnedWertpapiere() {
+		return SQLUtils.getResultSet("select distinct w.*, concat(w.wertpapiername , ' (' , w.wkn , ' / ' , w.isin , ')') as nicename " +
+			"from depotviewer_wertpapier w " +
+			"inner join depotviewer_umsaetze u on w.id = u.wpid " +
+			"order by w.wertpapiername", 
+			"depotviewer_wertpapier", "id", "nicename");
+	}
+
 }
