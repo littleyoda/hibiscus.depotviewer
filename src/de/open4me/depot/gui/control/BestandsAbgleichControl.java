@@ -1,5 +1,7 @@
 package de.open4me.depot.gui.control;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Part;
@@ -25,7 +27,7 @@ public class BestandsAbgleichControl extends AbstractControl {
 
 	    StringBuffer buffer = new StringBuffer();
 	    buffer.append("<form>" +
-	    (String) view.getCurrentObject()
+	    StringEscapeUtils.escapeXml((String) view.getCurrentObject())
 	    + "</form>");
 
 	    libList = new FormTextPart(buffer.toString());
