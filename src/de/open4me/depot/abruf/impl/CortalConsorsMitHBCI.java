@@ -140,6 +140,10 @@ public class CortalConsorsMitHBCI extends BasisHBCIDepotAbruf {
 							Logger.info("Order-Streichung übersprungen!");
 							continue;
 						}
+						if (orderinfo.get("12").toString().equals("T")) {
+							Logger.info("Order-Typ T übersprungen!");
+							continue;
+						}
 						String orderRequest = "{\"101\":{\"1\":\"" + depotnummer + "\",\"2\":\"" + orderinfo.get("4").toString() + "\",\"0\":{\"5\":\"MOOTWINA\",\"6\":\"0\",\"2\":\"DE\",\"1\":\"DE\",\"0\":\"CCOrderDetailInquiry\",\"3\":\"" + sessionID + "\",\"4\":\"1\"}}}";
 						String order = getRequest(webClient, "https://webservices.consorsbank.de/WebServicesDe/services/restful/getOrderDetail", orderRequest);
 						seiten.add(order);
