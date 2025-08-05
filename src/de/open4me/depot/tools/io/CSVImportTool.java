@@ -58,6 +58,9 @@ public class CSVImportTool {
 		boolean isheader = true;
 		header.clear();
 		for(CSVRecord record : parser) {
+			if (nonData(Arrays.asList(record.values()))) {
+				continue;
+			}
 			if (isheader) {
 				for (int i = 0; i < record.size(); i++) {
 					String name = record.get(i);
@@ -144,6 +147,10 @@ public class CSVImportTool {
 			tablist.add(g);
 		}
 		return fehler;
+	}
+
+	private boolean nonData(Collection<?> values) {
+		return values.stream().allMatch(value -> value == null || value.toString().trim().isEmpty());
 	}
 
 	public ArrayList<FeldConverterAuswahl<?>> getCsvOptions() {
