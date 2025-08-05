@@ -42,7 +42,7 @@
       <item id="depotviewer.wpadd" name="Neues &amp;Wertpapier hinzufügen..." shortcut="ALT+W" icon="stocks.png" action="de.open4me.depot.gui.action.AddWertpapierAction" />
       <item name="-" />
         <item id="depotviewer.einrichtugnsass" name="&amp;Einrichtungsassistenten..." shortcut="ALT+E" icon="seahorse-preferences.png" action="de.open4me.depot.gui.action.EinrichtungsassistentenAction" />
-        <item id="depotviewer.download" name="Download 'Gesamtliste aller auf Xetra handelbaren Wertpapiere' (35 MB)" icon="stocks.png" action="de.open4me.depot.gui.action.DownloadXetraListeAction" />
+        <item id="depotviewer.download" name="Download 'Gesamtliste aller auf Xetra handelbaren Wertpapiere' (3,5 MB)" icon="stocks.png" action="de.open4me.depot.gui.action.DownloadXetraListeAction" />
       <item name="-" />
       <item id="LizenzinformationAction" name="&amp;Lizenzinformationen" icon="text-x-generic.png" action="de.open4me.depot.gui.action.LizenzinformationAction" />
     </item>
