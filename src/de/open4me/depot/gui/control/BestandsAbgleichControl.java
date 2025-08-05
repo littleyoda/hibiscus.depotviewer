@@ -96,10 +96,10 @@ public class BestandsAbgleichControl extends AbstractControl {
 	          
 	          // Info-Labels links
 	          Container left = new SimpleContainer(leftComposite);
-	          left.addText("Konto: " + inconsistency.getKontoName() + 
-	                      " | WP: " + inconsistency.getWertpapiername() + 
-	                      " (" + inconsistency.getWkn() + ")", false);
-	          left.addText("ISIN: " + inconsistency.getIsin(), false);
+	          left.addText("Konto: " + inconsistency.getKontoName().replace("&", "&&") + 
+	                      " | WP: " + inconsistency.getWertpapiername().replace("&", "&&") + 
+	                      " (" + inconsistency.getWkn().replace("&", "&&") + ")", false);
+	          left.addText("ISIN: " + inconsistency.getIsin().replace("&", "&&"), false);
 	          left.addText("Bestand: " + inconsistency.getBestandAnzahl().toPlainString() + 
 	                      " | Orderbuch: " + inconsistency.getOrderbuchAnzahl().toPlainString() + 
 	                      " | Differenz: " + inconsistency.getDifferenz().toPlainString(), false);
