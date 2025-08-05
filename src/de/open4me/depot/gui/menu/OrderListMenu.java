@@ -47,7 +47,7 @@ public class OrderListMenu extends ContextMenu
 
 		}));
 		addItem(new ContextMenuItem("Hinzufügen", new UmsatzEditorAction(true)));
-		addItem(new CheckedContextMenuItem("Bearbeiten", new UmsatzEditorAction(false)));
+		addItem(new CheckedSingleContextMenuItem("Bearbeiten", new UmsatzEditorAction(false)));
 		addItem(new ContextMenuItem("Importieren", new UmsatzImportAction()));
 	}
 
