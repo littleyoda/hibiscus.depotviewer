@@ -9,7 +9,10 @@ import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.parts.Button;
+import de.willuhn.jameica.gui.util.ColumnLayout;
+import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.LabelGroup;
+import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.util.ApplicationException;
 
 public class BewertungsView extends AbstractView
@@ -47,6 +50,19 @@ public class BewertungsView extends AbstractView
 
 		}
 		BewertungsControl control = new BewertungsControl(this);
+
+		// Filter-Gruppe mit horizontalem Layout hinzufügen
+		LabelGroup filterGroup = new LabelGroup(this.getParent(), Settings.i18n().tr("Filter"));
+		ColumnLayout filterLayout = new ColumnLayout(filterGroup.getComposite(), 3);
+		
+		Container depotContainer = new SimpleContainer(filterLayout.getComposite());
+		depotContainer.addPart(control.getDepotFilter());
+		
+		Container wpContainer = new SimpleContainer(filterLayout.getComposite());
+		wpContainer.addPart(control.getWertpapierFilter());
+		
+		Container bestandContainer = new SimpleContainer(filterLayout.getComposite());
+		bestandContainer.addPart(control.getNurBestandFilter());
 
 		control.getOrderInfoTable().paint(this.getParent());
 
