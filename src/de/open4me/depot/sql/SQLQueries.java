@@ -36,4 +36,26 @@ public class SQLQueries {
 			"depotviewer_wertpapier", "id", "nicename");
 	}
 
+	public static List<GenericObjectSQL> getOwnedWertpapiereMitKursdatum() {
+		return SQLUtils.getResultSet("SELECT DISTINCT w.* , " +
+				"(SELECT kurs " +
+				"	FROM depotviewer_kurse k " +
+				"	INNER JOIN " +
+				"		(SELECT wpid, max( kursdatum ) as MaxDatum " +
+				"		FROM depotviewer_kurse " +
+				"		GROUP BY wpid" +
+				"		) AS groupeddatum " +
+				"	ON k.wpid = groupeddatum.wpid AND k.wpid = w.id " +
+				"	AND k.kursdatum = groupeddatum.MaxDatum) AS Kurs," +
+				"(SELECT max( kursdatum ) " + 
+				"FROM depotviewer_kurse " + 
+				"WHERE wpid = w.id " + 
+				") AS Kursdatum " + 
+				"FROM depotviewer_wertpapier w " +
+				"INNER JOIN depotviewer_bestand b ON w.id = b.wpid " +
+				"WHERE b.anzahl > 0 " +
+				"ORDER BY w.wertpapiername", 
+				"depotviewer_wertpapier", "id", "wertpapiername");		
+	}
+
 }

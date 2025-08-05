@@ -17,15 +17,19 @@ import de.open4me.depot.gui.action.WertpapiereAktualisierenAction;
 import de.open4me.depot.gui.menu.WertpapierMenu;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLQueries;
+import de.willuhn.jameica.gui.input.CheckboxInput;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.parts.TablePart;
+import de.willuhn.jameica.gui.util.SimpleContainer;
+import de.willuhn.logging.Logger;
 
 public class WertpapiereTableControl 
 {
 
 	private TablePart orderList;
 	private WertpapiereControl controller;
+	private CheckboxInput nurBestandFilter;
 
 	public WertpapiereTableControl() {
 	}
@@ -35,6 +39,7 @@ public class WertpapiereTableControl
 			return orderList;
 		}
 
+		// Initial alle Wertpapiere laden, Filter wird später angewendet
 		List<GenericObjectSQL> list = SQLQueries.getWertpapiereMitKursdatum();
 
 		orderList = new TablePart(list,new ModifyWertpapierAction());
@@ -84,6 +89,9 @@ public class WertpapiereTableControl
 		grid1.numColumns = 1;
 		rest.setLayout(grid1);
 
+		// Filter hinzufügen
+		SimpleContainer filterContainer = new SimpleContainer(rest);
+		filterContainer.addPart(getNurBestandFilter());
 
 		getTable().paint(rest);
 
@@ -103,8 +111,67 @@ public class WertpapiereTableControl
 
 	public void aktualisiere() throws RemoteException {
 		getTable().removeAll();
-		for (GenericObjectSQL x : SQLQueries.getWertpapiereMitKursdatum()) {
+		for (GenericObjectSQL x : getFilteredWertpapiere()) {
 			getTable().addItem(x);
+		}
+	}
+
+	/**
+	 * Nur-Bestand-Filter
+	 */
+	public CheckboxInput getNurBestandFilter() throws RemoteException {
+		if (nurBestandFilter != null)
+			return nurBestandFilter;
+
+		nurBestandFilter = new CheckboxInput(false);
+		nurBestandFilter.setName(Settings.i18n().tr("Nur Wertpapiere im Bestand anzeigen"));
+		nurBestandFilter.addListener(new Listener() {
+			public void handleEvent(Event event) {
+				try {
+					refreshTable();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		return nurBestandFilter;
+	}
+
+	/**
+	 * Filtert die Wertpapiere basierend auf dem Filter
+	 */
+	private List<GenericObjectSQL> getFilteredWertpapiere() {
+		Boolean nurBestand = false;
+		try {
+			nurBestand = nurBestandFilter != null ? (Boolean) nurBestandFilter.getValue() : false;
+		} catch (Exception e) {
+			// Ignorieren, Default-Wert verwenden
+		}
+
+		Logger.info("Filter Status: nurBestand = " + nurBestand);
+		
+		if (nurBestand) {
+			List<GenericObjectSQL> owned = SQLQueries.getOwnedWertpapiereMitKursdatum();
+			Logger.info("Owned Wertpapiere: " + owned.size());
+			return owned;
+		} else {
+			List<GenericObjectSQL> all = SQLQueries.getWertpapiereMitKursdatum();
+			Logger.info("Alle Wertpapiere: " + all.size());
+			return all;
+		}
+	}
+
+	/**
+	 * Aktualisiert die Tabelle mit gefilterten Daten
+	 */
+	private void refreshTable() throws RemoteException {
+		if (orderList != null) {
+			orderList.removeAll();
+			List<GenericObjectSQL> filteredData = getFilteredWertpapiere();
+			for (GenericObjectSQL item : filteredData) {
+				orderList.addItem(item);
+			}
 		}
 	}
 }

@@ -190,13 +190,13 @@ public class BewertungsControl extends AbstractControl {
 			"", "", "");
 		
 		List<String> wpNames = new ArrayList<String>();
-		wpNames.add("Alle Aktien");
+		wpNames.add("Alle Wertpapiere");
 		for (GenericObjectSQL wp : wertpapiere) {
 			wpNames.add((String) wp.getAttribute("wertpapiername"));
 		}
 
-		wertpapierFilter = new SelectInput(wpNames, "Alle Aktien");
-		wertpapierFilter.setName(Settings.i18n().tr("Aktie"));
+		wertpapierFilter = new SelectInput(wpNames, "Alle Wertpapiere");
+		wertpapierFilter.setName(Settings.i18n().tr("Wertpapier"));
 		wertpapierFilter.addListener(new Listener() {
 			public void handleEvent(Event event) {
 				try {
@@ -218,7 +218,7 @@ public class BewertungsControl extends AbstractControl {
 			return nurBestandFilter;
 
 		nurBestandFilter = new CheckboxInput(false);
-		nurBestandFilter.setName(Settings.i18n().tr("Nur Aktien im Bestand anzeigen"));
+		nurBestandFilter.setName(Settings.i18n().tr("Nur Wertpapiere im Bestand anzeigen"));
 		nurBestandFilter.addListener(new Listener() {
 			public void handleEvent(Event event) {
 				try {
@@ -242,7 +242,7 @@ public class BewertungsControl extends AbstractControl {
 		List<GenericObjectHashMap> filtered = new ArrayList<GenericObjectHashMap>();
 
 		String selectedDepot = depotFilter != null ? (String) depotFilter.getValue() : "Alle Depots";
-		String selectedWP = wertpapierFilter != null ? (String) wertpapierFilter.getValue() : "Alle Aktien";
+		String selectedWP = wertpapierFilter != null ? (String) wertpapierFilter.getValue() : "Alle Wertpapiere";
 		Boolean nurBestand = nurBestandFilter != null ? (Boolean) nurBestandFilter.getValue() : false;
 
 		for (GenericObjectHashMap item : allData) {
@@ -256,7 +256,7 @@ public class BewertungsControl extends AbstractControl {
 				}
 
 				// Wertpapier-Filter
-				if (!"Alle Aktien".equals(selectedWP)) {
+				if (!"Alle Wertpapiere".equals(selectedWP)) {
 					String wpName = (String) item.getAttribute("wertpapiername");
 					if (wpName == null || !wpName.equals(selectedWP)) {
 						continue;
