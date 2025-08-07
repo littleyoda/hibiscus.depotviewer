@@ -64,6 +64,9 @@ public class BewertungsView extends AbstractView
 		Container bestandContainer = new SimpleContainer(filterLayout.getComposite());
 		bestandContainer.addPart(control.getNurBestandFilter());
 
+		// Setup dispose listeners after controls are properly initialized
+		control.setupDisposeListeners();
+
 		control.getOrderInfoTable().paint(this.getParent());
 
 

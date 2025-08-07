@@ -165,6 +165,16 @@ public class BewertungsControl extends AbstractControl {
 
 		depotFilter = new SelectInput(depotNames, "Alle Depots");
 		depotFilter.setName(Settings.i18n().tr("Depot"));
+		// Load saved depot from settings
+		try {
+			de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(BewertungsControl.class);
+			String savedDepot = settings.getString("bewertung.depot", "Alle Depots");
+			if (depotNames.contains(savedDepot)) {
+				depotFilter.setValue(savedDepot);
+			}
+		} catch (Exception e) {
+			// Ignore errors, use default
+		}
 		depotFilter.addListener(new Listener() {
 			public void handleEvent(Event event) {
 				try {
@@ -197,6 +207,16 @@ public class BewertungsControl extends AbstractControl {
 
 		wertpapierFilter = new SelectInput(wpNames, "Alle Wertpapiere");
 		wertpapierFilter.setName(Settings.i18n().tr("Wertpapier"));
+		// Load saved wertpapier from settings
+		try {
+			de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(BewertungsControl.class);
+			String savedWP = settings.getString("bewertung.wertpapier", "Alle Wertpapiere");
+			if (wpNames.contains(savedWP)) {
+				wertpapierFilter.setValue(savedWP);
+			}
+		} catch (Exception e) {
+			// Ignore errors, use default
+		}
 		wertpapierFilter.addListener(new Listener() {
 			public void handleEvent(Event event) {
 				try {
@@ -219,6 +239,14 @@ public class BewertungsControl extends AbstractControl {
 
 		nurBestandFilter = new CheckboxInput(false);
 		nurBestandFilter.setName(Settings.i18n().tr("Nur Wertpapiere im Bestand anzeigen"));
+		// Load saved checkbox from settings
+		try {
+			de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(BewertungsControl.class);
+			boolean savedNurBestand = settings.getBoolean("bewertung.nurbestand", false);
+			nurBestandFilter.setValue(savedNurBestand);
+		} catch (Exception e) {
+			// Ignore errors, use default
+		}
 		nurBestandFilter.addListener(new Listener() {
 			public void handleEvent(Event event) {
 				try {
@@ -230,6 +258,55 @@ public class BewertungsControl extends AbstractControl {
 		});
 
 		return nurBestandFilter;
+	}
+
+	/**
+	 * Setup dispose listeners for filter persistence
+	 */
+	public void setupDisposeListeners() {
+		if (depotFilter != null) {
+			depotFilter.getControl().addDisposeListener(e -> {
+				try {
+					de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(BewertungsControl.class);
+					String value = (String) depotFilter.getValue();
+					if (value != null) {
+						settings.setAttribute("bewertung.depot", value);
+					} else {
+						settings.setAttribute("bewertung.depot", "Alle Depots");
+					}
+				} catch (Exception ex) {
+					// Ignore save errors
+				}
+			});
+		}
+		
+		if (wertpapierFilter != null) {
+			wertpapierFilter.getControl().addDisposeListener(e -> {
+				try {
+					de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(BewertungsControl.class);
+					String value = (String) wertpapierFilter.getValue();
+					if (value != null) {
+						settings.setAttribute("bewertung.wertpapier", value);
+					} else {
+						settings.setAttribute("bewertung.wertpapier", "Alle Wertpapiere");
+					}
+				} catch (Exception ex) {
+					// Ignore save errors
+				}
+			});
+		}
+		
+		if (nurBestandFilter != null) {
+			nurBestandFilter.getControl().addDisposeListener(e -> {
+				try {
+					de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(BewertungsControl.class);
+					Boolean value = (Boolean) nurBestandFilter.getValue();
+					settings.setAttribute("bewertung.nurbestand", value != null ? value : false);
+				} catch (Exception ex) {
+					// Ignore save errors
+				}
+			});
+		}
 	}
 
 	/**

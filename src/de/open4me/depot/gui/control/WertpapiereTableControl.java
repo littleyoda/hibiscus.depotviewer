@@ -93,7 +93,17 @@ public class WertpapiereTableControl
 		SimpleContainer filterContainer = new SimpleContainer(rest);
 		filterContainer.addPart(getNurBestandFilter());
 
+		// Setup dispose listener after control is properly initialized
+		setupDisposeListeners();
+
 		getTable().paint(rest);
+		
+		// Apply saved filter after table is painted
+		try {
+			refreshTable();
+		} catch (Exception e) {
+			Logger.error("Error applying saved filter", e);
+		}
 
 		ButtonArea buttons = new ButtonArea();
 
@@ -125,6 +135,14 @@ public class WertpapiereTableControl
 
 		nurBestandFilter = new CheckboxInput(false);
 		nurBestandFilter.setName(Settings.i18n().tr("Nur Wertpapiere im Bestand anzeigen"));
+		// Load saved checkbox from settings
+		try {
+			de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(WertpapiereTableControl.class);
+			boolean savedNurBestand = settings.getBoolean("wertpapiere.nurbestand", false);
+			nurBestandFilter.setValue(savedNurBestand);
+		} catch (Exception e) {
+			// Ignore errors, use default
+		}
 		nurBestandFilter.addListener(new Listener() {
 			public void handleEvent(Event event) {
 				try {
@@ -136,6 +154,23 @@ public class WertpapiereTableControl
 		});
 
 		return nurBestandFilter;
+	}
+
+	/**
+	 * Setup dispose listeners for filter persistence
+	 */
+	private void setupDisposeListeners() {
+		if (nurBestandFilter != null) {
+			nurBestandFilter.getControl().addDisposeListener(e -> {
+				try {
+					de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(WertpapiereTableControl.class);
+					Boolean value = (Boolean) nurBestandFilter.getValue();
+					settings.setAttribute("wertpapiere.nurbestand", value != null ? value : false);
+				} catch (Exception ex) {
+					// Ignore save errors
+				}
+			});
+		}
 	}
 
 	/**

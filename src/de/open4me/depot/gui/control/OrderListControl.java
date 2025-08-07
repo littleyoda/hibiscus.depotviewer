@@ -34,8 +34,12 @@ import de.willuhn.jameica.gui.util.Color;
 import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.jameica.gui.util.ColumnLayout;
+import de.willuhn.jameica.gui.parts.ButtonArea;
+import de.willuhn.jameica.gui.parts.Button;
+import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.hbci.gui.ColorUtil;
 import de.willuhn.logging.Logger;
+import de.willuhn.util.ApplicationException;
 
 
 public class OrderListControl extends AbstractControl
@@ -164,20 +168,55 @@ public class OrderListControl extends AbstractControl
 	public Container getFilterContainer(Composite parent) throws RemoteException {
 		Container container = new SimpleContainer(parent);
 		
-		// Date range filter in one row
-		ColumnLayout dateColumns = new ColumnLayout(container.getComposite(), 2);
-		Container dateLeft = new SimpleContainer(dateColumns.getComposite());
-		Container dateRight = new SimpleContainer(dateColumns.getComposite());
-		dateLeft.addLabelPair(Settings.i18n().tr("Von Datum"), getDateFrom());
-		dateRight.addLabelPair(Settings.i18n().tr("Bis Datum"), getDateTo());
+		// Date range and depot filter in one row
+		ColumnLayout topColumns = new ColumnLayout(container.getComposite(), 3);
+		Container dateLeft = new SimpleContainer(topColumns.getComposite());
+		Container dateRight = new SimpleContainer(topColumns.getComposite());
+		Container depotContainer = new SimpleContainer(topColumns.getComposite());
+		dateLeft.addLabelPair(Settings.i18n().tr("von"), getDateFrom());
+		dateRight.addLabelPair(Settings.i18n().tr("bis"), getDateTo());
+		depotContainer.addLabelPair(Settings.i18n().tr("Depot"), getDepotFilter());
 		
-		// Depot filter
-		container.addLabelPair(Settings.i18n().tr("Depot"), getDepotFilter());
+		// WKN filter and reset button in same row
+		ColumnLayout wknLayout = new ColumnLayout(container.getComposite(), 2);
+		Container wknContainer = new SimpleContainer(wknLayout.getComposite());
+		Container buttonContainer = new SimpleContainer(wknLayout.getComposite());
 		
-		// WKN filter
-		container.addLabelPair(Settings.i18n().tr("WKN"), getWknFilter());
+		wknContainer.addLabelPair(Settings.i18n().tr("WKN"), getWknFilter());
+		buttonContainer.addPart(getResetButton());
+		
+		// Add dispose listeners after controls are properly initialized
+		setupDisposeListeners();
 		
 		return container;
+	}
+	
+	public ButtonArea getButtonArea(Composite parent) throws RemoteException {
+		ButtonArea buttons = new ButtonArea();
+		buttons.addButton(Settings.i18n().tr("Filter zurücksetzen"), new Action() {
+			public void handleAction(Object context) throws ApplicationException {
+				try {
+					handleReset();
+				} catch (RemoteException e) {
+					throw new ApplicationException("Fehler beim Zurücksetzen der Filter", e);
+				}
+			}
+		}, null, false, "edit-undo.png");
+		buttons.paint(parent);
+		return buttons;
+	}
+	
+	public Button getResetButton() throws RemoteException {
+		Button resetButton = new Button(Settings.i18n().tr("Filter zurücksetzen"), new Action() {
+			public void handleAction(Object context) throws ApplicationException {
+				try {
+					handleReset();
+				} catch (RemoteException e) {
+					throw new ApplicationException("Fehler beim Zurücksetzen der Filter", e);
+				}
+			}
+		});
+		return resetButton;
 	}
 	
 	public DateInput getDateFrom() throws RemoteException {
@@ -185,6 +224,16 @@ public class OrderListControl extends AbstractControl
 			return dateFrom;
 			
 		dateFrom = new DateInput();
+		// Load saved date from settings
+		try {
+			de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(OrderListControl.class);
+			String savedDate = settings.getString("orderlist.dateFrom", null);
+			if (savedDate != null && !savedDate.isEmpty()) {
+				dateFrom.setValue(Settings.DATEFORMAT.parse(savedDate));
+			}
+		} catch (Exception e) {
+			// Ignore parsing errors, use default empty value
+		}
 		dateFrom.addListener(new Listener() {
 			public void handleEvent(Event event) {
 				try {
@@ -202,6 +251,16 @@ public class OrderListControl extends AbstractControl
 			return dateTo;
 			
 		dateTo = new DateInput();
+		// Load saved date from settings
+		try {
+			de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(OrderListControl.class);
+			String savedDate = settings.getString("orderlist.dateTo", null);
+			if (savedDate != null && !savedDate.isEmpty()) {
+				dateTo.setValue(Settings.DATEFORMAT.parse(savedDate));
+			}
+		} catch (Exception e) {
+			// Ignore parsing errors, use default empty value
+		}
 		dateTo.addListener(new Listener() {
 			public void handleEvent(Event event) {
 				try {
@@ -223,6 +282,21 @@ public class OrderListControl extends AbstractControl
 			depotFilter = new SelectInput(depots, null);
 			depotFilter.setAttribute("bezeichnung");
 			depotFilter.setPleaseChoose(Settings.i18n().tr("Alle Depots"));
+			// Load saved depot from settings
+			try {
+				de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(OrderListControl.class);
+				String savedDepotId = settings.getString("orderlist.depot", null);
+				if (savedDepotId != null && !savedDepotId.isEmpty()) {
+					for (GenericObjectHashMap depot : depots) {
+						if (savedDepotId.equals(String.valueOf(depot.getAttribute("id")))) {
+							depotFilter.setValue(depot);
+							break;
+						}
+					}
+				}
+			} catch (Exception e) {
+				// Ignore errors, use default empty value
+			}
 			depotFilter.addListener(new Listener() {
 				public void handleEvent(Event event) {
 					try {
@@ -246,6 +320,21 @@ public class OrderListControl extends AbstractControl
 		wknFilter = new SelectInput(wertpapiere, null);
 		wknFilter.setAttribute("nicename");
 		wknFilter.setPleaseChoose(Settings.i18n().tr("Alle Wertpapiere"));
+		// Load saved WKN from settings
+		try {
+			de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(OrderListControl.class);
+			String savedWknId = settings.getString("orderlist.wkn", null);
+			if (savedWknId != null && !savedWknId.isEmpty()) {
+				for (GenericObjectSQL wp : wertpapiere) {
+					if (savedWknId.equals(wp.getID())) {
+						wknFilter.setValue(wp);
+						break;
+					}
+				}
+			}
+		} catch (Exception e) {
+			// Ignore errors, use default empty value
+		}
 		wknFilter.addListener(new Listener() {
 			public void handleEvent(Event event) {
 				try {
@@ -256,6 +345,96 @@ public class OrderListControl extends AbstractControl
 			}
 		});
 		return wknFilter;
+	}
+	
+	private void setupDisposeListeners() {
+		// Setup dispose listeners after controls are properly initialized
+		if (dateFrom != null) {
+			dateFrom.getControl().addDisposeListener(e -> {
+				try {
+					de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(OrderListControl.class);
+					Date value = (Date) dateFrom.getValue();
+					if (value != null) {
+						settings.setAttribute("orderlist.dateFrom", Settings.DATEFORMAT.format(value));
+					} else {
+						settings.setAttribute("orderlist.dateFrom", "");
+					}
+				} catch (Exception ex) {
+					// Ignore save errors
+				}
+			});
+		}
+		
+		if (dateTo != null) {
+			dateTo.getControl().addDisposeListener(e -> {
+				try {
+					de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(OrderListControl.class);
+					Date value = (Date) dateTo.getValue();
+					if (value != null) {
+						settings.setAttribute("orderlist.dateTo", Settings.DATEFORMAT.format(value));
+					} else {
+						settings.setAttribute("orderlist.dateTo", "");
+					}
+				} catch (Exception ex) {
+					// Ignore save errors
+				}
+			});
+		}
+		
+		if (depotFilter != null) {
+			depotFilter.getControl().addDisposeListener(e -> {
+				try {
+					de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(OrderListControl.class);
+					GenericObjectHashMap depot = (GenericObjectHashMap) depotFilter.getValue();
+					if (depot != null) {
+						settings.setAttribute("orderlist.depot", String.valueOf(depot.getAttribute("id")));
+					} else {
+						settings.setAttribute("orderlist.depot", "");
+					}
+				} catch (Exception ex) {
+					// Ignore save errors
+				}
+			});
+		}
+		
+		if (wknFilter != null) {
+			wknFilter.getControl().addDisposeListener(e -> {
+				try {
+					de.willuhn.jameica.system.Settings settings = new de.willuhn.jameica.system.Settings(OrderListControl.class);
+					GenericObjectSQL wp = (GenericObjectSQL) wknFilter.getValue();
+					if (wp != null) {
+						settings.setAttribute("orderlist.wkn", wp.getID());
+					} else {
+						settings.setAttribute("orderlist.wkn", "");
+					}
+				} catch (Exception ex) {
+					// Ignore save errors
+				}
+			});
+		}
+	}
+	
+	private void handleReset() throws RemoteException {
+		try {
+			// Alle Filter zurücksetzen
+			if (dateFrom != null) {
+				dateFrom.setValue(null);
+			}
+			if (dateTo != null) {
+				dateTo.setValue(null);
+			}
+			if (depotFilter != null) {
+				depotFilter.setValue(null);
+			}
+			if (wknFilter != null) {
+				wknFilter.setValue(null);
+			}
+			// Tabelle aktualisieren
+			refreshTable();
+		} catch (Exception e) {
+			Logger.error("Fehler beim Zurücksetzen der Filter", e);
+			throw new RemoteException("Fehler beim Zurücksetzen der Filter", e);
+		}
 	}
 	
 	private void refreshTable() throws RemoteException {
