@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
@@ -29,7 +30,7 @@ public class CSVImportTool {
 	private FeldConverterAuswahl<String> trennzeichen = new FeldConverterAuswahl<String>("separator", "Trennzeichen", Arrays.asList(new String[] { ";", ",", "|", "\t" }));
 	private FeldConverterAuswahl<Integer> skipLines = new FeldConverterAuswahl<Integer>("rowheader", "Zeile mit den Spaltennamen", Arrays.asList(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9,10 }));
 	private File file;
-			
+
 	public CSVImportTool(ArrayList<FeldDefinitionen> fd) {
 		this.feldDefinitionen = fd;
 		csvOptions = new ArrayList<FeldConverterAuswahl<?>>();
@@ -37,7 +38,7 @@ public class CSVImportTool {
 		csvOptions.add(trennzeichen);
 		csvOptions.add(skipLines);
 	}
-	
+
 	public void setFile(File file) {
 		this.file = file;
 	}
@@ -58,7 +59,7 @@ public class CSVImportTool {
 		boolean isheader = true;
 		header.clear();
 		for(CSVRecord record : parser) {
-			if (nonData(Arrays.asList(record.values()))) {
+			if (nonData(getCsvValues(record))) {
 				continue;
 			}
 			if (isheader) {
@@ -69,7 +70,7 @@ public class CSVImportTool {
 					}
 					String neuername = name;
 					counter = 1;
-					while (header.contains(neuername)) { 
+					while (header.contains(neuername)) {
 						neuername = name + " (" + counter + ")";
 						counter++;
 					}
@@ -91,8 +92,17 @@ public class CSVImportTool {
 
 			}
 			list.add(g);
-		} 
+		}
 		parser.close();
+	}
+
+	private List<String> getCsvValues(CSVRecord csvRecord) {
+		ArrayList<String> values = new ArrayList<>();
+		for ( String value : csvRecord) {
+			values.add(value);
+		}
+
+		return values;
 	}
 
 	public List<GenericObjectHashMap> getList() {

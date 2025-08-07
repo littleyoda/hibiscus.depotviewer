@@ -1,12 +1,16 @@
 package de.open4me.depot.gui.menu;
 
+import java.util.stream.Stream;
+
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.action.UmsatzEditorAction;
 import de.open4me.depot.gui.action.UmsatzImportAction;
+import de.open4me.depot.gui.dialogs.Sicherheitsabfrage;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
+import de.willuhn.jameica.gui.parts.CheckedSingleContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
 import de.willuhn.jameica.gui.parts.ContextMenuItem;
 import de.willuhn.jameica.gui.parts.TablePart;
