@@ -38,10 +38,6 @@ public class PortfolioMessageConsumer implements MessageConsumer
     Map data = (Map) qm.getData();
     System.out.println("Portfolio");
     System.out.println(data);
-//    Portfolio
-//    {portfolio=[{anzahl=14.898688, kursw=EUR, wert=152.63705855999999, name=Scalable MSCI AC World Xtrackers (Acc), kontoid=377, kurs=10.245, 
-    //bewertungszeitpunkt=Mon Mar 23 18:02:48 CET 2026, wkn=DBX1SC, wertw=EUR, isin=LU2903252349}], 
-    //kontoid=377}
     Utils.clearBestand((Konto) data.get("konto"));
     for (Map<String,Object> h : (List<Map<String, Object>>)data.get("portfolio")) {
     	Utils.addBestand(
@@ -56,8 +52,6 @@ public class PortfolioMessageConsumer implements MessageConsumer
     			(Date) h.get("bewertungszeitpunkt"));
     }
     
-//	public static void addBestand(String wpid, Konto konto, Double anzahl, 
-//			Double kurs, String kursw, double wert, String wertw, Date date, Date bewertungsZeitpunkt) throws ApplicationException {
 
   }
 } 
