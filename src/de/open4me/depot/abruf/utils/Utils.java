@@ -118,7 +118,7 @@ public class Utils {
 		try {
 			if (orderid == null) {
 				orderid = "" + ("" + kontoid + wpid + aktion + date + anzahl + kurs + kursW).hashCode();
-				Logger.info("Setting id to " + orderid);
+				Logger.info("Transaction-ID is null. Calculate id to " + orderid);
 			}
 			DBIterator<Umsatz> liste = Settings.getDBService().createList(Umsatz.class);
 			liste.addFilter("orderid=?", orderid);
@@ -131,8 +131,8 @@ public class Utils {
 				Logger.error("Unbekannte Buchungsart: " + aktion);
 				return null;
 			}
-			if ((a.equals(DepotAktion.KAUF) && (kosten >= 0.0f))
-					|| (a.equals(DepotAktion.VERKAUF) && (kosten <= 0.0f))) {
+			if ((a.equals(DepotAktion.KAUF) && (kosten > 0.0f))
+					|| (a.equals(DepotAktion.VERKAUF) && (kosten < 0.0f))) {
 				throw new ApplicationException("Bei Käufen muss der Gesamtbetrag negativ sein, beim Verkauf positiv. ("
 						+ aktion.toUpperCase() + " " + kosten + ")");
 			}
