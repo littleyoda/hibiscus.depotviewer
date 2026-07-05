@@ -8,7 +8,6 @@ import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
@@ -74,7 +73,7 @@ public class CSVImportTool {
 		boolean isheader = true;
 		header.clear();
 		for(CSVRecord record : parser) {
-			if (nonData(getCsvValues(record))) {
+			if (isEmptyRecord(record)) {
 				continue;
 			}
 			if (isheader) {
@@ -116,13 +115,13 @@ public class CSVImportTool {
 		loadedSkipLines = skipLinesValue;
 	}
 
-	private List<String> getCsvValues(CSVRecord csvRecord) {
-		ArrayList<String> values = new ArrayList<>();
-		for ( String value : csvRecord) {
-			values.add(value);
+	private boolean isEmptyRecord(CSVRecord record) {
+		for (String value : record) {
+			if (value != null && !value.trim().isEmpty()) {
+				return false;
+			}
 		}
-
-		return values;
+		return true;
 	}
 
 	public List<GenericObjectHashMap> getList() {
@@ -177,10 +176,6 @@ public class CSVImportTool {
 			tablist.add(g);
 		}
 		return fehler;
-	}
-
-	private boolean nonData(Collection<?> values) {
-		return values.stream().allMatch(value -> value == null || value.toString().trim().isEmpty());
 	}
 
 	public ArrayList<FeldConverterAuswahl<?>> getCsvOptions() {
