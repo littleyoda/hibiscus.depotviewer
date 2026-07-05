@@ -29,6 +29,10 @@ public class CSVImportTool {
 	private FeldConverterAuswahl<String> trennzeichen = new FeldConverterAuswahl<String>("separator", "Trennzeichen", Arrays.asList(new String[] { ";", ",", "|", "\t" }));
 	private FeldConverterAuswahl<Integer> skipLines = new FeldConverterAuswahl<Integer>("rowheader", "Zeile mit den Spaltennamen", Arrays.asList(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9,10 }));
 	private File file;
+	private long loadedFileModified = -1;
+	private String loadedCharset;
+	private String loadedTrennzeichen;
+	private Integer loadedSkipLines;
 
 	public CSVImportTool(ArrayList<FeldDefinitionen> fd) {
 		this.feldDefinitionen = fd;
@@ -43,10 +47,22 @@ public class CSVImportTool {
 	}
 
 	public void load() throws IOException {
+		long fileModified = file.lastModified();
+		String charsetValue = charset.getAuswahl();
+		String trennzeichenValue = trennzeichen.getAuswahl();
+		Integer skipLinesValue = skipLines.getAuswahl();
+		if (fileModified == loadedFileModified
+				&& charsetValue.equals(loadedCharset)
+				&& trennzeichenValue.equals(loadedTrennzeichen)
+				&& skipLinesValue.equals(loadedSkipLines)) {
+			// Datei und Einstellungen unverändert, keine erneute Verarbeitung nötig
+			return;
+		}
+
 		header.clear();
 		long counter = 0;
 
-		int headerline = skipLines.getAuswahl() - 1;
+		int headerline = skipLinesValue - 1;
 		FileInputStream is = new FileInputStream(file);
 		InputStreamReader isr = new InputStreamReader(is, Charset.forName(charset.getAuswahl()) );
 		CSVFormat format = CSVFormat.RFC4180
@@ -93,6 +109,11 @@ public class CSVImportTool {
 			list.add(g);
 		}
 		parser.close();
+
+		loadedFileModified = fileModified;
+		loadedCharset = charsetValue;
+		loadedTrennzeichen = trennzeichenValue;
+		loadedSkipLines = skipLinesValue;
 	}
 
 	private List<String> getCsvValues(CSVRecord csvRecord) {
