@@ -36,7 +36,9 @@ import de.willuhn.util.ApplicationException;
 
 
 public class CSVImportStage2 extends AbstractDialog
-{	  
+{
+	private static final int PREVIEW_ROWS = 500;
+
 	private LabelInput error;
 	private Button weiterbutton;
 	List<GenericObjectHashMap> tablist = new ArrayList<GenericObjectHashMap>();
@@ -190,7 +192,8 @@ public class CSVImportStage2 extends AbstractDialog
 	private void reload() throws RemoteException {
 		getError().setValue("");
 		int fehler = tool.transformiereDaten(tablist);
-		TablePart tab = new TablePart(tablist, null);
+		List<GenericObjectHashMap> preview = tablist.subList(0, Math.min(PREVIEW_ROWS, tablist.size()));
+		TablePart tab = new TablePart(preview, null);
 		for (FeldDefinitionen h : feldDefinitionen) {
 			if (h.getFeldtype().equals(Date.class)) {
 				tab.addColumn(h.getAttr(), h.getAttr(), new DateFormatter(Settings.DATEFORMAT));
@@ -198,11 +201,14 @@ public class CSVImportStage2 extends AbstractDialog
 				tab.addColumn(h.getAttr(), h.getAttr());
 			}
 		}
-		if (fehler == 0) {
-			getError().setValue("");
-		} else {
-			getError().setValue("Fehlerhafte Zellen: " + fehler);
+		String msg = "";
+		if (fehler != 0) {
+			msg = "Fehlerhafte Zellen: " + fehler;
 		}
+		if (tablist.size() > preview.size()) {
+			msg = msg + (msg.isEmpty() ? "" : "\n") + "Vorschau: " + preview.size() + " von " + tablist.size() + " Zeilen";
+		}
+		getError().setValue(msg);
 		weiterbutton.setEnabled(fehler == 0);
 
 		rc.replace(tab);
