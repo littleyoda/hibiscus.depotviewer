@@ -19,6 +19,7 @@ import de.open4me.depot.tools.io.feldConverter.options.FeldConverterAuswahl;
 import de.open4me.depot.tools.io.feldConverter.options.FeldConverterOption;
 import de.open4me.depot.tools.io.feldConverter.options.FeldConverterText;
 import de.willuhn.jameica.gui.Action;
+import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.AbstractDialog;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
 import de.willuhn.jameica.gui.input.AbstractInput;
@@ -68,6 +69,12 @@ public class CSVImportStage2 extends AbstractDialog
 	protected void paint(Composite parent) throws Exception
 	{
 		//		controls = new HashMap<FeldDefinitionen, AbstractInput>();
+
+		// Ohne feste Hoehe waechst der Dialog mit der Anzahl der Tabellenzeilen
+		// unbegrenzt (TablePart hat zwar eigene Scrollbalken, aber der Shell
+		// wird per pack() sonst auf die volle Tabellenhoehe aufgezogen).
+		int maxHeight = (int) (GUI.getShell().getMonitor().getBounds().height * 0.9);
+		setSize(SWT.DEFAULT, maxHeight);
 
 		SimpleContainer columns = new SimpleContainer(parent, true, 2);
 		ScrolledContainer left = new ScrolledContainer(columns.getComposite());
