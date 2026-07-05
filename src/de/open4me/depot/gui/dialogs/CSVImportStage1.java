@@ -34,7 +34,7 @@ import de.willuhn.util.ApplicationException;
 @SuppressWarnings("rawtypes")
 public class CSVImportStage1 extends AbstractDialog
 {
-	private static final int PREVIEW_ROWS = 500;
+	private static final int PREVIEW_ROWS = 100;
 
 	private Composite comp;
 	private LabelInput error;

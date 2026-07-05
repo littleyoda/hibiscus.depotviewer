@@ -37,7 +37,7 @@ import de.willuhn.util.ApplicationException;
 
 public class CSVImportStage2 extends AbstractDialog
 {
-	private static final int PREVIEW_ROWS = 500;
+	private static final int PREVIEW_ROWS = 100;
 
 	private LabelInput error;
 	private Button weiterbutton;
