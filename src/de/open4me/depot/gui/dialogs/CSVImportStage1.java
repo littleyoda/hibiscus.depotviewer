@@ -33,7 +33,9 @@ import de.willuhn.util.ApplicationException;
 
 @SuppressWarnings("rawtypes")
 public class CSVImportStage1 extends AbstractDialog
-{	  
+{
+	private static final int PREVIEW_ROWS = 500;
+
 	private Composite comp;
 	private LabelInput error;
 	private Button weiterbutton;
@@ -140,7 +142,11 @@ public class CSVImportStage1 extends AbstractDialog
 			this.getError().setValue("Fehler beim Lesen der Datei:\n" + e.getMessage());
 			enable = false;
 		}
-		TablePart tab = new TablePart(list, null);
+		List<GenericObjectHashMap> preview = list.subList(0, Math.min(PREVIEW_ROWS, list.size()));
+		if (list.size() > preview.size()) {
+			getError().setValue("Die mit X markierten Zeilen werden ignoriert. (Vorschau: " + preview.size() + " von " + list.size() + " Zeilen)");
+		}
+		TablePart tab = new TablePart(preview, null);
 // TODO		tab.addColumn("" + headerline, "_DEPOTVIEWER_IDX");
 		tab.addColumn("", "_DEPOTVIEWER_IGNORE");
 		for (String h : header) {
