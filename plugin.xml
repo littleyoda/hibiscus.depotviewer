@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.willuhn.de/schema/jameica-plugin"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.willuhn.de/schema/jameica-plugin http://www.willuhn.de/schema/jameica-plugin-1.2.xsd"
-        name="hibiscus.depotviewer" version="0.9.2" class="de.open4me.depot.DepotViewerPlugin">
+        name="hibiscus.depotviewer" version="0.9.3" class="de.open4me.depot.DepotViewerPlugin">
 
   <description>Depot Viewer (bitte auch Toolkit installieren)</description>
   <url>https://www.open4me.de/hibiscus/hibiscus.depotviewer/hibiscus.depotviewer.zip</url>
@@ -14,6 +14,7 @@
     <import plugin="hibiscus" version="2.10.1+" />
     <import plugin="hibiscus.scripting.htmlunit" version="3.00+" />
     <import plugin="hibiscus.ly.toolkit" version="1.0.7+" />
+    <import plugin="hibiscus.ly.reports" version="0.7.3+" required="false" />
   </requires>
 
   <classfinder>
@@ -23,6 +24,7 @@
 
  <extensions>
     <extension extends="hibiscus.navi" class="de.open4me.depot.gui.Navi"/>
+    <extension extends="hibiscus.ly.reports.template.context" class="de.open4me.depot.reports.DepotviewerReportTemplateExtension" requires="hibiscus.ly.reports"/>
  </extensions>
 
   <navigation>
