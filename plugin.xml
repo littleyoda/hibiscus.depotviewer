@@ -38,6 +38,7 @@
   <menu>
     <item id="depotviewer.menu" name="Depot-&amp;Viewer">
       <item id="depotviewer.import" name="&amp;Import von Ordern/Umsätze..." shortcut="ALT+I" icon="emblem-documents.png" action="de.open4me.depot.gui.action.UmsatzImportAction" />
+      <item id="depotviewer.pp-export" name="Export f&#252;r Portfolio Performance..." icon="emblem-documents.png" action="de.open4me.depot.gui.action.PortfolioPerformanceExportAction" />
       <item id="depotviewer.abgleich" name="&amp;Abgleich zwischen Orderbuch und Bestand..." shortcut="ALT+A" icon="check.png" action="de.open4me.depot.gui.action.BestandspruefungAction" />
       <item id="depotviewer.wpadd" name="Neues &amp;Wertpapier hinzufügen..." shortcut="ALT+W" icon="stocks.png" action="de.open4me.depot.gui.action.AddWertpapierAction" />
       <item name="-" />
