@@ -25,6 +25,7 @@
  <extensions>
     <extension extends="hibiscus.navi" class="de.open4me.depot.gui.Navi"/>
     <extension extends="hibiscus.ly.reports.template.context" class="de.open4me.depot.reports.DepotviewerReportTemplateExtension" requires="hibiscus.ly.reports"/>
+    <extension extends="hibiscus.ly.reports.mcp.tools" class="de.open4me.depot.reports.DepotviewerMcpToolExtension" requires="hibiscus.ly.reports"/>
  </extensions>
 
   <navigation>
