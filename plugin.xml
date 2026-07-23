@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.willuhn.de/schema/jameica-plugin http://www.willuhn.de/schema/jameica-plugin-1.2.xsd"
         name="hibiscus.depotviewer" version="1.0.0" class="de.open4me.depot.DepotViewerPlugin">
 
-  <description>Depot Viewer (bitte auch Toolkit installieren)</description>
+  <description>Depot Viewer</description>
   <url>https://www.open4me.de/hibiscus/hibiscus.depotviewer/hibiscus.depotviewer.zip</url>
   <homepage>https://github.com/littleyoda/hibiscus.depotviewer</homepage>
   <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
@@ -13,7 +13,6 @@
   <requires jameica="2.6.0+">
     <import plugin="hibiscus" version="2.10.1+" />
     <import plugin="hibiscus.scripting.htmlunit" version="3.00+" />
-    <import plugin="hibiscus.ly.toolkit" version="1.0.7+" />
     <import plugin="hibiscus.ly.reports" version="0.7.3+" required="false" />
   </requires>
 
