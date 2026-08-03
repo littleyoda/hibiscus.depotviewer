@@ -39,3 +39,17 @@ PARTICULAR PURPOSE.  Please refer to the licence for details.
 http://www.jfree.org/jfreechart/
 
 =============================================================================
+Files: lib/htmlunit/*.jar
+
+HtmlUnit and related HtmlUnit modules are licensed under the Apache License,
+Version 2.0.
+
+This distribution also includes Apache Commons IO, Apache Commons Logging,
+Apache Commons Lang, Apache Commons Codec, Apache Commons Text and Apache
+HttpComponents libraries used by HtmlUnit or directly by DepotViewer. These
+libraries are licensed under the Apache License, Version 2.0.
+
+https://www.htmlunit.org/
+https://www.apache.org/licenses/LICENSE-2.0
+
+=============================================================================

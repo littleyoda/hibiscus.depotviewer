@@ -10,9 +10,8 @@
   <homepage>https://github.com/littleyoda/hibiscus.depotviewer</homepage>
   <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
 
-  <requires jameica="2.6.0+">
+  <requires jameica="2.10.5+">
     <import plugin="hibiscus" version="2.10.1+" />
-    <import plugin="hibiscus.scripting.htmlunit" version="3.00+" />
     <import plugin="hibiscus.ly.reports" version="0.7.3+" required="false" />
   </requires>
 

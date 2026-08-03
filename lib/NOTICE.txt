@@ -9,3 +9,14 @@ This file was downloaded from http://www.ferc.gov/docs-filing/eqr/soft-tools/sam
 
 src/main/resources/transaction.txt
 This file was downloaded from http://www.ferc.gov/docs-filing/eqr/soft-tools/sample-csv/transaction.txt and contains neither copyright notice nor license.
+
+=============================================================================
+Files: htmlunit/*.jar
+
+HtmlUnit and related HtmlUnit modules are licensed under the Apache License,
+Version 2.0.
+
+This distribution also includes Apache Commons IO, Apache Commons Logging,
+Apache Commons Lang, Apache Commons Codec, Apache Commons Text and Apache
+HttpComponents libraries used by HtmlUnit or directly by DepotViewer. These
+libraries are licensed under the Apache License, Version 2.0.

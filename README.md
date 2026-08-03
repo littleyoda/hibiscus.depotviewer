@@ -19,7 +19,7 @@ weitere Informationen im [Wiki](https://github.com/littleyoda/hibiscus.depotview
 
 
 # Installation
-Voraussetzung ist Hibiscus in Version 2.6.12 oder neuer
+Voraussetzung ist Java 17 oder neuer, Jameica 2.10.5 oder neuer und Hibiscus 2.10.1 oder neuer.
 
 ## Plugin installieren
 * Menü Datei/Einstellungen

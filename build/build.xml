@@ -53,9 +53,6 @@
 			<fileset dir="." >
 				<include name="${lib.dir}/**/*.jar" if="havelib"/>
 			</fileset>
-			<fileset dir="${define.htmlunit.dir}/lib" >
-				<include name="**/*.jar" />
-			</fileset>
 			<fileset dir="${define.jameica.dir}/lib/" >
 				<include name="**/*.jar" />
 			</fileset>
@@ -81,6 +78,7 @@
 
 		<javac debug="true" debuglevel="lines,vars,source" deprecation="true"
 		       source="${define.java.version}" target="${define.java.version}"
+		       includeantruntime="false"
 		       encoding="${define.encoding}"
 		       srcdir="${src.dir}"
 		       destdir="${class.dir}">
@@ -90,6 +88,7 @@
 		<copy todir="${class.dir}">
 			<fileset dir="${src.dir}">
 				<include name="META-INF/**" />
+				<include name="**/*.txt" />
 			</fileset>
 		</copy>
 
