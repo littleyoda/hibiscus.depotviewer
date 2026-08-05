@@ -98,7 +98,7 @@ public class BestandImportAction implements Action {
 				}
 
 				if (x.getAttribute("kurs").toString().isEmpty()  && !x.getAttribute("wert").toString().isEmpty()) {
-					BigDecimal d = ((BigDecimal) x.getAttribute("wert")).divide((BigDecimal) x.getAttribute("anzahl"),5, RoundingMode.HALF_UP);
+					BigDecimal d = ((BigDecimal) x.getAttribute("wert")).divide((BigDecimal) x.getAttribute("anzahl"),8, RoundingMode.HALF_UP);
 					x.setAttribute("kurs", d);
 				}
 				if (!x.getAttribute("kurs").toString().isEmpty()  && x.getAttribute("wert").toString().isEmpty()) {

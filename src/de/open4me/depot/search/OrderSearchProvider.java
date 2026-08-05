@@ -70,7 +70,7 @@ public class OrderSearchProvider implements SearchProvider {
 		public String getName() {
 			try {
 				DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-				VarDecimalFormat kf = new VarDecimalFormat(5);
+				VarDecimalFormat kf = new VarDecimalFormat(5, 3);
 				return df.format((Date) this.order.getAttribute("buchungsdatum")) + ": "
 						+ this.order.getAttribute("aktion") + " " + kf.format(this.order.getAttribute("anzahl"))
 						+ " Stück " + (String) this.order.getAttribute("nicename") + ", Kurs: "

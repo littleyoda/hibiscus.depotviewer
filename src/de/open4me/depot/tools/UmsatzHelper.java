@@ -38,7 +38,7 @@ public class UmsatzHelper {
 	 */
 	public static void storeUmsatzInHibiscus(Umsatz u) throws RemoteException, ApplicationException {		
 		VarDecimalFormat df = new VarDecimalFormat(2);
-		VarDecimalFormat kf = new VarDecimalFormat(5);
+		VarDecimalFormat kf = new VarDecimalFormat(5, 3);
 		
 		// abfragen, ob Umsatz bereits existiert anhand der meta-depotviewer_id
 		de.willuhn.jameica.hbci.rmi.Umsatz hu = getHibiscusUmsatzByDepotViewerId(u.getID());

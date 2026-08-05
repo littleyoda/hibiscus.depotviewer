@@ -118,7 +118,7 @@ public class UmsatzEditorControl extends AbstractControl
 		if (betrag != null)
 			return betrag;
 		double d = Double.NaN;
-		betrag = new DecimalInput(d, new VarDecimalFormat(2, 3));
+		betrag = new DecimalInput(d, new VarDecimalFormat(2, 6));
 		betrag.setMandatory(true);
 		betrag.addListener(new Listener() {
 
@@ -181,7 +181,7 @@ public class UmsatzEditorControl extends AbstractControl
 		if (einzelkurs != null)
 			return einzelkurs;
 		double d = Double.NaN;
-		einzelkurs = new DecimalInput(d, new VarDecimalFormat(2, 3));
+		einzelkurs = new DecimalInput(d, new VarDecimalFormat(2, 6));
 		einzelkurs.setMandatory(true);
 		einzelkurs.addListener(new Listener() {
 
@@ -320,7 +320,7 @@ public class UmsatzEditorControl extends AbstractControl
 		if (kurswert != null)
 			return kurswert;
 		double d = Double.NaN;
-		kurswert = new DecimalInput(d, new VarDecimalFormat(2, 3));
+		kurswert = new DecimalInput(d, new VarDecimalFormat(2, 6));
 		kurswert.setMandatory(true);
 		return kurswert;
 	}
@@ -329,7 +329,7 @@ public class UmsatzEditorControl extends AbstractControl
 		if (transaktionskosten != null)
 			return transaktionskosten;
 		double d = Double.valueOf("0");
-		transaktionskosten = new DecimalInput(d, new VarDecimalFormat(2, 3));
+		transaktionskosten = new DecimalInput(d, new VarDecimalFormat(2, 6));
 		transaktionskosten.setMandatory(true);
 		transaktionskosten.addListener(new Listener() {
 
@@ -360,7 +360,7 @@ public class UmsatzEditorControl extends AbstractControl
 		if (steuern != null)
 			return steuern;
 		double d = Double.valueOf("0");
-		steuern = new DecimalInput(d, new VarDecimalFormat(2, 3));
+		steuern = new DecimalInput(d, new VarDecimalFormat(2, 6));
 		steuern.setMandatory(true);
 		steuern.addListener(new Listener() {
 
