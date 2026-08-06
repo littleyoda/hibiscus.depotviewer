@@ -249,7 +249,7 @@ public class WertpapiereDatenControl {
 						ids += id;
 						spalten += ", a" + id + ".kurs as A" + id + "k, a" + id + ".kursw as A" + id + "kw";
 						spalten += ", a" + id + ".kursperf as A" + id + "kp, a" + id + ".kursw as A" + id + "kpw";
-						sql +="left join depotviewer_kurse as A" + id + " on A" + id + ".wpid = " + id + " and A" + id + ".kursdatum = datum.kursdatum\n";
+						sql +="left join depotviewer_kurse as a" + id + " on a" + id + ".wpid = " + id + " and a" + id + ".kursdatum = datum.kursdatum\n";
 					}
 					sql = "select "  + spalten + " from (select distinct kursdatum from depotviewer_kurse where wpid in (" + ids + ") order by 1 desc) as datum\n" + sql;
 
@@ -458,7 +458,7 @@ public class WertpapiereDatenControl {
 			if (referenz.size() == 0) {
 				return "Keine Kursdaten";
 			}
-			Long daysdiff = (Long) referenz.get(0).getAttribute("diff");
+			long daysdiff = getLong(referenz.get(0).getAttribute("diff"));
 			if (daysdiff > 7 && (jahr !=  Calendar.getInstance().get(Calendar.YEAR))) {
 				return "Keine aktuellen Kursdaten (" + daysdiff + " Tage alt)";
 			}
@@ -471,7 +471,7 @@ public class WertpapiereDatenControl {
 			if (referenz.size() == 0) {
 				return "Keine Kursdaten";
 			}
-			daysdiff = (Long) referenz.get(0).getAttribute("diff");
+			daysdiff = getLong(referenz.get(0).getAttribute("diff"));
 			if (daysdiff > 7) {
 				return "Keine Kursdaten des Vorjahres (" + daysdiff + " Tage alt)";
 			}
@@ -495,7 +495,7 @@ public class WertpapiereDatenControl {
 			BigDecimal refKurs = null;
 			List<GenericObjectSQL> referenz = SQLUtils.getResultSet(pre, "depotviewer_kurse", "", "");
 			if (referenz.size() > 0) {
-				Long daysdiff = (Long) referenz.get(0).getAttribute("diff");
+				long daysdiff = getLong(referenz.get(0).getAttribute("diff"));
 				if (daysdiff < maximalesAlter) {
 					refKurs = (BigDecimal) referenz.get(0).getAttribute("kurs");
 				}
@@ -526,7 +526,7 @@ public class WertpapiereDatenControl {
 				return "Keine Kurse";
 			}
 			GenericObjectSQL v = x.get(0);
-			Long daysdiff = (Long) v.getAttribute("diff");
+			long daysdiff = getLong(v.getAttribute("diff"));
 			if (daysdiff > 7) {
 				return "Keine aktuellen Kurse";
 			}
@@ -536,6 +536,13 @@ public class WertpapiereDatenControl {
 			//					(refkurs - kurs)/(kurs/100)
 			return performance.setScale(2, RoundingMode.HALF_UP).toPlainString() + "%";
 		}
+	}
+
+	private static long getLong(Object value) {
+		if (value instanceof Number) {
+			return ((Number) value).longValue();
+		}
+		return Long.parseLong(value.toString());
 	}
 
 
