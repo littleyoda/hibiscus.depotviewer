@@ -67,16 +67,39 @@ public class ModifyWertpapierControl extends AbstractControl {
 	}
 
 	protected boolean handleStore() throws RemoteException, ApplicationException {
-		String isin = getIsin().getValue().toString().toUpperCase();
-		String name = getWertpapiername().getValue().toString();
-		String wkn = getWkn().getValue().toString().toUpperCase();
+		String isin = normalizeIdentifier(getIsin().getValue());
+		String name = getWertpapiername().getValue().toString().trim();
+		String wkn = normalizeIdentifier(getWkn().getValue());
 		if (name.isEmpty()) {
 			Application.getMessagingFactory().sendMessage(new StatusBarMessage("Wertpapiername fehlt.",StatusBarMessage.TYPE_ERROR));
 			return false;
 		}
 		DBIterator<Wertpapier> liste = Settings.getDBService().createList(Wertpapier.class);
-		liste.addFilter("(isin=? OR wkn=?) AND id <> ? ", isin, wkn, wp.getID());
-		if (liste.hasNext()) {
+		boolean checkDuplicate = true;
+		Object currentId = wp.getID();
+		boolean excludeCurrent = currentId != null && !currentId.toString().isEmpty();
+		if (!isin.isEmpty() && !wkn.isEmpty()) {
+			if (excludeCurrent) {
+				liste.addFilter("(isin=? OR wkn=?) AND id <> ? ", isin, wkn, currentId);
+			} else {
+				liste.addFilter("(isin=? OR wkn=?)", isin, wkn);
+			}
+		} else if (!isin.isEmpty()) {
+			if (excludeCurrent) {
+				liste.addFilter("isin=? AND id <> ? ", isin, currentId);
+			} else {
+				liste.addFilter("isin=?", isin);
+			}
+		} else if (!wkn.isEmpty()) {
+			if (excludeCurrent) {
+				liste.addFilter("wkn=? AND id <> ? ", wkn, currentId);
+			} else {
+				liste.addFilter("wkn=?", wkn);
+			}
+		} else {
+			checkDuplicate = false;
+		}
+		if (checkDuplicate && liste.hasNext()) {
 			Application.getMessagingFactory().sendMessage(new StatusBarMessage("Die WKN oder ISIN wird bereits bei einem anderen Eintrag genutzt.",StatusBarMessage.TYPE_ERROR));
 			return false;
 		}
@@ -85,6 +108,10 @@ public class ModifyWertpapierControl extends AbstractControl {
 		wp.setWkn(wkn);
 		wp.store();
 		return true;
+	}
+
+	private static String normalizeIdentifier(Object value) {
+		return value == null ? "" : value.toString().trim().toUpperCase();
 	}
 
 }
