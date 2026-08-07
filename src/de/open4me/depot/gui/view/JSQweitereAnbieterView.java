@@ -1,12 +1,15 @@
 package de.open4me.depot.gui.view;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.Label;
 
 import de.open4me.depot.DepotViewerPlugin;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.input.TextInput;
+import de.willuhn.jameica.gui.internal.action.FileClose;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.SimpleContainer;
@@ -59,6 +62,11 @@ public class JSQweitereAnbieterView extends AbstractView
 		}
 		,null,true,"dialog-information.png");
 		dir.paint(group.getComposite());
+		button.paint(group.getComposite());
+
+		group.addText("\n\n", false);
+		new Label(group.getComposite(), SWT.NONE);
+		button = new Button("Beenden", new FileClose(), null, false, "window-close.png");
 		button.paint(group.getComposite());
 		
 	}
