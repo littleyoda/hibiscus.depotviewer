@@ -76,7 +76,7 @@ public class OrderListControl extends AbstractControl
 		orderList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
 		orderList.addColumn(Settings.i18n().tr("WKN"),"wkn");
 		orderList.addColumn(Settings.i18n().tr("Wertpapiername"),"wertpapiername");
-		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.5f", "anzahl"));
+		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.8f", "anzahl"));
 		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Kurs"), "kurs", "%,.6f %s", "kurs", "kursw"));
 		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Kosten"), "kosten", "%,.2f %s", "kosten", "kostenw"));
 		orderList.addColumn(new PrintfColumn(Settings.i18n().tr("Gebühren"), "transaktionskosten", "%,.2f %s", "transaktionskosten", "transaktionskostenw"));

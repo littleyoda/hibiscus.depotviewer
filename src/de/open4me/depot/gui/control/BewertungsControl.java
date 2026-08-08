@@ -119,7 +119,7 @@ public class BewertungsControl extends AbstractControl {
 		wertList.addColumn(Settings.i18n().tr("Name"),"wertpapiername");
 		wertList.addColumn(Settings.i18n().tr("ISIN"),"isin");
 		wertList.addColumn(Settings.i18n().tr("WKN"),"wkn");
-		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.5f", "anzahl"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.8f", "anzahl"));
 		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Einstandspreis"), "einstand", "%,.2f %s", "einstand", "währung"));
 		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Verkaufserlöse"), "erloese", "%,.2f %s", "erloese", "währung"));
 		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Aktueller Wert"), "wert", "%,.2f %s", "wert", "währung"));

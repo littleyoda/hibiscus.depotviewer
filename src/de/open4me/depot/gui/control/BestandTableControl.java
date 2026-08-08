@@ -104,7 +104,7 @@ public class BestandTableControl extends AbstractControl implements Listener
 		bestandsList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
 		bestandsList.addColumn(Settings.i18n().tr("WKN"),"wkn");
 		bestandsList.addColumn(Settings.i18n().tr("Name"),"wertpapiername");
-		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.5f", "anzahl"));
+		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.8f", "anzahl"));
 		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Kurs"), "kurs", "%,.6f %s", "kurs", "kursw"));
 		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Wert"), "wert", "%,.2f %s", "wert", "wertw"));
 		bestandsList.addColumn(Settings.i18n().tr("Bewertungsdatum"),"bewertungszeitpunkt", new DateFormatter(Settings.DATEFORMAT));
