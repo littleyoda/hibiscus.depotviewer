@@ -84,7 +84,7 @@ und blieb bis v18 bei `decimal(10,5)` — das war die einzige Spalte, die noch a
 7. **[OrderSearchProvider.java:73](src/de/open4me/depot/search/OrderSearchProvider.java#L73)** —
    `VarDecimalFormat(5)` für Suchergebnisse. → jetzt `VarDecimalFormat(5, 3)`.
 8. Listen-Spalten (reine Anzeige, unverändert gelassen):
-   `OrderListControl`/`BestandTableControl` zeigen Anzahl mit `%,.5f`, Kurs mit
+   `OrderListControl`/`BestandTableControl` zeigen Anzahl mit `%,.8f`, Kurs mit
    `%,.6f`, Beträge mit `%,.2f`; `WertpapiereDatenControl` zeigt Kurse mit `%.6f`.
    Diese Formatierungen betreffen nur die Darstellung in Tabellen, nicht die
    gespeicherten Werte.
