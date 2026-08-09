@@ -140,10 +140,10 @@ public class BestandImportAction implements Action {
 				Utils.addBestand(
 						Utils.getORcreateWKN((String) x.getAttribute("wkn"), (String) x.getAttribute("isin"), (String) x.getAttribute("name")),
 						konto,
-						((BigDecimal) x.getAttribute("anzahl")).doubleValue(),
-						((BigDecimal) x.getAttribute("kurs")).doubleValue(),
+						(BigDecimal) x.getAttribute("anzahl"),
+						(BigDecimal) x.getAttribute("kurs"),
 						handleCurrency(kursW),
-						((BigDecimal) x.getAttribute("wert")).doubleValue(),
+						(BigDecimal) x.getAttribute("wert"),
 						handleCurrency(wertW),
 						(Date) x.getAttribute("date"),
 						(Date) x.getAttribute("date"));

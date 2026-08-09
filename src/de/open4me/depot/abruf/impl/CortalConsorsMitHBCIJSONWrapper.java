@@ -1,5 +1,7 @@
 package de.open4me.depot.abruf.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -65,9 +67,9 @@ public class CortalConsorsMitHBCIJSONWrapper {
 					getDatum(), // Datum
 					getOrderID(), // orderid
 					"", // Kommentar
-					0.0d, // Gebuehren
-					"EUR", /// 
-					0.0d, // Steuern
+					BigDecimal.ZERO, // Gebuehren
+					"EUR", ///
+					BigDecimal.ZERO, // Steuern
 					"EUR" /// 
 			);
 		} catch (RemoteException | ApplicationException | ParseException e) {
@@ -96,21 +98,22 @@ public class CortalConsorsMitHBCIJSONWrapper {
 		return (String) detailInfo.get("2");
 	}
 
-	private Double getKosten() {
-		return (getOrderArt().equals("B") ? -1 : 1) *
-		Math.rint(getKurs() * getStueckzahl() * 100) / 100;
+	private BigDecimal getKosten() {
+		// Math.rint() rundete kaufmaennisch zur geraden Ziffer -> HALF_EVEN
+		BigDecimal kosten = getKurs().multiply(getStueckzahl()).setScale(2, RoundingMode.HALF_EVEN);
+		return getOrderArt().equals("B") ? kosten.negate() : kosten;
 	}
 
 	private String getKursW() {
 		return (String) detailInfo.get("2");
 	}
 
-	private Double getKurs() {
-		return Double.parseDouble(detailInfo.get("1").toString());
+	private BigDecimal getKurs() {
+		return new BigDecimal(detailInfo.get("1").toString());
 	}
 
-	private Double getStueckzahl() {
-		return Double.parseDouble(detailInfo.get("12").toString());
+	private BigDecimal getStueckzahl() {
+		return new BigDecimal(detailInfo.get("12").toString());
 	}
 
 	private String getOrderArt() {

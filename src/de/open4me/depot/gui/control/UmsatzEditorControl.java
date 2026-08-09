@@ -20,10 +20,10 @@ import de.open4me.depot.sql.SQLUtils;
 import de.open4me.depot.tools.InconsistencyData;
 import de.open4me.depot.tools.UmsatzHelper;
 import de.open4me.depot.tools.VarDecimalFormat;
+import de.open4me.depot.tools.Zahlen;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Part;
-import de.willuhn.jameica.gui.input.AbstractInput;
 import de.willuhn.jameica.gui.input.CheckboxInput;
 import de.willuhn.jameica.gui.input.DateInput;
 import de.willuhn.jameica.gui.input.DecimalInput;
@@ -37,7 +37,7 @@ import de.willuhn.util.ApplicationException;
 public class UmsatzEditorControl extends AbstractControl
 {
 
-	private Input betrag                       = null;
+	private DecimalInput betrag                = null;
 	private SelectInput aktion;
 	private SelectInput wp;
 	private DateInput datum;
@@ -47,7 +47,7 @@ public class UmsatzEditorControl extends AbstractControl
 	private DecimalInput gesamt;
 	private DecimalInput kurswert;
 	private CheckboxInput kurswertberechnen;
-	private AbstractInput transaktionskosten;
+	private DecimalInput transaktionskosten;
 	private DecimalInput steuern;
 	private Umsatz umsatz = null;
 	private Input kommentar;
@@ -72,9 +72,9 @@ public class UmsatzEditorControl extends AbstractControl
 		getAnzahl().setValue(umsatz.getAnzahl());
 		getEinzelkurs().setValue(umsatz.getKurs());
 		getDate().setValue(umsatz.getBuchungsdatum());
-		getSteuern().setValue((umsatz.getSteuern() != null) ? umsatz.getSteuern() : 0.0d);
-		getTransaktionskosten().setValue((umsatz.getTransaktionsgebuehren() != null) ? umsatz.getTransaktionsgebuehren()  : 0.0d);
-		getKurswert().setValue(Math.abs(umsatz.getKosten().doubleValue()));
+		getSteuern().setValue((umsatz.getSteuern() != null) ? umsatz.getSteuern() : BigDecimal.ZERO);
+		getTransaktionskosten().setValue((umsatz.getTransaktionsgebuehren() != null) ? umsatz.getTransaktionsgebuehren()  : BigDecimal.ZERO);
+		getKurswert().setValue(umsatz.getKosten().abs());
 		getKommentar().setValue(umsatz.getKommentar());
 		
 		String id = umsatz.getWPid().toString();
@@ -113,12 +113,13 @@ public class UmsatzEditorControl extends AbstractControl
 	 * @return Eingabe-Feld.
 	 * @throws RemoteException
 	 */
-	public Input getAnzahl() throws RemoteException
+	public DecimalInput getAnzahl() throws RemoteException
 	{
 		if (betrag != null)
 			return betrag;
-		double d = Double.NaN;
-		betrag = new DecimalInput(d, new VarDecimalFormat(2, 6));
+		// 8 statt 6 optionale Nachkommastellen: Stueckzahlen liegen als
+		// decimal(20,10) in der Datenbank, die Anzeige darf nicht frueher runden.
+		betrag = new DecimalInput((Number) null, new VarDecimalFormat(2, 8));
 		betrag.setMandatory(true);
 		betrag.addListener(new Listener() {
 
@@ -132,6 +133,31 @@ public class UmsatzEditorControl extends AbstractControl
 		return betrag;
 	}
 
+	/**
+	 * Liest den Wert eines Eingabefeldes als BigDecimal.
+	 *
+	 * Bewusst über {@link DecimalInput#getNumber()} statt getValue():
+	 * getValue() wandelt intern immer nach Double und wäre verlustbehaftet.
+	 * Dank {@link VarDecimalFormat} (setParseBigDecimal) liefert getNumber()
+	 * bereits einen BigDecimal; {@link Zahlen#toBigDecimal(Object)} deckt nur
+	 * Alt-/Sonderfälle ab.
+	 *
+	 * @return Wert oder null, wenn das Feld leer bzw. nicht lesbar ist
+	 */
+	private static BigDecimal toDecimal(DecimalInput input) {
+		Number n = input.getNumber();
+		if (n == null) {
+			return null;
+		}
+		// NaN/Infinity kaeme aus einem leeren bzw. kaputten Feld und liesse sich
+		// nicht in einen BigDecimal ueberfuehren - das gilt als "kein Wert".
+		double d = n.doubleValue();
+		if (Double.isNaN(d) || Double.isInfinite(d)) {
+			return null;
+		}
+		return Zahlen.toBigDecimal(n);
+	}
+
 	protected void calc()  {
 		try {
 			if ((Boolean) getCBKurswertBerechnen().getValue()) {
@@ -140,29 +166,33 @@ public class UmsatzEditorControl extends AbstractControl
 			} else {
 				getKurswert().setEnabled(true);
 			}
-			getGesamtSumme().setValue(Double.NaN);
-			if (getEinzelkurs().getValue() == null || getAnzahl().getValue() == null) {
+			getGesamtSumme().setValue(null);
+			BigDecimal anzahl = toDecimal(getAnzahl());
+			BigDecimal kurs = toDecimal(getEinzelkurs());
+			if (kurs == null || anzahl == null) {
 				return;
 			}
-			if ((Double) getAnzahl().getValue() <=0 || ((Double) getEinzelkurs().getValue() < 0)) {
+			if (anzahl.signum() <= 0 || kurs.signum() < 0) {
 				return;
 			}
 			if ((Boolean) getCBKurswertBerechnen().getValue()) {
-				Double d = (Double) getAnzahl().getValue() * (Double) getEinzelkurs().getValue();
-				getKurswert().setValue(d);
-			} else {
+				getKurswert().setValue(anzahl.multiply(kurs));
 			}
-			
-			int faktor = -1;
-			if (getAktionAuswahl().getValue().equals(DepotAktion.VERKAUF) || getAktionAuswahl().getValue().equals(DepotAktion.AUSBUCHUNG)) {
-				faktor = 1;
+
+			BigDecimal kurswert = toDecimal(getKurswert());
+			if (kurswert == null) {
+				return;
 			}
-			Double d = faktor * (Double) getKurswert().getValue();
-			if (getTransaktionskosten().getValue() != null) {
-				d = d  - (Double) getTransaktionskosten().getValue();
+			boolean istErloes = getAktionAuswahl().getValue().equals(DepotAktion.VERKAUF)
+					|| getAktionAuswahl().getValue().equals(DepotAktion.AUSBUCHUNG);
+			BigDecimal d = istErloes ? kurswert : kurswert.negate();
+			BigDecimal kosten = toDecimal(getTransaktionskosten());
+			if (kosten != null) {
+				d = d.subtract(kosten);
 			}
-			if (getSteuern().getValue() != null) {
-				d = d  - (Double) getSteuern().getValue();
+			BigDecimal st = toDecimal(getSteuern());
+			if (st != null) {
+				d = d.subtract(st);
 			}
 			getGesamtSumme().setValue(d);
 		} catch (RemoteException re) {
@@ -176,12 +206,11 @@ public class UmsatzEditorControl extends AbstractControl
 	 * @return Eingabe-Feld.
 	 * @throws RemoteException
 	 */
-	public Input getEinzelkurs() throws RemoteException
+	public DecimalInput getEinzelkurs() throws RemoteException
 	{
 		if (einzelkurs != null)
 			return einzelkurs;
-		double d = Double.NaN;
-		einzelkurs = new DecimalInput(d, new VarDecimalFormat(2, 6));
+		einzelkurs = new DecimalInput((Number) null, new VarDecimalFormat(2, 6));
 		einzelkurs.setMandatory(true);
 		einzelkurs.addListener(new Listener() {
 
@@ -242,22 +271,36 @@ public class UmsatzEditorControl extends AbstractControl
 
 
 	public void handleStore() throws RemoteException, ApplicationException {
-		int faktor = -1;
-		if (getAktionAuswahl().getValue().equals(DepotAktion.VERKAUF) || getAktionAuswahl().getValue().equals(DepotAktion.AUSBUCHUNG)) {
-			faktor = 1;
-		}
-		if (getEinzelkurs().getValue() == null || getAnzahl().getValue() == null || getDate().getValue() ==null) {
+		boolean istErloes = getAktionAuswahl().getValue().equals(DepotAktion.VERKAUF)
+				|| getAktionAuswahl().getValue().equals(DepotAktion.AUSBUCHUNG);
+		BigDecimal anzahl = toDecimal(getAnzahl());
+		BigDecimal kurs = toDecimal(getEinzelkurs());
+		if (kurs == null || anzahl == null || getDate().getValue() ==null) {
 			throw new ApplicationException("Bitte vervollständigen Sie die Eingabe.");
 		}
-		if ((Double) getAnzahl().getValue() <=0 || ((Double) getEinzelkurs().getValue() < 0)) {
+		if (anzahl.signum() <= 0 || kurs.signum() < 0) {
 			throw new ApplicationException("Die Anzahl und der Kurs müssen positiv sein.");
+		}
+		BigDecimal kurswert = toDecimal(getKurswert());
+		if (kurswert == null) {
+			throw new ApplicationException("Bitte vervollständigen Sie die Eingabe.");
+		}
+		// Leere Gebühren-/Steuerfelder wie 0 behandeln (so sind sie auch vorbelegt)
+		BigDecimal gebuehren = toDecimal(getTransaktionskosten());
+		if (gebuehren == null) {
+			gebuehren = BigDecimal.ZERO;
+		}
+		BigDecimal st = toDecimal(getSteuern());
+		if (st == null) {
+			st = BigDecimal.ZERO;
 		}
 		if (umsatz == null) {
 			umsatz = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
 			umsatz.setBuchungsinformationen("");
-			umsatz.setOrderid("" + (((GenericObjectSQL) getWertpapiere().getValue()).getID() + getAktionAuswahl().getValue().toString() +
-						getAnzahl().getValue().toString() + getEinzelkurs().getValue().toString() + "EUR" + getDate().getValue()
-						).hashCode());
+			umsatz.setOrderid(Zahlen.berechneManuelleOrderId(
+						((GenericObjectSQL) getWertpapiere().getValue()).getID(),
+						getAktionAuswahl().getValue().toString(),
+						anzahl, kurs, "EUR", (Date) getDate().getValue()));
 			umsatz.setKursW("EUR");
 			umsatz.setKostenW("EUR");
 			umsatz.setSteuernW("EUR");
@@ -267,12 +310,12 @@ public class UmsatzEditorControl extends AbstractControl
 		umsatz.setKontoid(Integer.parseInt(k.getID()));
 		umsatz.setWPid(((GenericObjectSQL) getWertpapiere().getValue()).getID());
 		umsatz.setAktion((DepotAktion) getAktionAuswahl().getValue());
-		umsatz.setAnzahl(BigDecimal.valueOf((Double) getAnzahl().getValue()));
-		umsatz.setKurs(BigDecimal.valueOf((Double) getEinzelkurs().getValue()));
-		umsatz.setKosten(BigDecimal.valueOf(faktor * (Double) getKurswert().getValue()));
+		umsatz.setAnzahl(anzahl);
+		umsatz.setKurs(kurs);
+		umsatz.setKosten(istErloes ? kurswert : kurswert.negate());
 		umsatz.setBuchungsdatum((Date) getDate().getValue());
-		umsatz.setSteuern(BigDecimal.valueOf((Double) getSteuern().getValue()));
-		umsatz.setTransaktionsgebuehren(BigDecimal.valueOf((Double) getTransaktionskosten().getValue()));
+		umsatz.setSteuern(st);
+		umsatz.setTransaktionsgebuehren(gebuehren);
 		umsatz.setKommentar((String)getKommentar().getValue());
 		umsatz.store();
 		
@@ -300,8 +343,7 @@ public class UmsatzEditorControl extends AbstractControl
 	public DecimalInput getGesamtSumme() {
 		if (gesamt != null)
 			return gesamt;
-		double d = Double.NaN;
-		gesamt = new DecimalInput(d, new VarDecimalFormat(2));
+		gesamt = new DecimalInput((Number) null, new VarDecimalFormat(2));
 		gesamt.setMandatory(true);
 		gesamt.setEnabled(false);
 		return gesamt;
@@ -316,20 +358,18 @@ public class UmsatzEditorControl extends AbstractControl
 		return kommentar;
 	}
 
-	public Input getKurswert() {
+	public DecimalInput getKurswert() {
 		if (kurswert != null)
 			return kurswert;
-		double d = Double.NaN;
-		kurswert = new DecimalInput(d, new VarDecimalFormat(2, 6));
+		kurswert = new DecimalInput((Number) null, new VarDecimalFormat(2, 6));
 		kurswert.setMandatory(true);
 		return kurswert;
 	}
 
-	public Input getTransaktionskosten() {
+	public DecimalInput getTransaktionskosten() {
 		if (transaktionskosten != null)
 			return transaktionskosten;
-		double d = Double.valueOf("0");
-		transaktionskosten = new DecimalInput(d, new VarDecimalFormat(2, 6));
+		transaktionskosten = new DecimalInput(BigDecimal.ZERO, new VarDecimalFormat(2, 6));
 		transaktionskosten.setMandatory(true);
 		transaktionskosten.addListener(new Listener() {
 
@@ -356,11 +396,10 @@ public class UmsatzEditorControl extends AbstractControl
 		return kurswertberechnen;
 	}
 
-	public Input getSteuern() {
+	public DecimalInput getSteuern() {
 		if (steuern != null)
 			return steuern;
-		double d = Double.valueOf("0");
-		steuern = new DecimalInput(d, new VarDecimalFormat(2, 6));
+		steuern = new DecimalInput(BigDecimal.ZERO, new VarDecimalFormat(2, 6));
 		steuern.setMandatory(true);
 		steuern.addListener(new Listener() {
 

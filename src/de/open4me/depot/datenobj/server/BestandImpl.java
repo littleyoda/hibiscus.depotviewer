@@ -43,21 +43,21 @@ public class BestandImpl extends AbstractDBObject implements Bestand
 	{
 		setAttribute("wpid",name);
 	}
-	public Double getAnzahl() throws RemoteException
+	public BigDecimal getAnzahl() throws RemoteException
 	{
-		return (Double) getAttribute("anzahl");
+		return (BigDecimal) getAttribute("anzahl");
 	}
 
-	public void setAnzahl(Double name) throws RemoteException
+	public void setAnzahl(BigDecimal name) throws RemoteException
 	{
 		setAttribute("anzahl",name);
 	}
-	public Double getKurs() throws RemoteException
+	public BigDecimal getKurs() throws RemoteException
 	{
-		return (Double) getAttribute("kurs");
+		return (BigDecimal) getAttribute("kurs");
 	}
 
-	public void setKurs(Double name) throws RemoteException
+	public void setKurs(BigDecimal name) throws RemoteException
 	{
 		setAttribute("kurs",name);
 	}
@@ -70,12 +70,12 @@ public class BestandImpl extends AbstractDBObject implements Bestand
 	{
 		setAttribute("kursw",name);
 	}
-	public Double getWert() throws RemoteException
+	public BigDecimal getWert() throws RemoteException
 	{
-		return ((BigDecimal) getAttribute("wert")).doubleValue();
+		return (BigDecimal) getAttribute("wert");
 	}
 
-	public void setWert(Double name) throws RemoteException
+	public void setWert(BigDecimal name) throws RemoteException
 	{
 		setAttribute("wert",name);
 	}

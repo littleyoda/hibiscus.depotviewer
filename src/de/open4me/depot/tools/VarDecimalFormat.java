@@ -32,6 +32,10 @@ public class VarDecimalFormat extends DecimalFormat
 		super("###,###,##0." + nullen(nachkommastellen) + StringUtils.repeat('#', extranachkommastellen),new DecimalFormatSymbols(Application.getConfig().getLocale()));
 		this.nachkommastellen = nachkommastellen;
 		setGroupingUsed(true);
+		// Geldbetraege duerfen beim Einlesen nicht ueber double laufen.
+		// Wirkt nur auf parse(), nicht auf format(). DecimalInput.getNumber()
+		// liefert dadurch BigDecimal statt Double.
+		setParseBigDecimal(true);
 	}
 
 	/**

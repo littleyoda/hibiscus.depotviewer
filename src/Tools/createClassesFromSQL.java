@@ -71,7 +71,11 @@ public class createClassesFromSQL {
 			} else if (type.startsWith("date")) {
 				vartype = "Date";
 			} else if (type.startsWith("decimal")) {
-				vartype = "Double";
+				// Geldbetraege/Kurse immer als BigDecimal: JDBC liefert fuer
+				// decimal-Spalten BigDecimal, ein (Double)-Cast wuerde zur
+				// Laufzeit eine ClassCastException werfen.
+				// Die erzeugten Klassen brauchen dann import java.math.BigDecimal.
+				vartype = "BigDecimal";
 			} else if (type.startsWith("numeric")) {
 				vartype = "Integer";
 			} else {

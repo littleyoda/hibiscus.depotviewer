@@ -15,6 +15,7 @@ import de.open4me.depot.gui.menu.BestandsListMenu;
 import de.open4me.depot.gui.parts.PrintfColumn;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.tools.Bestandsabfragen;
+import de.open4me.depot.tools.Zahlen;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Part;
@@ -76,19 +77,15 @@ public class BestandTableControl extends AbstractControl implements Listener
 
 			@SuppressWarnings("unchecked")
 			private String gesamtDepotWert() {
-				double sum = 0.0d;
+				BigDecimal sum = BigDecimal.ZERO;
 				try {
 					for (GenericObjectSQL k: (List<GenericObjectSQL>) getItems())
 					{
-						if (k.getAttribute("wert") == null) {
+						BigDecimal wert = Zahlen.toBigDecimal(k.getAttribute("wert"));
+						if (wert == null) {
 							continue;
 						}
-						if (k.getAttribute("wert") instanceof BigDecimal) {
-							sum += ((BigDecimal) k.getAttribute("wert")).doubleValue();
-						} else {
-							sum += (Double) k.getAttribute("wert");
-
-						}
+						sum = sum.add(wert);
 					}
 				} catch (Exception e) {
 					Logger.error("Kann Gesamtdepotwert nicht berechnen",e);

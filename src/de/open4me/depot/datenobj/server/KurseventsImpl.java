@@ -1,5 +1,6 @@
 package de.open4me.depot.datenobj.server;
 
+import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.Date;
 
@@ -56,12 +57,12 @@ public class KurseventsImpl extends AbstractDBObject implements Kursevents
 	{
 		setAttribute("ratio",name);
 	}
-	public Double getValue() throws RemoteException
+	public BigDecimal getValue() throws RemoteException
 	{
-		return (Double) getAttribute("value");
+		return (BigDecimal) getAttribute("value");
 	}
 
-	public void setValue(Double name) throws RemoteException
+	public void setValue(BigDecimal name) throws RemoteException
 	{
 		setAttribute("value",name);
 	}

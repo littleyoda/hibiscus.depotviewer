@@ -1,5 +1,7 @@
 package de.open4me.depot.hbcijobs;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -208,26 +210,27 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 					String orderid = i.wkn + i.isin + aktion + t.datum + t.anzahl + t.betrag; 
 					try {
 						String waehrung = "";
-						double gesamtbetrag = 0.0d;
-						double einzelbetrag = 0.0d;
+						BigDecimal gesamtbetrag = BigDecimal.ZERO;
+						BigDecimal einzelbetrag = BigDecimal.ZERO;
 						if (t.betrag != null) {
-							gesamtbetrag = t.betrag.getValue().doubleValue();
+							gesamtbetrag = t.betrag.getValue();
 							if ("BIWBDE33XXX".equals(konto.getBic()) || "10130800".equals(konto.getBLZ()))  {
 								// Hack für FlatEx
-								gesamtbetrag = -gesamtbetrag;
+								gesamtbetrag = gesamtbetrag.negate();
 							}
 							waehrung = t.betrag.getCurr();
-							einzelbetrag = Math.abs(gesamtbetrag) / t.anzahl.getValue().doubleValue();
+							// Scale 8 passend zur Spalte kurs decimal(20,8)
+							einzelbetrag = gesamtbetrag.abs().divide(t.anzahl.getValue(), 8, RoundingMode.HALF_UP);
 						}
-						Umsatz u = Utils.addUmsatz(konto.getID(), 
+						Umsatz u = Utils.addUmsatz(konto.getID(),
 								Utils.getORcreateWKN(i.wkn, i.isin, i.name), aktion,
 								i.toString() + "\n" + t.toString(),
-								t.anzahl.getValue().doubleValue(),
+								t.anzahl.getValue(),
 								einzelbetrag, waehrung,
 								gesamtbetrag, waehrung,
 								t.datum,
 								String.valueOf(orderid.hashCode()),
-								"",0.0d, "EUR", 0.0d, "EUR"
+								"", BigDecimal.ZERO, "EUR", BigDecimal.ZERO, "EUR"
 								);
 						UmsatzHelper.storeUmsatzInHibiscus(u);
 					} catch (RemoteException e) {

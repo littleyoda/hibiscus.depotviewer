@@ -144,8 +144,8 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 					}
 				}
 				subtotal = subtotal.add(g.depotwert.getValue());
-				Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, anzahl.doubleValue(), g.price.getValue().doubleValue(), 
-						g.price.getCurr(), g.depotwert.getValue().doubleValue(),  g.depotwert.getCurr(), depot.timestamp, g.timestamp_price);
+				Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, anzahl, g.price.getValue(),
+						g.price.getCurr(), g.depotwert.getValue(),  g.depotwert.getCurr(), depot.timestamp, g.timestamp_price);
 			}
 			total = total.add((depot.total != null) ? depot.total.getValue() : subtotal); // Bei der DKB ist depot.total == null, wenn das Depot leer ist
 		}
