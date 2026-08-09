@@ -9,6 +9,7 @@ import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry.Gattung;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry.Gattung.SubSaldo;
 
 import de.open4me.depot.abruf.impl.BasisDepotAbruf;
+import de.open4me.depot.abruf.utils.PropHelper;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.tools.UmsatzeAusBestandsAenderung;
 import de.willuhn.jameica.hbci.HBCIProperties;
@@ -102,6 +103,9 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 		GVRWPDepotList result=(GVRWPDepotList) getJobResult();
 		if (!result.isOK()) {
 			throw new ApplicationException(result.getJobStatus().getErrorString());
+		}
+		if (Boolean.valueOf(konto.getMeta(PropHelper.DEBUGPROTOKOLL, "false"))) {
+			HBCIDepotCsvDumper.dumpBestand(result, konto);
 		}
 //		if (result.getEntries().length > 1) {
 //			String out = "";

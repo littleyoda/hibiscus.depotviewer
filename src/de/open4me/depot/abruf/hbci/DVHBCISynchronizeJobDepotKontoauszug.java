@@ -78,7 +78,7 @@ public class DVHBCISynchronizeJobDepotKontoauszug extends SynchronizeJobKontoaus
 	  	}
 		BasisDepotAbruf x = DepotAbrufFabrik.getDepotAbrufHBCI(k);
 		if (x == null) {
-			List<String> liste = Arrays.asList(new String[]{PropHelper.NURBESTANDINKLFORMAT});
+			List<String> liste = Arrays.asList(new String[]{PropHelper.NURBESTANDINKLFORMAT, PropHelper.DEBUGPROTOKOLLINKLFORMAT});
 			return liste;
 		}
 		return x.getPROP(k);

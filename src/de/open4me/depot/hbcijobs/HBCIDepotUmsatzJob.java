@@ -14,6 +14,7 @@ import org.kapott.hbci.GV_Result.GVRWPDepotUms.Entry.FinancialInstrument;
 import org.kapott.hbci.GV_Result.GVRWPDepotUms.Entry.FinancialInstrument.Transaction;
 import org.kapott.hbci.structures.TypedValue;
 
+import de.open4me.depot.abruf.utils.PropHelper;
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.datenobj.DepotAktion;
 import de.open4me.depot.datenobj.rmi.Umsatz;
@@ -160,6 +161,9 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 			GVRWPDepotUms result =(GVRWPDepotUms) getJobResult();
 			if (!result.isOK()) {
 				throw new ApplicationException(result.getJobStatus().getErrorString());
+			}
+			if (Boolean.valueOf(konto.getMeta(PropHelper.DEBUGPROTOKOLL, "false"))) {
+				HBCIDepotCsvDumper.dumpUmsaetze(result, konto);
 			}
 			parseDepotUmsatz(result, konto);
 

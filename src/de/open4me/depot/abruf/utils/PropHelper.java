@@ -7,12 +7,15 @@ public class PropHelper {
 	public final static String PROP_OPTIONS = "Optionen (kann leer bleiben)";
 	public final static String NURBESTAND = "Nur Bestand via HBCI abholen?";
 	public final static String NURBESTANDINKLFORMAT = NURBESTAND  + "(true/false)";
+	public final static String DEBUGPROTOKOLL = "Debug: Umsätze und Bestand als Protokoll speichern";
+	public final static String DEBUGPROTOKOLLINKLFORMAT = DEBUGPROTOKOLL + "(true/false)";
 	//public final static String UMSAETZEERGAENZEN = "Umsätze aus Bestandsänderungen ermitteln?";
 	//public final static String UMSAETZEERGAENZENINCLFORMAT = UMSAETZEERGAENZEN + "(true/false)";
 
 	public static List<String> getPROP() {
 		List<String> result = new ArrayList<String>();
 		result.add(PROP_OPTIONS);
+		result.add(DEBUGPROTOKOLLINKLFORMAT);
 	//	result.add(UMSAETZEERGAENZENINCLFORMAT);
 		return result;
 
