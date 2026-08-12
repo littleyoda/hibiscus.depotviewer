@@ -135,6 +135,7 @@
 		<antcall target="addlib"/>
 
 		<copy file="plugin.xml" todir="${project.zipdir}" />
+		<copy file="ChangeLog.txt" todir="${project.zipdir}" />
 
 		<!-- create zip file -->
 		<zip destfile="${project.release}/${define.zipfilename}">
