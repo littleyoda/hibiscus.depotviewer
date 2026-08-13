@@ -2,6 +2,7 @@ package de.open4me.depot.gui.control;
 
 import java.awt.Font;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.AttributedString;
 import java.util.Date;
 
@@ -24,6 +25,7 @@ import org.jfree.util.SortOrder;
 import de.open4me.depot.gui.DatumsSlider;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.tools.Bestandsabfragen;
+import de.open4me.depot.tools.Zahlen;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
@@ -75,7 +77,7 @@ public class BestandPieChartControl implements Listener
 		                try {
 		                    Number value = dataset.getValue(key);
 		                    if (value != null) {
-		                        long euroValue = Math.round(value.doubleValue());
+		                        long euroValue = Zahlen.toBigDecimal(value).setScale(0, RoundingMode.HALF_UP).longValue();
 		                        result = key.toString() + " (" + euroValue + " €)";
 		                    } else {
 		                        result = key.toString();
@@ -106,27 +108,23 @@ public class BestandPieChartControl implements Listener
 						dataset.clear();
 						break;
 					}
-					double wert;
-					if (anzahl instanceof BigDecimal) {
-						wert = ((BigDecimal) anzahl).doubleValue();
-					} else {
-						wert = (Double) anzahl;
-					}
-					
+					BigDecimal wert = Zahlen.toBigDecimal(anzahl);
+
 					// Addiere Werte für das gleiche Wertpapier aus verschiedenen Depots
 					String wertpapiername = (String) x.getAttribute("wertpapiername");
-					
+
 					// Prüfe ob das Wertpapier bereits im Dataset vorhanden ist
 					try {
 						Number existingValue = dataset.getValue(wertpapiername);
 						if (existingValue != null) {
 							// Addiere zum bestehenden Wert
-							wert += existingValue.doubleValue();
+							wert = wert.add(Zahlen.toBigDecimal(existingValue));
 						}
 					} catch (Exception e) {
 						// Key existiert noch nicht, das ist in Ordnung
 					}
-					
+
+					// bindet an setValue(Comparable, Number) - der Wert bleibt BigDecimal
 					dataset.setValue(wertpapiername, wert);
 				}
 				dataset.sortByValues(SortOrder.DESCENDING);

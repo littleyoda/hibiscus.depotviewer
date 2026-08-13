@@ -157,7 +157,8 @@ public class SQLUtils {
 
 
 	public static void checkforupdates() throws ApplicationException {
-		List<SQLChange> liste = SQLChange.getChangesSinceVersion(getCurrentDBVersion());
+		int currentversion = getCurrentDBVersion(); // initialisiert nebenbei den Treiber
+		List<SQLChange> liste = SQLChange.getChangesSinceVersion(currentversion, driver instanceof DBSupportMySqlImpl);
 		try(Connection conn = getConnection();) {
 			for (SQLChange changeset : liste) {
 				Logger.info("Depot-Viewer: Updating DB to " + changeset.getVersion());

@@ -24,6 +24,17 @@ public class SQLChange {
 	}
 
 	public static List<SQLChange> getChangesSinceVersion(int currentversion) {
+		return getChangesSinceVersion(currentversion, false);
+	}
+
+	/**
+	 * Liefert die Changesets seit der übergebenen Version.
+	 * Ab Version 19 unterscheiden sich die Statements je nach Datenbank,
+	 * da H2 2.x kein "MODIFY COLUMN" mehr versteht und MySQL kein "ALTER COLUMN &lt;typ&gt;".
+	 * @param currentversion aktuelle dbversion
+	 * @param mysql true für MySQL/MariaDB, false für H2 (Hibiscus-Standard)
+	 */
+	public static List<SQLChange> getChangesSinceVersion(int currentversion, boolean mysql) {
 		ArrayList<SQLChange> liste = new ArrayList<SQLChange>();
 		if (currentversion < 3) {
 
@@ -209,9 +220,44 @@ public class SQLChange {
 					"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `aktion` varchar(30) NOT NULL;"));
 		}
 		if (currentversion < 18) {
-			liste.add(new SQLChange(18, 	
+			liste.add(new SQLChange(18,
 					"create index idxKurseId on depotviewer_kurse(id);"
 					));
+		}
+		if (currentversion < 19) {
+			// Erweiterung aller Geld-/Kurs-Spalten von decimal(20,6) bzw. decimal(10,5) auf decimal(20,8)
+			if (mysql) {
+				liste.add(new SQLChange(19,
+						"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `kurs` decimal(20,8);",
+						"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `kosten` decimal(20,8);",
+						"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `transaktionskosten` decimal(20,8);",
+						"ALTER TABLE depotviewer_umsaetze MODIFY  COLUMN  `steuern` decimal(20,8);",
+
+						"ALTER TABLE depotviewer_bestand MODIFY  COLUMN  `kurs` decimal(20,8);",
+						"ALTER TABLE depotviewer_bestand MODIFY  COLUMN  `wert` decimal(20,8);",
+
+						"ALTER TABLE depotviewer_kurse MODIFY  COLUMN  `kurs` decimal(20,8);",
+						"ALTER TABLE depotviewer_kurse MODIFY  COLUMN  `kursperf` decimal(20,8);",
+
+						"ALTER TABLE depotviewer_kursevent MODIFY  COLUMN  `value` decimal(20,8);"
+						));
+			} else {
+				liste.add(new SQLChange(19,
+						"ALTER TABLE depotviewer_umsaetze ALTER COLUMN kurs decimal(20,8);",
+						"ALTER TABLE depotviewer_umsaetze ALTER COLUMN kosten decimal(20,8);",
+						"ALTER TABLE depotviewer_umsaetze ALTER COLUMN transaktionskosten decimal(20,8);",
+						"ALTER TABLE depotviewer_umsaetze ALTER COLUMN steuern decimal(20,8);",
+
+						"ALTER TABLE depotviewer_bestand ALTER COLUMN kurs decimal(20,8);",
+						"ALTER TABLE depotviewer_bestand ALTER COLUMN wert decimal(20,8);",
+
+						"ALTER TABLE depotviewer_kurse ALTER COLUMN kurs decimal(20,8);",
+						"ALTER TABLE depotviewer_kurse ALTER COLUMN kursperf decimal(20,8);",
+
+						// "value" ist ab H2 2.x ein Schlüsselwort und muss gequotet werden
+						"ALTER TABLE depotviewer_kursevent ALTER COLUMN \"VALUE\" decimal(20,8);"
+						));
+			}
 		}
 
 //		liste.add(new SQLChange(currentversion,

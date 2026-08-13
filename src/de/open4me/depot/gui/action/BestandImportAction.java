@@ -98,7 +98,7 @@ public class BestandImportAction implements Action {
 				}
 
 				if (x.getAttribute("kurs").toString().isEmpty()  && !x.getAttribute("wert").toString().isEmpty()) {
-					BigDecimal d = ((BigDecimal) x.getAttribute("wert")).divide((BigDecimal) x.getAttribute("anzahl"),5, RoundingMode.HALF_UP);
+					BigDecimal d = ((BigDecimal) x.getAttribute("wert")).divide((BigDecimal) x.getAttribute("anzahl"),8, RoundingMode.HALF_UP);
 					x.setAttribute("kurs", d);
 				}
 				if (!x.getAttribute("kurs").toString().isEmpty()  && x.getAttribute("wert").toString().isEmpty()) {
@@ -140,10 +140,10 @@ public class BestandImportAction implements Action {
 				Utils.addBestand(
 						Utils.getORcreateWKN((String) x.getAttribute("wkn"), (String) x.getAttribute("isin"), (String) x.getAttribute("name")),
 						konto,
-						((BigDecimal) x.getAttribute("anzahl")).doubleValue(),
-						((BigDecimal) x.getAttribute("kurs")).doubleValue(),
+						(BigDecimal) x.getAttribute("anzahl"),
+						(BigDecimal) x.getAttribute("kurs"),
 						handleCurrency(kursW),
-						((BigDecimal) x.getAttribute("wert")).doubleValue(),
+						(BigDecimal) x.getAttribute("wert"),
 						handleCurrency(wertW),
 						(Date) x.getAttribute("date"),
 						(Date) x.getAttribute("date"));

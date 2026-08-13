@@ -15,6 +15,7 @@ import de.open4me.depot.gui.menu.BestandsListMenu;
 import de.open4me.depot.gui.parts.PrintfColumn;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.tools.Bestandsabfragen;
+import de.open4me.depot.tools.Zahlen;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Part;
@@ -76,19 +77,15 @@ public class BestandTableControl extends AbstractControl implements Listener
 
 			@SuppressWarnings("unchecked")
 			private String gesamtDepotWert() {
-				double sum = 0.0d;
+				BigDecimal sum = BigDecimal.ZERO;
 				try {
 					for (GenericObjectSQL k: (List<GenericObjectSQL>) getItems())
 					{
-						if (k.getAttribute("wert") == null) {
+						BigDecimal wert = Zahlen.toBigDecimal(k.getAttribute("wert"));
+						if (wert == null) {
 							continue;
 						}
-						if (k.getAttribute("wert") instanceof BigDecimal) {
-							sum += ((BigDecimal) k.getAttribute("wert")).doubleValue();
-						} else {
-							sum += (Double) k.getAttribute("wert");
-
-						}
+						sum = sum.add(wert);
 					}
 				} catch (Exception e) {
 					Logger.error("Kann Gesamtdepotwert nicht berechnen",e);
@@ -104,7 +101,7 @@ public class BestandTableControl extends AbstractControl implements Listener
 		bestandsList.addColumn(Settings.i18n().tr("Depot"), "bezeichnung");
 		bestandsList.addColumn(Settings.i18n().tr("WKN"),"wkn");
 		bestandsList.addColumn(Settings.i18n().tr("Name"),"wertpapiername");
-		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.5f", "anzahl"));
+		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.8f", "anzahl"));
 		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Kurs"), "kurs", "%,.6f %s", "kurs", "kursw"));
 		bestandsList.addColumn(new PrintfColumn(Settings.i18n().tr("Wert"), "wert", "%,.2f %s", "wert", "wertw"));
 		bestandsList.addColumn(Settings.i18n().tr("Bewertungsdatum"),"bewertungszeitpunkt", new DateFormatter(Settings.DATEFORMAT));

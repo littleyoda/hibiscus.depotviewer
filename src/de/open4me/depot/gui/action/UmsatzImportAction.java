@@ -121,7 +121,7 @@ public class UmsatzImportAction implements Action {
 					x.setAttribute("anzahl", ((BigDecimal) x.getAttribute("anzahl")).abs());
 				}
 				if (x.getAttribute("kurs").toString().isEmpty()  && !x.getAttribute("kosten").toString().isEmpty()) {
-					BigDecimal d = ((BigDecimal) x.getAttribute("kosten")).divide((BigDecimal) x.getAttribute("anzahl"),5, RoundingMode.HALF_UP);
+					BigDecimal d = ((BigDecimal) x.getAttribute("kosten")).divide((BigDecimal) x.getAttribute("anzahl"),8, RoundingMode.HALF_UP);
 					x.setAttribute("kurs", d);
 				}
 				if (!x.getAttribute("kurs").toString().isEmpty()  && x.getAttribute("kosten").toString().isEmpty()) {

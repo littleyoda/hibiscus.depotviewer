@@ -6,11 +6,10 @@ import java.util.Map;
 
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.open4me.depot.abruf.utils.Utils;
+import de.open4me.depot.tools.Zahlen;
 import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
 import de.willuhn.jameica.messaging.QueryMessage;
-import de.willuhn.jameica.hbci.rmi.Konto;
-import de.willuhn.util.ApplicationException;
 
 
 public class PortfolioMessageConsumer implements MessageConsumer
@@ -43,10 +42,10 @@ public class PortfolioMessageConsumer implements MessageConsumer
     	Utils.addBestand(
     			Utils.getORcreateWKN((String) h.get("wkn"),(String)h.get("isin"),(String)h.get("name")),
     			(Konto) h.get("konto"),
-    			(Double) h.get("anzahl"),
-    			(Double) h.get("kurs"),
+    			Zahlen.toBigDecimal(h.get("anzahl")),
+    			Zahlen.toBigDecimal(h.get("kurs")),
     			(String) h.get("kursw"),
-    			(Double) h.get("wert"),
+    			Zahlen.toBigDecimal(h.get("wert")),
     			(String) h.get("wertw"),
     			(Date) h.get("datum"),
     			(Date) h.get("bewertungszeitpunkt"));

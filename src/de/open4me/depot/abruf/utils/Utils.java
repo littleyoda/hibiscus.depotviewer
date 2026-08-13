@@ -32,6 +32,7 @@ import de.open4me.depot.datenobj.rmi.Wertpapier;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
+import de.open4me.depot.tools.Zahlen;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.gui.dialogs.YesNoDialog;
 import de.willuhn.jameica.hbci.rmi.Konto;
@@ -86,13 +87,10 @@ public class Utils {
 		return Application.getPluginLoader().getPlugin(class1).getResources().getWorkPath();
 	}
 
-	public static Double getDoubleFromZahl(String s) {
-		return Double.parseDouble(s.replace(".", "").replace(",","."));
-	}
-	
 	public static DepotAktion checkTransaktionsBezeichnung(String aktion) {
 		return DepotAktion.getByString(aktion);
 	}
+
 
 	/**
 	 * Speichert einen Wertpapier-Umsatz in der Datenbanktabelle DEPOTVIEWER_UMSATZ und liefert das erzeugte Umsatz-Objekt zurück.
@@ -112,12 +110,12 @@ public class Utils {
 	 * @param kommentar
 	 * @throws ApplicationException
 	 */
-	public static Umsatz addUmsatz(String kontoid, String wpid, String aktion, String info, Double anzahl, 
-			Double kurs, String kursW, Double kosten, String kostenW, Date date, String orderid, String kommentar,
-			Double gebuehren, String gebuehrenW, Double steuern, String steuernW) throws ApplicationException {
+	public static Umsatz addUmsatz(String kontoid, String wpid, String aktion, String info, BigDecimal anzahl,
+			BigDecimal kurs, String kursW, BigDecimal kosten, String kostenW, Date date, String orderid, String kommentar,
+			BigDecimal gebuehren, String gebuehrenW, BigDecimal steuern, String steuernW) throws ApplicationException {
 		try {
 			if (orderid == null) {
-				orderid = "" + ("" + kontoid + wpid + aktion + date + anzahl + kurs + kursW).hashCode();
+				orderid = Zahlen.berechneOrderId(kontoid, wpid, aktion, date, anzahl, kurs, kursW);
 				Logger.info("Transaction-ID is null. Calculate id to " + orderid);
 			}
 			DBIterator<Umsatz> liste = Settings.getDBService().createList(Umsatz.class);
@@ -131,8 +129,8 @@ public class Utils {
 				Logger.error("Unbekannte Buchungsart: " + aktion);
 				return null;
 			}
-			if ((a.equals(DepotAktion.KAUF) && (kosten > 0.0f))
-					|| (a.equals(DepotAktion.VERKAUF) && (kosten < 0.0f))) {
+			if ((a.equals(DepotAktion.KAUF) && (kosten.signum() > 0))
+					|| (a.equals(DepotAktion.VERKAUF) && (kosten.signum() < 0))) {
 				throw new ApplicationException("Bei Käufen muss der Gesamtbetrag negativ sein, beim Verkauf positiv. ("
 						+ aktion.toUpperCase() + " " + kosten + ")");
 			}
@@ -149,17 +147,17 @@ public class Utils {
 			p.setAktion(a);
 			p.setBuchungsinformationen(info);
 			p.setWPid(wpid);
-			p.setAnzahl(new BigDecimal(anzahl));
-			p.setKurs(new BigDecimal(kurs));
+			p.setAnzahl(anzahl);
+			p.setKurs(kurs);
 			p.setKursW(kursW);
-			p.setKosten(new BigDecimal(kosten));
+			p.setKosten(kosten);
 			p.setKostenW(kostenW);
 			p.setBuchungsdatum(date);
 			p.setOrderid(orderid);
 			p.setKommentar(kommentar);
-			p.setSteuern(new BigDecimal(steuern));
+			p.setSteuern(steuern);
 			p.setSteuernW(steuernW);
-			p.setTransaktionsgebuehren(new BigDecimal(gebuehren));
+			p.setTransaktionsgebuehren(gebuehren);
 			p.setTransaktionsgebuehrenW(gebuehrenW);
 			p.store();
 			
@@ -228,8 +226,8 @@ public class Utils {
 	}
 
 
-	public static void addBestand(String wpid, Konto konto, Double anzahl, 
-			Double kurs, String kursw, double wert, String wertw, Date date, Date bewertungsZeitpunkt) throws ApplicationException {
+	public static void addBestand(String wpid, Konto konto, BigDecimal anzahl,
+			BigDecimal kurs, String kursw, BigDecimal wert, String wertw, Date date, Date bewertungsZeitpunkt) throws ApplicationException {
 		try {
 			markRecalc(konto);
 			Bestand p = (Bestand) Settings.getDBService().createObject(Bestand.class,null);

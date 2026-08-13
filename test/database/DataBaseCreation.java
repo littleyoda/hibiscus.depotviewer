@@ -23,7 +23,7 @@ public class DataBaseCreation {
 	public void runH2() throws ClassNotFoundException, SQLException, IOException {
 		File file = File.createTempFile("depotviewer", "test");
 		file.delete(); // Not safe, but in this case ok
-		test("org.h2.Driver","jdbc:h2:" + file.getAbsolutePath(), "", "");
+		test("org.h2.Driver","jdbc:h2:" + file.getAbsolutePath(), "", "", false);
 	}
 
 	@Test
@@ -35,7 +35,7 @@ public class DataBaseCreation {
 			reader.close();
 
 		String dbname = createTempDB("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/", credentail.getProperty("user"), credentail.getProperty("pwd"));
-		test("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/" + dbname + "?useUnicode=Yes&characterEncoding=ISO8859_1", "hibiscus", "hibiscus");
+		test("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/" + dbname + "?useUnicode=Yes&characterEncoding=ISO8859_1", "hibiscus", "hibiscus", true);
 	}
 
 	private String createTempDB(String classname, String jdbc, String user, String pwd) throws ClassNotFoundException, SQLException {
@@ -83,12 +83,12 @@ public class DataBaseCreation {
 		conn.commit();
 	}
 
-	public void test(String classname, String jdbc, String user, String pwd) throws ClassNotFoundException, SQLException {
+	public void test(String classname, String jdbc, String user, String pwd, boolean mysql) throws ClassNotFoundException, SQLException {
 		Class.forName(classname);
 
 
 
-		List<SQLChange> liste = SQLChange.getChangesSinceVersion(0);
+		List<SQLChange> liste = SQLChange.getChangesSinceVersion(0, mysql);
 		Connection conn = null;
 
 		conn = DriverManager.getConnection(jdbc, user, pwd);

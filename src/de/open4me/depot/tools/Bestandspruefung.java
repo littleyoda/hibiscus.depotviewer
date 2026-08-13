@@ -136,7 +136,7 @@ public class Bestandspruefung {
 			}
 			
 			// Bestand hinzufügen
-			Utils.addBestand(position.getKey().toString(), k, position.getValue().doubleValue(), kurs.doubleValue(), kursW, wert.doubleValue(), wertW, new Date(), bewertung);
+			Utils.addBestand(position.getKey().toString(), k, position.getValue(), kurs, kursW, wert, wertW, new Date(), bewertung);
 		}
 		k.setSaldo(saldo.doubleValue());
 		k.store();

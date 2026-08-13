@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Event;
@@ -17,7 +16,6 @@ import de.open4me.depot.gui.parts.PrintfColumn;
 import de.open4me.depot.sql.GenericObjectHashMap;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
-import de.open4me.depot.tools.Bestandsabfragen;
 import de.open4me.depot.tools.WertBerechnung;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
@@ -119,7 +117,7 @@ public class BewertungsControl extends AbstractControl {
 		wertList.addColumn(Settings.i18n().tr("Name"),"wertpapiername");
 		wertList.addColumn(Settings.i18n().tr("ISIN"),"isin");
 		wertList.addColumn(Settings.i18n().tr("WKN"),"wkn");
-		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.5f", "anzahl"));
+		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Anzahl"), "anzahl",	"%,.8f", "anzahl"));
 		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Einstandspreis"), "einstand", "%,.2f %s", "einstand", "währung"));
 		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Verkaufserlöse"), "erloese", "%,.2f %s", "erloese", "währung"));
 		wertList.addColumn(new PrintfColumn(Settings.i18n().tr("Aktueller Wert"), "wert", "%,.2f %s", "wert", "währung"));

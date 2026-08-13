@@ -120,6 +120,10 @@ public class Bestandsabfragen implements AccountBalanceProvider {
 
 		    int numdays = (int)Utils.getDifferenceDays(start, end) + 1;
 		    BigDecimal[] wpTagWerte = new BigDecimal[numdays]; // für das aktuelle Wertpapier werden hier Anzahl * Kurs für jeden Tag verwaltet
+		    // Tagessummen über alle Wertpapiere exakt aufaddieren; erst zum Schluss
+		    // nach double wandeln, da Value (Hibiscus) nur double kennt
+		    BigDecimal[] tagesSummen = new BigDecimal[numdays];
+		    Arrays.fill(tagesSummen, BigDecimal.ZERO);
 
 		    // Ausgabe vorbereiten
 		    data = new ArrayList<Value>(numdays);
@@ -182,9 +186,13 @@ public class Bestandsabfragen implements AccountBalanceProvider {
 
 				// Werte des Wertpapiers auf Ergebnis summieren
 				for (tagIdx = 0; tagIdx < numdays; ++tagIdx) {
-			    	Value v = data.get(tagIdx);
-			    	v.setValue(v.getValue() + wpTagWerte[tagIdx].doubleValue());
+			    	tagesSummen[tagIdx] = tagesSummen[tagIdx].add(wpTagWerte[tagIdx]);
 			    }
+			}
+
+			// Exakte Tagessummen an die (double-basierte) Hibiscus-API übergeben
+			for (int tagIdx = 0; tagIdx < numdays; ++tagIdx) {
+				data.get(tagIdx).setValue(tagesSummen[tagIdx].doubleValue());
 			}
 		} catch (Exception e) {
 			Logger.error("Fehler beim der Ermittlung der Depotsalden des DeportViewers", e);

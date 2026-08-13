@@ -95,14 +95,14 @@ public class UmsatzeAusBestandsAenderung {
 						"" + wpid,
 						(isKauf) ? DepotAktion.KAUF.internal() : DepotAktion.VERKAUF.internal(),
 								"",
-								diff.abs().doubleValue(),
-								((BigDecimal) ref.getAttribute("kurs")).doubleValue(),
+								diff.abs(),
+								(BigDecimal) ref.getAttribute("kurs"),
 								(String) ref.getAttribute("kursw"),
-								(isKauf) ? ((BigDecimal) ref.getAttribute("wert")).negate().doubleValue() : ((BigDecimal) ref.getAttribute("wert")).doubleValue(),
+								(isKauf) ? ((BigDecimal) ref.getAttribute("wert")).negate() : (BigDecimal) ref.getAttribute("wert"),
 										(String) ref.getAttribute("kursw"),
 										(Date) ref.getAttribute("datum"),
 										null, "aus Bestandsänderungen generierte Schätzung"
-										,0.0d, "EUR", 0.0d, "EUR");
+										, BigDecimal.ZERO, "EUR", BigDecimal.ZERO, "EUR");
 				UmsatzHelper.storeUmsatzInHibiscus(u);
 			}
 		} catch (Exception e) {

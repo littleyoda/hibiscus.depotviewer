@@ -77,7 +77,7 @@
 		<mkdir dir="${class.dir}" />
 
 		<javac debug="true" debuglevel="lines,vars,source" deprecation="true"
-		       source="${define.java.version}" target="${define.java.version}"
+		       release="${define.java.version}"
 		       includeantruntime="false"
 		       encoding="${define.encoding}"
 		       srcdir="${src.dir}"
