@@ -1,28 +1,91 @@
 1.1.1 -- 2026-08-08
+	Prüfung von Duplikaten beim Bearbeiten und Anlegen von Wertpapieren
+	Depotviewer & SQL-Backend
+	Beenden-Button im JSQ-Dialog ergänzt
+
 1.1.0 -- 2026-08-03
+	CSV-Import: Vorschautabelle auf 100 Zeilen begrenzt
+	CSV-Import: erneutes Parsen überspringen, wenn Datei und Einstellungen unverändert sind
+	CSV-Import: leere Zeilen effizienter erkennen
+	CSV-Import Stage 2: Dialoghöhe auf 90% der Monitorhöhe begrenzt
+	HTMLUnit-Libraries in das Release aufgenommen
+
 1.0.3 -- 2026-07-24
+
 1.0.1 -- 2026-07-24
+	Abhängigkeit zu ly.toolkit entfernt
+
 1.0.0 -- 2026-07-12
+	Optionale Unterstützung für den MCP-Server aus dem hibiscus.ly.reports-Plugin
+
 0.9.4 -- 2026-07-10
+	banken.md aktualisiert
+
 0.9.3 -- 2026-07-10
+	Aufräumarbeiten
+	Debug-Ausgaben und kleinere Fixes
+	Export für Portfolio Performance
+	Unterstützung für das Reports-Plugin
+
 0.9.2 -- 2026-03-25
+	Alle Konten berücksichtigen, die als Wertpapierdepot markiert sind
+
 0.9.1 -- 2026-03-25
-0.9.0 -- 2026-03-25
+	Benachrichtigung über neue Nachrichten korrigiert
+
 0.9.0 -- 2026-03-24
+	Message Consumer für Depotbestand und Depotumsätze zur Nutzung durch andere Plugins
+
 0.8.5 -- 2026-03-23
-0.8.4 -- 2026-03-23
+	Änderungen an java.util.Date-Deprecations zurückgenommen
+
 0.8.4 -- 2026-03-16
+	Name der Xetra-Liste angepasst
+	Deprecation-Warnung für RoundingMode.ROUND_HALF_UP behoben
+	Unbenutzte Imports und unbenutzten Code entfernt
+	Generics für DBIterator, GenericObjectHashMap und SQLXYDataset ergänzt
+	Deprecation-Warnungen für java.util.Date sowie Integer/Long-Konstruktoren bearbeitet
+	SQLXYDataset-Fix korrigiert
+
 0.8.3 -- 2026-03-15
+	CSV-Import ignoriert leere Zeilen
+	Mehrere Einträge im Orderbuch können markiert und gelöscht werden
+	Compile-Fehler aus Pull Requests #142 und #143 behoben
+	GUI-Verbesserungen, unter anderem gespeicherte Auswahlen
+	Screen-Scraping-Hinweise geklärt
+	Lösch-Warnung im Orderbuch angepasst
+	Export-Funktion im Orderbuch ergänzt
+
 0.8.2 -- 2025-08-05
+	Fehlermeldung bei Gewinn / Verlust im Depotviewer verbessert
+	Gewinn / Verlust nach Depot oder aktuellem Bestand filterbar
+	Dateigröße angepasst
+	Filtermöglichkeiten in der Wertpapierübersicht ergänzt
+
 0.8.0 -- 2025-08-03
+	SWT FormText Entity-Parsing-Fehler behoben
+	Consors: Buchungstyp T wird übersprungen
+	Korrekturen für Inkonsistenzen erleichtert
+	Filtermöglichkeit im Orderbuch ergänzt
+	Grafische Portfolio-Anzeige berücksichtigt Wertpapiere in mehreren Depots
+
 0.7.5 -- 2025-08-03
-0.7.5 -- 2025-08-03
-	Consors: Stornierte Aktienkäufe
+	Sicherheitsabfrage beim Löschen ergänzt
+	Consors: stornierte Buchungen korrigiert
+
 0.7.4 -- 2025-04-02
-0.7.3 -- 2025-04-02
+	Patch für BewertungsControl übernommen
+	Sonderbehandlung für DKB-Depot: maximal 16 Tage rückwirkend
+	Weitere Aktualisierungen
+
 0.7.3 -- 2024-12-02
+	Depotwert berechnen, wenn die Bank diesen nicht zurückliefert
+
 0.7.2 -- 2024-08-10
-	[Fix] Changes for Java 17
+	README aktualisiert
+	JavaStockQuotes auf 0.1.4 für Java-17-Unterstützung aktualisiert
+	JavaStockQuotes neu kompiliert und Rhino-Jar ergänzt
+
 0.7.1 -- 2024-03-17
 	[Fix] Libary neu compilert, damit  weiterhin Java 8 ausreicht
 0.7.0 -- 2024-03-16
