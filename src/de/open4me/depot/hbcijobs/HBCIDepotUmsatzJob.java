@@ -172,7 +172,7 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 		}
 	}
 
-	protected void parseDepotUmsatz(GVRWPDepotUms ret, Konto konto) throws ApplicationException {
+	protected void parseDepotUmsatz(GVRWPDepotUms ret, Konto konto) throws ApplicationException, RemoteException {
 		List<Transaction> unbekannte = new ArrayList<Transaction>(); 
 		for(Entry entry : ret.getEntries()) {
 			for (FinancialInstrument i : entry.instruments) {
@@ -193,20 +193,11 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 								+ t.toString());
 						continue;
 					}
-					String aktion = "";
-					if (t.transaction_indicator == Transaction.INDICATOR_CORPORATE_ACTION 
-							&& t.richtung == Transaction.RICHTUNG_ERHALT) {
-						aktion = DepotAktion.EINBUCHUNG.internal();
-					} else if (t.transaction_indicator == Transaction.INDICATOR_CORPORATE_ACTION 
-							&& t.richtung == Transaction.RICHTUNG_LIEFERUNG) {
-						aktion = DepotAktion.AUSBUCHUNG.internal();
-					} else if (t.transaction_indicator == Transaction.INDICATOR_SETTLEMENT_CLEARING 
-							&& t.richtung == Transaction.RICHTUNG_ERHALT) {
-						aktion = DepotAktion.KAUF.internal();
-					}  else if (t.transaction_indicator == Transaction.INDICATOR_SETTLEMENT_CLEARING 
-							&& t.richtung == Transaction.RICHTUNG_LIEFERUNG) {
-						aktion = DepotAktion.VERKAUF.internal();
-					} else {
+					String aktion = getAktion(konto, t);
+					if (aktion == null) {
+						continue;
+					}
+					if (aktion.length() == 0) {
 						de.willuhn.logging.Logger.error("Unbekannte Transaktion. Bitte nehmen sie Kontakt zum Author auf.\n"
 								+ t.toString());
 						continue;
@@ -217,11 +208,7 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 						BigDecimal gesamtbetrag = BigDecimal.ZERO;
 						BigDecimal einzelbetrag = BigDecimal.ZERO;
 						if (t.betrag != null) {
-							gesamtbetrag = t.betrag.getValue();
-							if ("BIWBDE33XXX".equals(konto.getBic()) || "10130800".equals(konto.getBLZ()))  {
-								// Hack für FlatEx
-								gesamtbetrag = gesamtbetrag.negate();
-							}
+							gesamtbetrag = getGesamtbetrag(konto, aktion, t.betrag.getValue());
 							waehrung = t.betrag.getCurr();
 							// Scale 8 passend zur Spalte kurs decimal(20,8)
 							einzelbetrag = gesamtbetrag.abs().divide(t.anzahl.getValue(), 8, RoundingMode.HALF_UP);
@@ -251,6 +238,68 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 			}
 			throw new ApplicationException("Es wurden Transactionen von einem unbekannten Typ gefunden.\nBitte kontaktieren sie den Autor (depotviewer@open4me.de) und senden sie ihm, falls es für sie akzeptabel ist, bitte das Logfiles (jameica.log) zu!");
 		}
+	}
+
+	private String getAktion(Konto konto, Transaction t) throws RemoteException
+	{
+		if (isBLZ75090300(konto)) {
+			return getAktionBLZ75090300(t);
+		}
+		if (t.transaction_indicator == Transaction.INDICATOR_CORPORATE_ACTION
+				&& t.richtung == Transaction.RICHTUNG_ERHALT) {
+			return DepotAktion.EINBUCHUNG.internal();
+		} else if (t.transaction_indicator == Transaction.INDICATOR_CORPORATE_ACTION
+				&& t.richtung == Transaction.RICHTUNG_LIEFERUNG) {
+			return DepotAktion.AUSBUCHUNG.internal();
+		} else if (t.transaction_indicator == Transaction.INDICATOR_SETTLEMENT_CLEARING
+				&& t.richtung == Transaction.RICHTUNG_ERHALT) {
+			return DepotAktion.KAUF.internal();
+		} else if (t.transaction_indicator == Transaction.INDICATOR_SETTLEMENT_CLEARING
+				&& t.richtung == Transaction.RICHTUNG_LIEFERUNG) {
+			return DepotAktion.VERKAUF.internal();
+		}
+		return "";
+	}
+
+	private String getAktionBLZ75090300(Transaction t)
+	{
+		String freitext = t.freitext_details == null ? "" : t.freitext_details.trim();
+		if ("Kauf".equalsIgnoreCase(freitext)) {
+			return DepotAktion.KAUF.internal();
+		}
+		if ("Verkauf".equalsIgnoreCase(freitext)) {
+			return DepotAktion.VERKAUF.internal();
+		}
+		if ("Dividende".equalsIgnoreCase(freitext)) {
+			Logger.info("BLZ 75090300: Dividende wird nicht als Depot-Order importiert.\n" + t.toString());
+			return null;
+		}
+		Logger.warn("BLZ 75090300: Depotumsatz wird nicht als Order importiert. Freitext: "
+				+ freitext + "\n" + t.toString());
+		return null;
+	}
+
+	private BigDecimal getGesamtbetrag(Konto konto, String aktion, BigDecimal betrag) throws RemoteException
+	{
+		if (isBLZ75090300(konto)) {
+			BigDecimal absolut = betrag.abs();
+			if (DepotAktion.KAUF.internal().equals(aktion)) {
+				return absolut.negate();
+			}
+			if (DepotAktion.VERKAUF.internal().equals(aktion)) {
+				return absolut;
+			}
+		}
+		if ("BIWBDE33XXX".equals(konto.getBic()) || "10130800".equals(konto.getBLZ()))  {
+			// Hack für FlatEx
+			return betrag.negate();
+		}
+		return betrag;
+	}
+
+	private boolean isBLZ75090300(Konto konto) throws RemoteException
+	{
+		return "75090300".equals(konto.getBLZ());
 	}
 
 	@Override

@@ -36,6 +36,8 @@ class HBCIDepotCsvDumper
 				printer.printRecord(
 						"konto_id",
 						"konto_name",
+						"konto_blz",
+						"konto_bic",
 						"depot_index",
 						"depot_timestamp",
 						"depot_total_wert",
@@ -61,6 +63,8 @@ class HBCIDepotCsvDumper
 						printer.printRecord(
 								konto.getID(),
 								konto.getLongName(),
+								value(konto.getBLZ()),
+								value(konto.getBic()),
 								Integer.valueOf(depotIndex),
 								value(depot.timestamp),
 								value(depot.total),
@@ -85,6 +89,8 @@ class HBCIDepotCsvDumper
 						printer.printRecord(
 								konto.getID(),
 								konto.getLongName(),
+								value(konto.getBLZ()),
+								value(konto.getBic()),
 								Integer.valueOf(depotIndex),
 								value(depot.timestamp),
 								value(depot.total),
@@ -109,6 +115,8 @@ class HBCIDepotCsvDumper
 				printer.printRecord(
 						"konto_id",
 						"konto_name",
+						"konto_blz",
+						"konto_bic",
 						"entry_index",
 						"instrument_index",
 						"transaction_index",
@@ -135,6 +143,8 @@ class HBCIDepotCsvDumper
 							printer.printRecord(
 									konto.getID(),
 									konto.getLongName(),
+									value(konto.getBLZ()),
+									value(konto.getBic()),
 									Integer.valueOf(entryIndex),
 									Integer.valueOf(instrumentIndex),
 									Integer.valueOf(transactionIndex),

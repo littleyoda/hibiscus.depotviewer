@@ -27,12 +27,12 @@
  </extensions>
 
   <navigation>
-    <item name="Depot-Viewer" icon-close="folder.png" icon-open="folder-open.png" action="de.open4me.depot.gui.action.DepotListAction">
-      <item name="Depots" icon-close="seahorse-preferences.png" action="de.open4me.depot.gui.action.DepotListAction" />
-      <item name="Wertpapiere" icon-close="stocks.png" action="de.open4me.depot.gui.action.WertpapierAction" />
-      <item name="Orderbuch" icon-close="emblem-documents.png" action="de.open4me.depot.gui.action.OrderList" />
-      <item name="Portfolio" icon-close="portfolio.png" action="de.open4me.depot.gui.action.BestandAction" />
-      <item name="Gewinn / Verlust" icon-close="invest.png" action="de.open4me.depot.gui.action.BewertungsAction" />
+    <item id="depotviewer.navi" name="Depot-Viewer" icon-close="folder.png" icon-open="folder-open.png" action="de.open4me.depot.gui.action.DepotListAction">
+      <item id="depotviewer.navi.depots" name="Depots" icon-close="seahorse-preferences.png" action="de.open4me.depot.gui.action.DepotListAction" />
+      <item id="depotviewer.navi.wertpapiere" name="Wertpapiere" icon-close="stocks.png" action="de.open4me.depot.gui.action.WertpapierAction" />
+      <item id="depotviewer.navi.orderbuch" name="Orderbuch" icon-close="emblem-documents.png" action="de.open4me.depot.gui.action.OrderList" />
+      <item id="depotviewer.navi.portfolio" name="Portfolio" icon-close="portfolio.png" action="de.open4me.depot.gui.action.BestandAction" />
+      <item id="depotviewer.navi.gewinn-verlust" name="Gewinn / Verlust" icon-close="invest.png" action="de.open4me.depot.gui.action.BewertungsAction" />
     </item>
   </navigation>
 
