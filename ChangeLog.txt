@@ -1,3 +1,8 @@
+1.2.0 -- 2026-08-26
+
+    Sonderfall BLZ75090300
+    [Featrue] scalable.capital als Kursprovider
+
 1.1.1 -- 2026-08-08
 	Prüfung von Duplikaten beim Bearbeiten und Anlegen von Wertpapieren
 	Depotviewer & SQL-Backend
