@@ -10,27 +10,31 @@ import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import de.open4me.depot.abruf.utils.Utils;
 import de.open4me.depot.gui.dialogs.KursAktualisierenAnbieterAuswahlDialog;
-import de.open4me.depot.gui.dialogs.KursAktualisierenDialog;
+import de.open4me.depot.kursprovider.KursAbrufResult;
+import de.open4me.depot.kursprovider.KursProvider;
+import de.open4me.depot.kursprovider.KursProviderEinstellung;
+import de.open4me.depot.kursprovider.KursProviderErgebnis;
+import de.open4me.depot.kursprovider.KursProviderKontext;
+import de.open4me.depot.kursprovider.KursProviderRegistry;
+import de.open4me.depot.kursprovider.KursAbrufResult.Ereignis;
+import de.open4me.depot.kursprovider.KursAbrufResult.Kurs;
 import de.open4me.depot.messaging.KursUpdatesMsg;
 import de.open4me.depot.sql.GenericObjectSQL;
 import de.open4me.depot.sql.SQLUtils;
 import de.open4me.depot.sql.SQLUtils.PreparedSQL;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.BackgroundTask;
+import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.ProgressMonitor;
-import jsq.config.Config;
-import jsq.config.ConfigTuple;
-import jsq.datastructes.Const;
-import jsq.datastructes.Datacontainer;
 import jsq.fetch.factory.Factory;
-import jsq.fetcher.history.BaseFetcher;
 
 
 
@@ -39,6 +43,7 @@ public class UpdateStock implements BackgroundTask {
 	private  GenericObjectSQL[] wertpapiere;
 	private  boolean forceNewSettings;
 	private boolean abort = false;
+	private final KursProviderRegistry providerRegistry = KursProviderRegistry.createDefault();
 
 	public UpdateStock(GenericObjectSQL[] context, boolean forceNewSettings)   {
 		this.wertpapiere = context;
@@ -77,57 +82,96 @@ public class UpdateStock implements BackgroundTask {
 
 	@Override
 	public void run(ProgressMonitor monitor) throws ApplicationException {
+		List<String> errors = new ArrayList<String>();
+		float proWert = wertpapiere.length == 0 ? 100.0f : 100.0f / wertpapiere.length;
+		float babysteps = proWert / 5;
 		try {
-			float proWert = 100.0f / wertpapiere.length;
-			float babysteps = proWert / 5;
 			for (int i = 0; i < wertpapiere.length; i++) {
-				if (abort) {
+				if (abort) return;
+				GenericObjectSQL wertpapier = wertpapiere[i];
+				String name = String.valueOf(wertpapier.getAttribute("wertpapiername"));
+				String searchterm = getSearchTerm(wertpapier);
+				monitor.setPercentComplete((int) (proWert * i));
+				monitor.setStatusText("Starte mit " + (searchterm == null ? name : searchterm));
+				try {
+					processStock(wertpapier, searchterm, monitor, babysteps);
+				}
+				catch (OperationCanceledException e)
+				{
 					return;
 				}
-				GenericObjectSQL wertpapier = wertpapiere[i];
-				String wpid = wertpapier.getAttribute("id").toString();
-				String searchterm = getSearchTerm(wertpapier);
-				String anbietername = getAnbieterName(wpid);
-
-				monitor.setPercentComplete((int) (proWert * i));
-				monitor.setStatusText("Starte mit " + searchterm);
-
-				Logger.info("Update Stock: Starte mit " + searchterm);
-
-
-				BaseFetcher base;
-				boolean manualWay = (anbietername == null || forceNewSettings);
-				if  (manualWay) {
-					base = updateStock(monitor, babysteps, wertpapier, searchterm);
-				} else {
-					base = updateStockAutomatic(anbietername, monitor, babysteps, wertpapier, searchterm, wpid);
+				catch (Exception e)
+				{
+					Logger.error("Fehler beim Kursabruf für " + name, e);
+					errors.add(name + ": " + readableMessage(e));
 				}
-
-				monitor.setPercentComplete((int) (monitor.getPercentComplete() + babysteps));
-				monitor.setStatusText("Speichern");
-				saveStockData(wertpapier, base);
-
-				monitor.setStatusText("Fertig mit " + searchterm);
-				Application.getMessagingFactory().sendMessage(new KursUpdatesMsg(wpid));
-
 			}
-		} catch (ApplicationException e) {
+		}
+		catch (Exception e)
+		{
+			throw new ApplicationException("Fehler beim Abruf der Kurse.", e);
+		}
+		finally
+		{
+			providerRegistry.close();
+		}
+
+		monitor.setPercentComplete(100);
+		if (!errors.isEmpty())
+		{
+			String message = errors.size() + " Kursabruf(e) fehlgeschlagen:\n" + String.join("\n", errors);
 			monitor.setStatus(ProgressMonitor.STATUS_ERROR);
-			monitor.setStatusText(e.getMessage());
-			e.printStackTrace();
-			throw e;
-		} catch (Exception e) {
-			monitor.setStatus(ProgressMonitor.STATUS_ERROR);
-			monitor.setStatusText(e.getMessage());
-			e.printStackTrace();
-			throw new ApplicationException("Fehler beim Abruf der Kurse." , e);
+			monitor.setStatusText(message);
+			throw new ApplicationException(message);
 		}
 		monitor.setStatusText("Fertig");
 		monitor.setStatus(ProgressMonitor.STATUS_DONE);
-		monitor.setPercentComplete(101);
+	}
 
+	private void processStock(GenericObjectSQL wertpapier, String searchterm, ProgressMonitor monitor,
+			float babysteps) throws Exception
+	{
+		String wpid = wertpapier.getID();
+		String savedProvider = getAnbieterName(wpid);
+		boolean manual = savedProvider == null || forceNewSettings;
+		KursProvider provider;
+		boolean vorbereiten = false;
+		boolean saveSettings = false;
+		if (manual)
+		{
+			KursAktualisierenAnbieterAuswahlDialog dialog = new KursAktualisierenAnbieterAuswahlDialog(
+					KursAktualisierenAnbieterAuswahlDialog.POSITION_CENTER,
+					wertpapier.getAttribute("wertpapiername").toString(), providerRegistry);
+			provider = (KursProvider) dialog.open();
+			if (provider == null) throw new OperationCanceledException("Abgebrochen");
+			vorbereiten = dialog.isForceConnect();
+			saveSettings = dialog.getSpeichernSetting();
+		}
+		else
+		{
+			provider = providerRegistry.findById(savedProvider);
+			if (provider == null)
+				throw new ApplicationException("Gespeicherter Kursprovider ist nicht mehr verfügbar. Bitte Einstellungen neu vornehmen.");
+		}
 
+		KursProviderKontext context = new KursProviderKontext(wertpapier, searchterm, manual,
+				vorbereiten, monitor, babysteps, () -> abort);
+		KursProviderErgebnis result = provider.abrufen(context);
+		if (abort) return;
+		Abruf abruf = new Abruf(provider, result.getKurse(), saveSettings, result.getKonfiguration());
+		boolean replaceAll = provider.ersetztBestandBeimWechsel() && !provider.getId().equals(savedProvider);
+		monitor.setStatusText("Speichern");
+		saveStockData(wertpapier, abruf, replaceAll);
+		monitor.setStatusText("Fertig mit " + searchterm);
+		Application.getMessagingFactory().sendMessage(new KursUpdatesMsg(wpid));
+	}
 
+	private static String readableMessage(Throwable error)
+	{
+		Throwable current = error;
+		while ((current.getMessage() == null || current.getMessage().isBlank()) && current.getCause() != null)
+			current = current.getCause();
+		return current.getMessage() == null ? current.getClass().getSimpleName() : current.getMessage();
 	}
 
 	private String getSearchTerm(GenericObjectSQL wertpapier) throws RemoteException {
@@ -140,165 +184,77 @@ public class UpdateStock implements BackgroundTask {
 		return searchterm;
 	}
 
-	private BaseFetcher updateStockAutomatic(String anbietername, ProgressMonitor monitor, float babysteps, GenericObjectSQL wertpapier, String searchterm, String wpid) throws Exception {
-
-		Logger.debug("Gespeicherter Name: " + anbietername);
-		BaseFetcher base = getFetcherByName(anbietername);
-		if (base == null) {
-			Logger.debug("Anbieter nicht gefunden.");
-			doCleanSaveSettings(wpid);
-			throw new ApplicationException("Fehler beim Abruf der Kurse. Bitte nochmal aktualisieren und Einstellungen neu vornehmen!");
-		}
-		Logger.debug("Anbieter für Kursaktualisierung: " + base.getName());
-		Date d = new Date();
-		base.prepare(searchterm, 2000, 1, 1, d.getYear() + 1900, d.getMonth() + 1, d.getDate());
-		try( PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("select value from depotviewer_cfgupdatestock where `wpid`= ? and `key` = ?");) {
-			PreparedStatement getCfg = preparedSQL.prest;
-			getCfg.setString(1, wpid);
-			while (base.hasMoreConfig()) {
-				if (abort) {
-					return null;
-				}
-				List<Config> cfgs = base.getConfigs();
-
-				Logger.debug("Notwendige Configs: " + cfgs);
-				for (Config cfg : cfgs) {
-					Logger.debug("Workung on: " + cfg);
-					getCfg.setString(2, cfg.getBeschreibung());
-					String ret = (String) SQLUtils.getObject(getCfg);
-					if (ret == null) {
-						doCleanSaveSettings(wpid);
-						Logger.debug("Gespeicherter Wert: null");
-						throw new ApplicationException("Fehler beim Abruf der Kurse. Bitte nochmal aktualisieren und Einstellungen neu vornehmen!");
-					}
-					ConfigTuple selected = null;
-					for (ConfigTuple opts : cfg.getOptions()) {
-						if (ret.equals(opts.getDescription().toString())) {
-							selected = opts;
-							break;
-						}
-					}
-					if (selected == null) {
-						doCleanSaveSettings(wpid);
-						Logger.debug("Selected is null für " + cfg.getBeschreibung());
-						throw new ApplicationException("Fehler beim Abruf der Kurse. Bitte nochmal aktualisieren und Einstellungen neu vornehmen!");
-					}
-					cfg.addSelectedOptions(selected);
-				}
-				monitor.setPercentComplete((int) (monitor.getPercentComplete() + babysteps));
-				monitor.setStatusText(cfgs.toString());
-				base.process(cfgs);
-			}
-		}
-		return base;
-	}
-
-	private BaseFetcher getFetcherByName(String anbietername) {
-		BaseFetcher base = null;
-		for (BaseFetcher x :Factory.getHistoryFetcher()) {
-			if (anbietername.equals(x.getName())) {
-				base = x;
-				break;
-			}
-		}
-		return base;
-	}
-
-	private BaseFetcher updateStock(ProgressMonitor monitor, float babysteps, GenericObjectSQL wertpapier,
-			String searchterm) throws RemoteException, Exception {
-		BaseFetcher base;
-		KursAktualisierenAnbieterAuswahlDialog dialog1 = new KursAktualisierenAnbieterAuswahlDialog(KursAktualisierenDialog.POSITION_CENTER,
-				wertpapier.getAttribute("wertpapiername").toString());
-		base = (BaseFetcher) dialog1.open();
-		Boolean saveSettings = dialog1.getSpeichernSetting();
-		if (saveSettings) {
-			doSaveAnbieter(wertpapier.getAttribute("id").toString(), base.getName());
-		}
-		Date d = new Date();
-		base.prepare(searchterm, 2000, 1, 1, d.getYear() + 1900, d.getMonth() + 1, d.getDate());
-		while (base.hasMoreConfig()) {
-			if (abort) {
-				return null;
-			}
-			List<Config> cfg = base.getConfigs();
-			monitor.setPercentComplete((int) (monitor.getPercentComplete() + babysteps));
-			monitor.setStatusText(cfg.toString());
-			KursAktualisierenDialog dialog= new KursAktualisierenDialog(KursAktualisierenDialog.POSITION_CENTER, cfg);
-			dialog.open();
-			base.process(cfg);
-			if (saveSettings) {
-				Logger.debug("Gespeicherte Config: " + cfg);
-				doSaveSettings(wertpapier.getAttribute("id").toString(), cfg);
-			}
-		}
-		return base;
-	}
-
-	// Speichert die Kursinformationen
-	private static void saveStockData(GenericObjectSQL wertpapier, BaseFetcher base) throws Exception {
-		// Kurse
-		try(Connection conn = SQLUtils.getConnection(); ) {
-			try(PreparedStatement del = conn.prepareStatement("delete from depotviewer_kurse where wpid = ? and kursdatum = ?");) {
-				for (Datacontainer dc : base.getHistQuotes()) {
-					del.setString(1, wertpapier.getID());
-					del.setDate(2, SQLUtils.getSQLDate((Date) dc.data.get("date")));
-					del.addBatch();
-				}
-				del.executeBatch();
-			}
-
-			try(PreparedStatement insert = conn.prepareStatement("insert into depotviewer_kurse (wpid, kurs, kursw, kursdatum) values (?,?,?,?)")){
-				for (Datacontainer dc : base.getHistQuotes()) {
-					insert.setString(1, wertpapier.getID());
-					insert.setBigDecimal(2, (BigDecimal) dc.data.get("last"));
-					insert.setString(3, (String) dc.data.get("currency"));
-					insert.setDate(4, SQLUtils.getSQLDate((Date) dc.data.get("date")));
-					insert.addBatch();
-				}
-				insert.executeBatch();
-			}
-			// Events
-			if (base.getHistEvents() != null) {
-				try(PreparedStatement del = conn.prepareStatement("delete from depotviewer_kursevent where wpid = ? and datum = ?")) {
-					for (Datacontainer dc : base.getHistEvents()) {
+	// Speichert Kursdaten und eine optional geänderte Anbieter-Konfiguration atomar.
+	private static void saveStockData(GenericObjectSQL wertpapier, Abruf abruf, boolean replaceAll) throws Exception {
+		try(Connection conn = SQLUtils.getConnection()) {
+			conn.setAutoCommit(false);
+			try {
+				if (replaceAll)
+				{
+					try (PreparedStatement del = conn.prepareStatement("delete from depotviewer_kurse where wpid = ?"))
+					{
 						del.setString(1, wertpapier.getID());
-						del.setDate(2, SQLUtils.getSQLDate((Date) dc.data.get("date")));
+						del.executeUpdate();
+					}
+					try (PreparedStatement del = conn.prepareStatement("delete from depotviewer_kursevent where wpid = ?"))
+					{
+						del.setString(1, wertpapier.getID());
+						del.executeUpdate();
+					}
+				}
+
+				try(PreparedStatement del = conn.prepareStatement("delete from depotviewer_kurse where wpid = ? and kursdatum = ?")) {
+					for (Kurs kurs : abruf.result.getKurse()) {
+						del.setString(1, wertpapier.getID());
+						del.setDate(2, java.sql.Date.valueOf(kurs.getDatum()));
 						del.addBatch();
 					}
 					del.executeBatch();
 				}
-
-				try(PreparedStatement insert = conn.prepareStatement("insert into depotviewer_kursevent (wpid, ratio, value, aktion, datum, waehrung) values (?,?,?,?,?,?)")) {
-					for (Datacontainer dc : base.getHistEvents()) {
-						String action = (String) dc.data.get("action");
-						if (action.equals(Const.CASHDIVIDEND)) {
-							action = "D";
-						} else if (action.equals(Const.STOCKDIVIDEND)) {
-							action = "G";
-						} else if (action.equals(Const.STOCKSPLIT)) {
-							action = "S";
-						} else if (action.equals(Const.STOCKREVERSESPLIT)) {
-							action = "R";
-						} else if (action.equals(Const.SUBSCRIPTIONRIGHTS)) {
-							action = "B";
-						} else {
-							System.out.println("Warning: " + action + " is unknown!");
-							continue;
-						}
-
+				try(PreparedStatement insert = conn.prepareStatement("insert into depotviewer_kurse (wpid, kurs, kursw, kursdatum) values (?,?,?,?)")) {
+					for (Kurs kurs : abruf.result.getKurse()) {
 						insert.setString(1, wertpapier.getID());
-						insert.setString(2, (String) dc.data.get("ratio"));
-						insert.setBigDecimal(3, (BigDecimal) dc.data.get("value"));
-						insert.setString(4, action);
-						insert.setDate(5,  new java.sql.Date(((Date) dc.data.get("date")).getTime()));
-						insert.setString(6, (String) dc.data.get("currency"));
+						insert.setBigDecimal(2, kurs.getWert());
+						insert.setString(3, kurs.getWaehrung());
+						insert.setDate(4, java.sql.Date.valueOf(kurs.getDatum()));
 						insert.addBatch();
 					}
 					insert.executeBatch();
 				}
+
+				if (abruf.result.getEreignisse() != null) {
+					try(PreparedStatement del = conn.prepareStatement("delete from depotviewer_kursevent where wpid = ? and datum = ?")) {
+						for (Ereignis event : abruf.result.getEreignisse()) {
+							del.setString(1, wertpapier.getID());
+							del.setDate(2, java.sql.Date.valueOf(event.getDatum()));
+							del.addBatch();
+						}
+						del.executeBatch();
+					}
+					try(PreparedStatement insert = conn.prepareStatement("insert into depotviewer_kursevent (wpid, ratio, value, aktion, datum, waehrung) values (?,?,?,?,?,?)")) {
+						for (Ereignis event : abruf.result.getEreignisse()) {
+							insert.setString(1, wertpapier.getID());
+							insert.setString(2, event.getRatio());
+							insert.setBigDecimal(3, event.getWert());
+							insert.setString(4, event.getAktion());
+							insert.setDate(5, java.sql.Date.valueOf(event.getDatum()));
+							insert.setString(6, event.getWaehrung());
+							insert.addBatch();
+						}
+						insert.executeBatch();
+					}
+				}
+
+				if (abruf.saveSettings)
+					saveSettings(conn, wertpapier.getID(), abruf.provider.getId(), abruf.configs);
+				calcPerformanceKurse(wertpapier, conn);
+				conn.commit();
 			}
-			// PerformanceKurs
-			calcPerformanceKurse(wertpapier, conn);
+			catch (Exception e)
+			{
+				conn.rollback();
+				throw e;
+			}
 		}
 		Utils.markRecalc(null);
 	}
@@ -311,36 +267,23 @@ public class UpdateStock implements BackgroundTask {
 		}
 	}
 
-	private static void doSaveAnbieter(String string, String name) throws Exception {
-		doCleanSaveSettings(string);
-
-
-		try(PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("insert into depotviewer_cfgupdatestock set `wpid`= ?, `key` = ?, `value` = ?");) {
-			preparedSQL.prest.setString(1, string);
-			preparedSQL.prest.setString(2, null);
-			preparedSQL.prest.setString(3, name);
-			preparedSQL.prest.execute();
+	private static void saveSettings(Connection conn, String wpid, String provider,
+			List<KursProviderEinstellung> einstellungen) throws Exception {
+		try (PreparedStatement delete = conn.prepareStatement("delete from depotviewer_cfgupdatestock where `wpid`= ?"))
+		{
+			delete.setString(1, wpid);
+			delete.executeUpdate();
 		}
-	}
-
-	private static void doCleanSaveSettings(String string) throws Exception {
-
-		try(PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("delete from depotviewer_cfgupdatestock where `wpid`= ?");) {
-			preparedSQL.prest.setString(1, string);
-			preparedSQL.prest.execute();
-		}
-	}
-
-	private static void doSaveSettings(String wpid, List<Config> cfg) throws Exception {
-
-		try(PreparedSQL preparedSQL = SQLUtils.getPreparedSQL("insert into depotviewer_cfgupdatestock set `wpid`= ?, `key` = ?, `value` = ?");) {
-			for (Config c : cfg) {
-				for (ConfigTuple sel : c.getSelected()) {
-					preparedSQL.prest.setString(1, wpid);
-					preparedSQL.prest.setString(2, c.getBeschreibung());
-					preparedSQL.prest.setString(3, sel.getDescription());
-					preparedSQL.prest.execute();
-				}
+		try(PreparedStatement insert = conn.prepareStatement("insert into depotviewer_cfgupdatestock (`wpid`, `key`, `value`) values (?,?,?)")) {
+			insert.setString(1, wpid);
+			insert.setString(2, null);
+			insert.setString(3, provider);
+			insert.executeUpdate();
+			for (KursProviderEinstellung einstellung : einstellungen) {
+				insert.setString(1, wpid);
+				insert.setString(2, einstellung.getSchluessel());
+				insert.setString(3, einstellung.getWert());
+				insert.executeUpdate();
 			}
 		}
 	}
@@ -400,6 +343,23 @@ public class UpdateStock implements BackgroundTask {
 		}
 	}
 
+	private static final class Abruf
+	{
+		final KursProvider provider;
+		final KursAbrufResult result;
+		final boolean saveSettings;
+		final List<KursProviderEinstellung> configs;
+
+		Abruf(KursProvider provider, KursAbrufResult result, boolean saveSettings,
+				List<KursProviderEinstellung> configs)
+		{
+			this.provider = provider;
+			this.result = result;
+			this.saveSettings = saveSettings;
+			this.configs = configs;
+		}
+	}
+
 
 
 	@Override
@@ -410,6 +370,6 @@ public class UpdateStock implements BackgroundTask {
 
 	@Override
 	public boolean isInterrupted() {
-		return false;
+		return abort;
 	}
 }
