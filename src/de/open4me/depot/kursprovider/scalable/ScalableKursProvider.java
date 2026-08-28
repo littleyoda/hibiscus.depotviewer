@@ -40,9 +40,16 @@ public final class ScalableKursProvider implements KursProvider
 	@Override
 	public KursanbieterDialogErweiterung createDialogErweiterung(Action vorbereiten)
 	{
-		return new ScalableKursanbieterDialogErweiterung(provider, vorbereiten);
+		return createDialogErweiterung(vorbereiten, () -> {});
 	}
 
+	@Override
+	public KursanbieterDialogErweiterung createDialogErweiterung(Action vorbereiten, Runnable statusGeaendert)
+	{
+		return new ScalableKursanbieterDialogErweiterung(provider, vorbereiten, statusGeaendert);
+	}
+
+	@Override public boolean istAbrufbereit() { return provider.isConnected(); }
 	@Override public boolean ersetztBestandBeimWechsel() { return true; }
 	@Override public void close() { provider.close(); }
 }

@@ -1,5 +1,8 @@
+	Leere Wertpapiersuchen verhindert und Suchbutton abhängig von der Eingabe aktiviert
+	Weiter-Button beim Kursabruf deaktiviert, solange eine erforderliche Provider-Verbindung fehlt
+
 1.2.1 -- 2026-08-28
-    Kurse von PortfolioPerformance
+    	Kurse von PortfolioPerformance
 
 1.2.0 -- 2026-08-26
     Sonderfall BLZ75090300

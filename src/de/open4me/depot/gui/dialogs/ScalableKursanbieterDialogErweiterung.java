@@ -18,11 +18,13 @@ public class ScalableKursanbieterDialogErweiterung implements KursanbieterDialog
 {
 	private final ScalableMcpProvider provider;
 	private final Action connect;
+	private final Runnable statusGeaendert;
 
-	public ScalableKursanbieterDialogErweiterung(ScalableMcpProvider provider, Action connect)
+	public ScalableKursanbieterDialogErweiterung(ScalableMcpProvider provider, Action connect, Runnable statusGeaendert)
 	{
 		this.provider = provider;
 		this.connect = connect;
+		this.statusGeaendert = statusGeaendert;
 	}
 
 	@Override
@@ -48,6 +50,7 @@ public class ScalableKursanbieterDialogErweiterung implements KursanbieterDialog
 					try { paint(parent); }
 					catch (Exception e) { throw new ApplicationException("Scalable-Steuerung konnte nicht aktualisiert werden.", e); }
 					parent.layout(true, true);
+					statusGeaendert.run();
 				}
 			}));
 		}

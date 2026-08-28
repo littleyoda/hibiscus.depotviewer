@@ -17,6 +17,17 @@ public interface KursProvider extends AutoCloseable
 		return KursanbieterDialogErweiterung.KEINE;
 	}
 
+	default KursanbieterDialogErweiterung createDialogErweiterung(Action vorbereiten, Runnable statusGeaendert)
+	{
+		return createDialogErweiterung(vorbereiten);
+	}
+
+	/** Gibt an, ob der Provider ohne weitere Verbindungsherstellung verwendet werden kann. */
+	default boolean istAbrufbereit()
+	{
+		return true;
+	}
+
 	default boolean ersetztBestandBeimWechsel()
 	{
 		return false;

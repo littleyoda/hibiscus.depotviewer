@@ -99,8 +99,15 @@ public final class PortfolioPerformanceKursProvider implements KursProvider
 	@Override
 	public KursanbieterDialogErweiterung createDialogErweiterung(Action vorbereiten)
 	{
-		return new PortfolioPerformanceKursanbieterDialogErweiterung(this, vorbereiten);
+		return createDialogErweiterung(vorbereiten, () -> {});
 	}
 
+	@Override
+	public KursanbieterDialogErweiterung createDialogErweiterung(Action vorbereiten, Runnable statusGeaendert)
+	{
+		return new PortfolioPerformanceKursanbieterDialogErweiterung(this, vorbereiten, statusGeaendert);
+	}
+
+	@Override public boolean istAbrufbereit() { return isConnected(); }
 	@Override public boolean ersetztBestandBeimWechsel() { return true; }
 }

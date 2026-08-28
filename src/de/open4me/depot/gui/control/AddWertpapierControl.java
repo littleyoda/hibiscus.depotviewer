@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.swt.SWT;
 import org.htmlunit.FailingHttpStatusCodeException;
 
 import de.open4me.depot.Settings;
@@ -22,6 +23,7 @@ import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.TextInput;
+import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.util.ApplicationException;
@@ -30,6 +32,7 @@ public class AddWertpapierControl  extends AbstractControl {
 
 	private Input suchbox;
 	private TablePart trefferListe;
+	private Button suchenButton;
 	
 	public AddWertpapierControl(AbstractView view) {
 		super(view);
@@ -72,13 +75,17 @@ public class AddWertpapierControl  extends AbstractControl {
 	}
 	public ButtonArea getSearchButton() {
 		ButtonArea buttons = new ButtonArea();
-		buttons.addButton("Suchen",new Action() {
+		suchenButton = new Button("Suchen",new Action() {
 
 			@Override
 			public void handleAction(Object context)
 					throws ApplicationException {
+				String suchbegriff = getSuchbegriff();
+				if (suchbegriff.isEmpty()) {
+					return;
+				}
 				try {
-					List<HashMap<String, String>> x = WertpapierSuche.search(((String) getSuchbox().getValue()).trim()); 
+					List<HashMap<String, String>> x = WertpapierSuche.search(suchbegriff);
 					TablePart ziel = getTab();
 					ziel.removeAll();
 					for (HashMap<String, String> map : x) {
@@ -95,8 +102,17 @@ public class AddWertpapierControl  extends AbstractControl {
 
 			}
 
-		},null ,false,"edit-copy.png");
+		}, null, false, "edit-copy.png");
+		suchenButton.setEnabled(!getSuchbegriff().isEmpty());
+		getSuchbox().getControl().addListener(SWT.Modify,
+				event -> suchenButton.setEnabled(!getSuchbegriff().isEmpty()));
+		buttons.addButton(suchenButton);
 		return buttons;
+	}
+
+	private String getSuchbegriff() {
+		Object value = getSuchbox().getValue();
+		return value == null ? "" : value.toString().trim();
 	}
 
 	public ButtonArea getAddButton() {
@@ -144,5 +160,3 @@ public class AddWertpapierControl  extends AbstractControl {
 	}
 
 }
-
-

@@ -31,6 +31,7 @@ public class KursAktualisierenAnbieterAuswahlDialog extends AbstractDialog
 	private boolean forceConnect;
 	private final KursProviderRegistry registry;
 	private Composite anbieterBereich;
+	private Button weiterButton;
 
 
 	public KursAktualisierenAnbieterAuswahlDialog(int position, String name, KursProviderRegistry registry)
@@ -109,17 +110,20 @@ public class KursAktualisierenAnbieterAuswahlDialog extends AbstractDialog
 
 		},null,true,"dialog-information.png");
 		group.addButtonArea(buttons1);
-		updateAnbieterBereich(connect);
 		
-		final Button weiterButton = new Button("Weiter", new Action() {
+		weiterButton = new Button("Weiter", new Action() {
 				public void handleAction(Object context) throws ApplicationException
 				{
+					KursProvider selected = (KursProvider) anbieter.getValue();
+					if (selected == null || !selected.istAbrufbereit())
+						throw new ApplicationException("Bitte stellen Sie zuerst eine Verbindung zum Kursanbieter her.");
 					if ((Boolean) erlaubnis.getValue()) {
-						auswahl = (KursProvider) anbieter.getValue();
+						auswahl = selected;
 						speich = (Boolean) speichern.getValue();
 						close();
 					}
 				}},null ,false, "ok.png");
+		updateAnbieterBereich(connect);
 
 		ButtonArea buttons = new ButtonArea();
 		buttons.addButton(weiterButton);
@@ -153,7 +157,8 @@ public class KursAktualisierenAnbieterAuswahlDialog extends AbstractDialog
 
 	private KursanbieterDialogErweiterung getErweiterung(KursProvider selected, Action connect)
 	{
-		return selected == null ? KursanbieterDialogErweiterung.KEINE : selected.createDialogErweiterung(connect);
+		return selected == null ? KursanbieterDialogErweiterung.KEINE
+				: selected.createDialogErweiterung(connect, this::updateWeiterButton);
 	}
 
 	private void updateAnbieterBereich(Action connect)
@@ -174,6 +179,14 @@ public class KursAktualisierenAnbieterAuswahlDialog extends AbstractDialog
 		anbieterBereich.layout(true, true);
 		anbieterBereich.getParent().layout(true, true);
 		anbieterBereich.getShell().pack();
+		updateWeiterButton();
+	}
+
+	private void updateWeiterButton()
+	{
+		if (weiterButton == null) return;
+		KursProvider selected = (KursProvider) anbieter.getValue();
+		weiterButton.setEnabled(selected != null && selected.istAbrufbereit());
 	}
 	
 	@Override

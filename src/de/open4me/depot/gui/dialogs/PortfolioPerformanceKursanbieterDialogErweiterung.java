@@ -20,11 +20,14 @@ public class PortfolioPerformanceKursanbieterDialogErweiterung implements Kursan
 {
 	private final PortfolioPerformanceKursProvider provider;
 	private final Action connect;
+	private final Runnable statusGeaendert;
 
-	public PortfolioPerformanceKursanbieterDialogErweiterung(PortfolioPerformanceKursProvider provider, Action connect)
+	public PortfolioPerformanceKursanbieterDialogErweiterung(PortfolioPerformanceKursProvider provider, Action connect,
+			Runnable statusGeaendert)
 	{
 		this.provider = provider;
 		this.connect = connect;
+		this.statusGeaendert = statusGeaendert;
 	}
 
 	@Override
@@ -50,6 +53,7 @@ public class PortfolioPerformanceKursanbieterDialogErweiterung implements Kursan
 				try { paint(parent); }
 				catch (Exception e) { throw new ApplicationException("Portfolio-Performance-Steuerung konnte nicht aktualisiert werden.", e); }
 				parent.layout(true, true);
+				statusGeaendert.run();
 			}));
 		}
 		container.addButtonArea(buttons);
