@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.open4me.depot.kursprovider.portfolio.PortfolioPerformanceKursProvider;
 import de.open4me.depot.kursprovider.scalable.ScalableKursProvider;
 import de.open4me.depot.kursprovider.scalable.ScalableMcpProvider;
 import jsq.fetch.factory.Factory;
@@ -20,6 +21,7 @@ public final class KursProviderRegistry implements AutoCloseable
 	{
 		KursProviderRegistry registry = new KursProviderRegistry();
 		registry.register(new ScalableKursProvider(new ScalableMcpProvider()));
+		registry.register(new PortfolioPerformanceKursProvider());
 		for (BaseFetcher fetcher : Factory.getHistoryFetcher())
 			registry.register(new JavaStockQuotesKursProvider(fetcher));
 		return registry;

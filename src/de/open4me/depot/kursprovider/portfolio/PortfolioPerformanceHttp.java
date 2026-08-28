@@ -1,0 +1,49 @@
+package de.open4me.depot.kursprovider.portfolio;
+
+import java.net.InetSocketAddress;
+import java.net.ProxySelector;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.time.Duration;
+import java.util.Set;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.willuhn.jameica.system.Application;
+
+final class PortfolioPerformanceHttp
+{
+	static final ObjectMapper JSON = new ObjectMapper();
+	static final Duration TIMEOUT = Duration.ofSeconds(30);
+	private static final Set<String> TRUSTED_HOSTS = Set.of(
+			"api.portfolio-performance.info", "accounts.portfolio-performance.info");
+
+	private PortfolioPerformanceHttp() {}
+
+	static HttpClient createClient()
+	{
+		HttpClient.Builder builder = HttpClient.newBuilder().connectTimeout(TIMEOUT)
+				.followRedirects(HttpClient.Redirect.NORMAL);
+		if (Application.getConfig().getUseSystemProxy())
+		{
+			ProxySelector selector = ProxySelector.getDefault();
+			if (selector != null) builder.proxy(selector);
+		}
+		else
+		{
+			String host = Application.getConfig().getHttpsProxyHost();
+			int port = Application.getConfig().getHttpsProxyPort();
+			if (host != null && !host.isBlank() && port > 0)
+				builder.proxy(ProxySelector.of(new InetSocketAddress(host, port)));
+		}
+		return builder.build();
+	}
+
+	static URI trustedUri(String value) throws Exception
+	{
+		URI uri = new URI(value);
+		if (!"https".equalsIgnoreCase(uri.getScheme()) || !TRUSTED_HOSTS.contains(uri.getHost()))
+			throw new Exception("Nicht vertrauenswürdiger Portfolio-Performance-Endpunkt: " + uri);
+		return uri;
+	}
+}

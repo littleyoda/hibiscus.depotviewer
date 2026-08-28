@@ -1,5 +1,6 @@
-1.2.0 -- 2026-08-26
+    Kurse von PortfolioPerformance
 
+1.2.0 -- 2026-08-26
     Sonderfall BLZ75090300
     [Featrue] scalable.capital als Kursprovider
 
