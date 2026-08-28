@@ -1,6 +1,10 @@
 package de.open4me.depot.kursprovider;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -41,8 +45,9 @@ public final class JavaStockQuotesKursProvider implements KursProvider
 	public KursProviderErgebnis abrufen(KursProviderKontext context) throws Exception
 	{
 		LocalDate heute = LocalDate.now();
-		fetcher.prepare(context.getSuchbegriff(), 2000, 1, 1,
-				heute.getYear(), heute.getMonthValue(), heute.getDayOfMonth());
+		mitFehlerprotokollierung("Vorbereitung", () ->
+				fetcher.prepare(context.getSuchbegriff(), 2000, 1, 1,
+						heute.getYear(), heute.getMonthValue(), heute.getDayOfMonth()));
 		List<Config> gespeichert = new ArrayList<Config>();
 		if (context.isManuell())
 			manuellKonfigurieren(context, gespeichert);
@@ -65,7 +70,7 @@ public final class JavaStockQuotesKursProvider implements KursProvider
 					+ context.getFortschrittsschritt()));
 			context.getMonitor().setStatusText(configs.toString());
 			new KursAktualisierenDialog(KursAktualisierenDialog.POSITION_CENTER, configs).open();
-			fetcher.process(configs);
+			processMitFehlerprotokollierung(configs);
 			gespeichert.addAll(configs);
 		}
 	}
@@ -95,13 +100,66 @@ public final class JavaStockQuotesKursProvider implements KursProvider
 				context.getMonitor().setPercentComplete((int) (context.getMonitor().getPercentComplete()
 						+ context.getFortschrittsschritt()));
 				context.getMonitor().setStatusText(configs.toString());
-				fetcher.process(configs);
+				processMitFehlerprotokollierung(configs);
 			}
 		}
 	}
 
-	private KursAbrufResult toResult()
+	private void processMitFehlerprotokollierung(List<Config> configs) throws Exception
 	{
+		mitFehlerprotokollierung("Verarbeitung", () -> fetcher.process(configs));
+	}
+
+	private void mitFehlerprotokollierung(String phase, KursproviderAktion aktion) throws Exception
+	{
+		ByteArrayOutputStream fehlerausgabe = new ByteArrayOutputStream();
+		synchronized (JavaStockQuotesKursProvider.class)
+		{
+			PrintStream original = System.err;
+			OutputStream gleichzeitig = new OutputStream()
+			{
+				@Override
+				public void write(int wert)
+				{
+					original.write(wert);
+					fehlerausgabe.write(wert);
+				}
+
+				@Override
+				public void write(byte[] daten, int offset, int laenge)
+				{
+					original.write(daten, offset, laenge);
+					fehlerausgabe.write(daten, offset, laenge);
+				}
+
+				@Override
+				public void flush()
+				{
+					original.flush();
+				}
+			};
+			PrintStream umgeleitet = new PrintStream(gleichzeitig, true, StandardCharsets.UTF_8);
+			try
+			{
+				System.setErr(umgeleitet);
+				aktion.ausfuehren();
+			}
+			finally
+			{
+				System.setErr(original);
+				umgeleitet.flush();
+				String text = fehlerausgabe.toString(StandardCharsets.UTF_8).strip();
+				if (!text.isEmpty())
+					Logger.error("Fehlerausgabe des Kursproviders " + getName() + " bei der " + phase + ":\n" + text);
+			}
+		}
+	}
+
+	private KursAbrufResult toResult() throws ApplicationException
+	{
+		if (fetcher.getHistQuotes() == null)
+			throw new ApplicationException("Der Kursprovider " + getName()
+					+ " hat keine Kursdaten geliefert. Details zum vorherigen Skriptfehler stehen im Hibiscus-Log.");
 		List<Kurs> quotes = new ArrayList<Kurs>();
 		for (Datacontainer data : fetcher.getHistQuotes())
 		{
@@ -124,6 +182,12 @@ public final class JavaStockQuotesKursProvider implements KursProvider
 			}
 		}
 		return new KursAbrufResult(quotes, events);
+	}
+
+	@FunctionalInterface
+	private interface KursproviderAktion
+	{
+		void ausfuehren() throws Exception;
 	}
 
 	private static String mapAction(String action)
