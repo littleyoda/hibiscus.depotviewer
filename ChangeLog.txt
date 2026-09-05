@@ -1,3 +1,4 @@
+1.2.3 -- 2026-09-05
 	Leere Wertpapiersuchen verhindert und Suchbutton abhängig von der Eingabe aktiviert
 	Weiter-Button beim Kursabruf deaktiviert, solange eine erforderliche Provider-Verbindung fehlt
 
