@@ -32,7 +32,6 @@ public class DepotAbrufFabrik {
 	public static  List<BasisDepotAbruf> getDepotAbrufsHBCISupport() {
 		if (depotHBCIAbrufs == null) {
 			depotHBCIAbrufs = new ArrayList<BasisDepotAbruf>();
-			depotHBCIAbrufs.add(new CortalConsorsMitHBCI());
 		}
 		return depotHBCIAbrufs;
 	}
