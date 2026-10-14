@@ -1,8 +1,6 @@
 package de.open4me.depot.gui.control;
 
 import java.awt.Color;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.rmi.RemoteException;
@@ -17,6 +15,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -283,7 +282,7 @@ public class WertpapiereDatenControl {
 				chart.getXYPlot().setDomainGridlinePaint(Color.LIGHT_GRAY);
 				chart.getXYPlot().setRangeGridlinePaint(Color.LIGHT_GRAY);
 				renderer = chart.getXYPlot().getRenderer();
-				Rectangle maxSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+				Rectangle maxSize = getComposite().getMonitor().getClientArea();
 				new ChartComposite(getComposite(), SWT.NONE, chart,
 						ChartComposite.DEFAULT_WIDTH,
 						ChartComposite.DEFAULT_HEIGHT,
