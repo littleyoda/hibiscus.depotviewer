@@ -119,10 +119,7 @@ public class WertpapiereTableControl
 	}
 
 	public void aktualisiere() throws RemoteException {
-		getTable().removeAll();
-		for (GenericObjectSQL x : getFilteredWertpapiere()) {
-			getTable().addItem(x);
-		}
+		refreshTable();
 	}
 
 	/**
@@ -201,11 +198,16 @@ public class WertpapiereTableControl
 	 */
 	private void refreshTable() throws RemoteException {
 		if (orderList != null) {
-			orderList.removeAll();
+			// removeAll() verwirft die Sortier-Indizes des TablePart und addItem() haengt
+			// die Zeilen in Query-Reihenfolge (ORDER BY Name) an. Die gewaehlte Spalte und
+			// Richtung bleiben im TablePart erhalten, werden aber nicht automatisch neu
+			// angewendet - das geschieht hier explizit per sort().
 			List<GenericObjectSQL> filteredData = getFilteredWertpapiere();
+			orderList.removeAll();
 			for (GenericObjectSQL item : filteredData) {
 				orderList.addItem(item);
 			}
+			orderList.sort();
 		}
 	}
 }
