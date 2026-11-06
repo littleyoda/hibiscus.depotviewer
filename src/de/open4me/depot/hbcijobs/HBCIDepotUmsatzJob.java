@@ -281,18 +281,14 @@ public class HBCIDepotUmsatzJob extends AbstractHBCIJob
 
 	private BigDecimal getGesamtbetrag(Konto konto, String aktion, BigDecimal betrag) throws RemoteException
 	{
-		if (isBLZ75090300(konto)) {
-			BigDecimal absolut = betrag.abs();
-			if (DepotAktion.KAUF.internal().equals(aktion)) {
-				return absolut.negate();
-			}
-			if (DepotAktion.VERKAUF.internal().equals(aktion)) {
-				return absolut;
-			}
+		// Banken liefern unterschiedliche Vorzeichenkonventionen. Für erkannte
+		// Käufe/Verkäufe gilt intern der Geldfluss aus Kundensicht.
+		// Stornos werden bereits in parseDepotUmsatz ausgeschlossen.
+		if (DepotAktion.KAUF.internal().equals(aktion)) {
+			return betrag.abs().negate();
 		}
-		if ("BIWBDE33XXX".equals(konto.getBic()) || "10130800".equals(konto.getBLZ()))  {
-			// Hack für FlatEx
-			return betrag.negate();
+		if (DepotAktion.VERKAUF.internal().equals(aktion)) {
+			return betrag.abs();
 		}
 		return betrag;
 	}
