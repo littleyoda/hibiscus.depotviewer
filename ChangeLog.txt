@@ -1,4 +1,9 @@
+1.2.5 -- 2026-11-06
+	 Andere Behandlung von neg/post Verkäufen/Käufe
+
 1.2.4 -- 2026-09-12
+	CSV-Import korrigiert
+
 1.2.3 -- 2026-09-05
 	Leere Wertpapiersuchen verhindert und Suchbutton abhängig von der Eingabe aktiviert
 	Weiter-Button beim Kursabruf deaktiviert, solange eine erforderliche Provider-Verbindung fehlt
