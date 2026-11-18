@@ -1,12 +1,14 @@
 package de.open4me.depot.hbcijobs;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.rmi.RemoteException;
 
 import org.kapott.hbci.GV_Result.GVRWPDepotList;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry.Gattung;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry.Gattung.SubSaldo;
+import org.kapott.hbci.structures.BigDecimalValue;
 
 import de.open4me.depot.abruf.impl.BasisDepotAbruf;
 import de.open4me.depot.abruf.utils.PropHelper;
@@ -136,20 +138,29 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 					Logger.error("Null Entry in depot.getEntries");
 					continue;
 				}
-				if (g.saldo == null || g.price == null || g.depotwert == null) {
+				if (g.saldo == null || g.depotwert == null) {
 					Logger.error("Eintrag ohne Saldo oder Wert. Saldo: " + g.saldo_type + " " + g.saldo + " " + "Wert: " + g.depotwert + " Price: " + g.pricetype + " " + g.pricequalifier + " " + g.price);
 					continue;
 				}
 				BigDecimal anzahl = g.saldo.getValue();
 				if(g.getEntries().length == 1) {
 					SubSaldo sub = g.getEntries()[0];
-					if("TAVI".equals(sub.qualifier)) { // TAVI = Total Available. Dies ist die eigentlich verfügbare Anzahl, falls g.saldo gerundet angegeben ist, zB. bei Depots der DKB 
+					if("TAVI".equals(sub.qualifier) && sub.saldo != null) { // TAVI = Total Available. Dies ist die eigentlich verfügbare Anzahl, falls g.saldo gerundet angegeben ist, zB. bei Depots der DKB
 						anzahl = sub.saldo.getValue();
 					}
 				}
+				BigDecimalValue preis = ermittle(g, anzahl);
+				if (preis == null) {
+					Logger.error("Eintrag ohne Kurs; keine Berechnung aus Positionswert und Stueckzahl moeglich. Saldo: " + g.saldo_type + " " + anzahl + " Wert: " + g.depotwert);
+					continue;
+				}
+				if (g.price == null) {
+					Logger.warn("Einzelkurs rechnerisch aus Positionswert und Stueckzahl ermittelt. ISIN: " + g.isin
+							+ " WKN: " + g.wkn + " Stueckzahl: " + anzahl + " Positionswert: " + g.depotwert + " Einzelkurs: " + preis);
+				}
 				subtotal = subtotal.add(g.depotwert.getValue());
-				Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, anzahl, g.price.getValue(),
-						g.price.getCurr(), g.depotwert.getValue(),  g.depotwert.getCurr(), depot.timestamp, g.timestamp_price);
+				Utils.addBestand(Utils.getORcreateWKN(g.wkn, g.isin, g.name), konto, anzahl, preis.getValue(),
+						preis.getCurr(), g.depotwert.getValue(),  g.depotwert.getCurr(), depot.timestamp, g.timestamp_price);
 			}
 			total = total.add((depot.total != null) ? depot.total.getValue() : subtotal); // Bei der DKB ist depot.total == null, wenn das Depot leer ist
 		}
@@ -172,6 +183,29 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 		}
 	}
 
+
+	/**
+	 * Liefert den Bankkurs oder einen rechnerischen Stueckkurs in der Waehrung
+	 * des Positionswertes. Nominalbestaende und Prozentkurse sind ungeeignet.
+	 * Die Anzahl muss der beim Import verwendeten (ggf. TAVI-)Stueckzahl entsprechen.
+	 */
+	private static BigDecimalValue ermittle(Gattung g, BigDecimal anzahl) {
+		if (g.price != null)
+			return g.price;
+		if (g.saldo_type != Entry.SALDO_TYPE_STCK || g.pricetype == Gattung.PRICE_TYPE_PRCT
+				|| anzahl == null || anzahl.signum() <= 0
+				|| g.depotwert == null || g.depotwert.getValue() == null
+				|| g.depotwert.getValue().signum() < 0)
+			return null;
+
+		String waehrung = g.depotwert.getCurr();
+		if (waehrung == null || !waehrung.matches("[A-Z]{3}"))
+			return null;
+
+		// Acht Nachkommastellen entsprechen der Kurs-Praezision der Datenbank.
+		BigDecimal kurs = g.depotwert.getValue().divide(anzahl, 8, RoundingMode.HALF_UP);
+		return new BigDecimalValue(kurs, waehrung);
+	}
 
 	/**
 	 * @see de.willuhn.jameica.hbci.server.hbci.AbstractHBCIJob#markFailed(java.lang.String)
