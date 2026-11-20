@@ -1,12 +1,14 @@
 package de.open4me.depot.hbcijobs;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.rmi.RemoteException;
 
 import org.kapott.hbci.GV_Result.GVRWPDepotList;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry.Gattung;
 import org.kapott.hbci.GV_Result.GVRWPDepotList.Entry.Gattung.SubSaldo;
+import org.kapott.hbci.structures.BigDecimalValue;
 
 import de.open4me.depot.abruf.impl.BasisDepotAbruf;
 import de.open4me.depot.abruf.utils.PropHelper;
@@ -135,6 +137,14 @@ public class HBCIDepotBestandJob extends AbstractHBCIJob
 				if (g == null) {
 					Logger.error("Null Entry in depot.getEntries");
 					continue;
+				}
+				if (g.price == null && g.saldo != null && g.depotwert != null
+						&& g.saldo_type == Entry.SALDO_TYPE_STCK && g.saldo.getValue().signum() != 0) {
+					// Manche Banken (z.B. Baader Bank) liefern Stueckzahl und Kurswert, aber keinen Kurs.
+					// Kurs dann aus Kurswert / Stueckzahl ableiten.
+					BigDecimal kurs = g.depotwert.getValue().divide(g.saldo.getValue(), 8, RoundingMode.HALF_UP);
+					g.price = new BigDecimalValue(kurs, g.depotwert.getCurr());
+					Logger.info("Kein Kurs von der Bank, aus Kurswert und Stueckzahl berechnet: " + g.isin + " " + g.price);
 				}
 				if (g.saldo == null || g.price == null || g.depotwert == null) {
 					Logger.error("Eintrag ohne Saldo oder Wert. Saldo: " + g.saldo_type + " " + g.saldo + " " + "Wert: " + g.depotwert + " Price: " + g.pricetype + " " + g.pricequalifier + " " + g.price);
