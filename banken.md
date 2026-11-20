@@ -19,6 +19,7 @@ Die Zugangsart ist auf HBCI zusetzen, nicht auf "Depot Viewer".
 | 1822direkt | ja | Nein | 4Q 2014 | |
 | ING-Diba | ja | Nein | 1Q 2017 | |
 | FLATEX | ja | ja | 1Q 2026 | |
+| Baader Bank (u.a. Oskar) | ja | Nein | 4Q 2026 | Liefert je Position Stückzahl und Kurswert, aber keinen Kurs. Der Kurs wird daraus berechnet. |
 Nicht unterstützte Banken
 
 | Bank | Stand | Anmerkungen |
